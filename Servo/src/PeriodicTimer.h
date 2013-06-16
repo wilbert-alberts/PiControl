@@ -24,20 +24,24 @@ public:
 	void start();
 	void stop();
 
-	unsigned long long getNrOverruns();
-	unsigned long long getMargin();
-
+	unsigned int getNrOverruns();
+	unsigned int getMargin();
+	unsigned int getMinMargin();
+	void resetStats();
 
 private:
 	int timer_fd;
 	unsigned int period;
-	unsigned long long wakeups_missed;
+	unsigned int wakeups_missed;
+	unsigned int minMargin;
+	unsigned int margin;
 	bool stopped;
 
 	std::vector<CallbackContext> callbacks;
 
 	void wait();
 	void setupTimer(unsigned int p);
+	void updateStats();
 };
 
 #endif /* PERIODICTIMER_H_ */

@@ -17,7 +17,8 @@
 
 PeriodicTimer::PeriodicTimer(unsigned int p)
 : timer_fd(0), period(p),
-  wakeups_missed(0), stopped(false)
+  wakeups_missed(0), stopped(false),
+  margin(0), minMargin(0)
 {
 }
 
@@ -69,6 +70,7 @@ void PeriodicTimer::start()
 			void* context = (*iter).second;
 			pf(context);
 		}
+		updateStats();
 		wait();
 	}
 	close(timer_fd);
@@ -98,17 +100,31 @@ void PeriodicTimer::wait()
 		wakeups_missed += (missed - 1);
 }
 
-unsigned long long PeriodicTimer::getNrOverruns() {
+unsigned int PeriodicTimer::getNrOverruns() {
 	return wakeups_missed;
 }
 
-unsigned long long PeriodicTimer::getMargin() {
+void PeriodicTimer::updateStats() {
 	 struct itimerspec m;
 	 int ret = timerfd_gettime(timer_fd, &m);
 	 if (ret== -1)  {
 		 perror("Reading margin");
-		 return 0;
 	 }
-	 return m.it_value.tv_nsec;
-
+	 margin = m.it_value.tv_nsec / 1000;
+	 minMargin = margin<minMargin? margin: minMargin;
 }
+
+unsigned int PeriodicTimer::getMargin() {
+	return margin;
+}
+
+unsigned int PeriodicTimer::getMinMargin() {
+	return minMargin;
+}
+
+void PeriodicTimer::resetStats(){
+	margin = period;
+	minMargin = period;
+	wakeups_missed = 0;
+}
+

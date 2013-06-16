@@ -5,38 +5,39 @@
 
 #include "PeriodicTimer.h"
 
-static DoubleBuffer* db;
+#include "Parameter.h"
 
-void count(void* context);
+#include "TimeStats.h"
+
 
 int main(int argc, char* argv[])
 {
 	PeriodicTimer* pt;
+	DoubleBuffer*  db;
+	TimeStats*     ts;
 
 	db = new DoubleBuffer_Imp();
 	db->create(1024);
 
 	pt = new PeriodicTimer(1000000);
-	pt->addPeriodicFunction(count, pt);
+	ts = new TimeStats(pt, db);
+
+	pt->addPeriodicFunction(lockDB, pt);
+	pt->addPeriodicFunction(TimeStats::tick, ts);
+	pt->addPeriodicFunction(unlockDB, pt);
+
 	pt->start();
-   return 0;
+    return 0;
 }
 
-void count(void* context) {
-	int ctr;
-	void* p;
-	PeriodicTimer* pt = static_cast<PeriodicTimer*>(context);
 
+
+void lockDB(void* context) {
+	DoubleBuffer* db = static_cast<DoubleBuffer*>(context);
 	db->lock();
+}
 
-	p = db->get();
-
-	ctr = *(int*)p;
-	ctr = ctr+1;
-	*(int*)p=ctr;
-
-	std::cout << "Operated on: " << p <<", wrote: " << ctr <<  std::endl;
-	std::cout << "  margin: " << pt->getMargin()/1000 << std::endl;
-
+void unlockDB(void* context) {
+	DoubleBuffer* db = static_cast<DoubleBuffer*>(context);
 	db->unlock();
 }
