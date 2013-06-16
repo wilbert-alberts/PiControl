@@ -1,16 +1,16 @@
 /*
- * ParamStore.cpp
+ * Parameter.cpp
  *
  *  Created on: Jun 15, 2013
  *      Author: wilbert
  */
 
 #include <string.h>
-#include <iostream>
 #include <stdlib.h>
+#include <iostream>
+#include <string>
 
-
-#include "ParamStore.h"
+#include "Parameter.h"
 #include "DoubleBuffer.h"
 
 #define MAXNAMESIZE (64)
@@ -25,53 +25,32 @@ typedef struct {
 	DB_Parameter params[];
 } DB_mem;
 
-ParamStore::ParamStore(DoubleBuffer* _db)
-:db(_db)
-{
-	// TODO Auto-generated constructor stub
 
-}
-
-ParamStore::~ParamStore() {
-	// TODO Auto-generated destructor stub
-}
-
-Parameter* ParamStore::createParameter(const std::string& name)
+Parameter::Parameter(DoubleBuffer* _db, const std::string& name)
+: db(_db)
 {
 	DB_mem* p=static_cast<DB_mem*>(db->get());
 
-	int parIdx = p->nrParameters;
+	idx = p->nrParameters;
 
-	DB_Parameter* par = (p->params)+(parIdx);
+	DB_Parameter* par = (p->params)+(idx);
 
 	strncpy(par->name, name.c_str(), MAXNAMESIZE-1);
 	par->value = 0.0;
 
-	return new Parameter(db, parIdx);
+	p->nrParameters++;
 }
 
-int ParamStore::getNrParameters() {
-	DB_mem* p=static_cast<DB_mem*>(db->get());
-	return p->nrParameters;
-}
-
-Parameter* ParamStore::getParameter(int i)
+Parameter::Parameter(DoubleBuffer* _db, int i)
+: db(_db),idx(i)
 {
 	DB_mem* p=static_cast<DB_mem*>(db->get());
-	if (i<p->nrParameters)
-		return new Parameter(db, i);
-	else {
+	if (i>=p->nrParameters) {
 		std::cerr << "Trying to retrieve Parameter by illegal index" <<  std::endl;
 		exit(-1);
 	}
-	return 0;
 }
 
-Parameter::Parameter(DoubleBuffer* _db, int _i)
-: db(_db), idx(_i)
-{
-
-}
 
 Parameter::~Parameter() {
 
@@ -107,3 +86,9 @@ void Parameter::set(double v) {
 
 	par->value = v;
 }
+
+int Parameter::getNrParameters(DoubleBuffer* db) {
+	DB_mem* p=static_cast<DB_mem*>(db->get());
+	return p->nrParameters;
+}
+

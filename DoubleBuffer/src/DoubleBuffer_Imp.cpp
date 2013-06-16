@@ -12,7 +12,7 @@
 #include <assert.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include <string.h>
+#include <cstring>
 #include <sys/types.h>
 #include <stdio.h>
 #include <errno.h>
@@ -62,10 +62,14 @@ void DoubleBuffer_Imp::create(int size) {
 
 	page0 = mmap(0, (size+sizeof(int))*2, PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0);
 
+	memset(page0, 0, (size+sizeof(int))*2);
+
 	if (page0 == MAP_FAILED) {
 		perror("Error, unable to map shared memory");
 		exit(-1);
 	}
+
+
 
 	char* p1 = static_cast<char*>(page0);
 	page1 = static_cast<void*>(p1+size+sizeof(int));

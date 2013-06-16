@@ -8,17 +8,20 @@
 #ifndef TIMESTATS_H_
 #define TIMESTATS_H_
 
+class PeriodicTimer;
+class Parameter;
+class DoubleBuffer;
+
 class TimeStats {
 public:
-	TimeStats(PeriodicTimer* pt,
-	        DoubleBuffer*   db);
+	TimeStats(PeriodicTimer* pt, DoubleBuffer* db);
 	virtual ~TimeStats();
 
 	static void tick(void*);
 
 private:
 	PeriodicTimer*  pt;
-	DoubleBuffer*   db;
-	Parameter*      par;};
+	Parameter*      par;
+};
 
 #endif /* TIMESTATS_H_ */

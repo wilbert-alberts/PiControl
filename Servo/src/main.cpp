@@ -10,6 +10,10 @@
 #include "TimeStats.h"
 
 
+
+void lockDB(void* context);
+void unlockDB(void* context);
+
 int main(int argc, char* argv[])
 {
 	PeriodicTimer* pt;
@@ -20,11 +24,15 @@ int main(int argc, char* argv[])
 	db->create(1024);
 
 	pt = new PeriodicTimer(1000000);
-	ts = new TimeStats(pt, db);
 
-	pt->addPeriodicFunction(lockDB, pt);
+	db->lock();
+	ts = new TimeStats(pt, db);
+	db->copyTo();
+	db->unlock();
+
+	pt->addPeriodicFunction(lockDB, db);
 	pt->addPeriodicFunction(TimeStats::tick, ts);
-	pt->addPeriodicFunction(unlockDB, pt);
+	pt->addPeriodicFunction(unlockDB, db);
 
 	pt->start();
     return 0;

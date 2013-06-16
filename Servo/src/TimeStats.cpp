@@ -5,14 +5,31 @@
  *      Author: wilbert
  */
 
+#include <iostream>
+
 #include "TimeStats.h"
 
-TimeStats::TimeStats() {
-	// TODO Auto-generated constructor stub
+#include "Parameter.h"
+#include "DoubleBuffer.h"
+#include "PeriodicTimer.h"
 
+TimeStats::TimeStats(PeriodicTimer* _pt, DoubleBuffer* db)
+: pt(_pt)
+{
+	// TODO Auto-generated constructor stub
+	par = new Parameter(db, "sampleDuration");
 }
 
 TimeStats::~TimeStats() {
 	// TODO Auto-generated destructor stub
+}
+
+void TimeStats::tick(void* context)
+{
+	TimeStats* my = static_cast<TimeStats*>(context);
+
+	my->par->set(1000000-my->pt->getMargin());
+
+	std::cout << "." << std::endl;
 }
 
