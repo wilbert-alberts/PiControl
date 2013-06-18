@@ -36,13 +36,13 @@ DoubleBuffer_Imp::~DoubleBuffer_Imp() {
 }
 
 void DoubleBuffer_Imp::initSemaphores() {
-	semLock0 = sem_open(DB_LOCK0_ID, O_CREAT, S_IRUSR | S_IWUSR, 1);
-	if (semLock0 == SEM_FAILED ) {
+	pageHandles[0].sem = sem_open(DB_LOCK0_ID, O_CREAT, S_IRUSR | S_IWUSR, 1);
+	if (pageHandles[0].sem == SEM_FAILED ) {
 		perror("Error, unable to create semaphore");
 		exit(-1);
 	}
-	semLock1 = sem_open(DB_LOCK1_ID, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR, 1);
-	if (semLock1 == SEM_FAILED ) {
+	pageHandles[1].sem = sem_open(DB_LOCK1_ID, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR, 1);
+	if (pageHandles[1].sem == SEM_FAILED ) {
 		perror("Error, unable to create semaphore");
 		exit(-1);
 	}
@@ -60,21 +60,21 @@ void DoubleBuffer_Imp::create(int size) {
 		exit(-1);
 	}
 
-	page0 = mmap(0, (size+sizeof(int))*2, PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0);
+	pageHandles[0].page = mmap(0, (size+sizeof(int))*2, PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0);
 
-	memset(page0, 0, (size+sizeof(int))*2);
+	memset(pageHandles[0].page, 0, (size+sizeof(int))*2);
 
-	if (page0 == MAP_FAILED) {
+	if (pageHandles[0].page == MAP_FAILED) {
 		perror("Error, unable to map shared memory");
 		exit(-1);
 	}
 
 
 
-	char* p1 = static_cast<char*>(page0);
-	page1 = static_cast<void*>(p1+size+sizeof(int));
-	*((int*)page0)=size;
-	*((int*)page1)=size;
+	char* p1 = static_cast<char*>(pageHandles[0].page);
+	pageHandles[1].page = static_cast<void*>(p1+size+sizeof(int));
+	*((int*)pageHandles[0].page)=size;
+	*((int*)pageHandles[1].page)=size;
 
 	created=true;
 
@@ -88,15 +88,15 @@ void DoubleBuffer_Imp::connect() {
 		exit(-1);
 	}
 
-	page0 = mmap(0, sizeof(int), PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0);
+	pageHandles[0].page = mmap(0, sizeof(int), PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0);
 
-	size = ((int*)page0)[0];
+	size = ((int*)pageHandles[0].page)[0];
 	if (ftruncate(shmfd, (size+sizeof(int))*2)==-1) {
 		perror("Error, unable to set length of shared memory");
 		exit(-1);
 	}
 
-	if (page0 == MAP_FAILED) {
+	if (pageHandles[0].page == MAP_FAILED) {
 		perror("Error, unable to map shared memory");
 		exit(-1);
 	}
@@ -106,70 +106,69 @@ void DoubleBuffer_Imp::connect() {
 	initSemaphores();
 }
 
-void DoubleBuffer_Imp::lock0() {
-	// Try to get page0;
-	int r = sem_wait(semLock0);
+void DoubleBuffer_Imp::lock(int page) {
+	int r = sem_wait(pageHandles[page].sem);
 	if (r == -1) {
 		perror("Error while locking in sem_wait: ");
 	}
-	locked0 = true;
+	pageHandles[page].locked = true;
 }
 
-void DoubleBuffer_Imp::lock1() {
-	// Try to get page1
-	int r = sem_wait(semLock1);
-	if (r == -1) {
-		perror("Error while locking in sem_wait: ");
+void DoubleBuffer_Imp::lockAny() {
+	int idx;
+	
+	if (buffer == pageHandles[0].page) {
+		// Start with try to lock page 1
+		idx = 1;
+	}		
+	else {
+		// Start with try to lock page 1
+		idx = 0;
 	}
-	locked1 = true;
+	
+	while (1) {
+		int r;
+		r = sem_trywait(pageHandles[idx].sem);
+		if (r==0) {
+			pageHandles[idx].locked=true;
+			buffer=pageHandles[idx].page;
+			return;
+		}
+		// Try to lock the other page.
+		idx = 1-idx;
+	}			
 }
 
 void DoubleBuffer_Imp::lock() {
 	assert(created);
 
-	// Find out which buffer to lock
-	if (buffer == page0) {
-		// Try to get page1
-		lock1();
-		buffer=page1;
-	} else {
-		// Try to get page0;
-		lock0();
-		buffer=page0;
-	}
+	lockAny();
+	return;
 }
 
-void DoubleBuffer_Imp::unlock1() {
-	locked1 = false;
-	int r = sem_post(semLock1);
+void DoubleBuffer_Imp::unlock(int page) {
+	pageHandles[page].locked = false;
+	int r = sem_post(pageHandles[page].sem);
 	if (r == -1) {
 		perror("Error unlocking: ");
 	}
 }
-
-void DoubleBuffer_Imp::unlock0() {
-	locked0 = false;
-	int r = sem_post(semLock0);
-	if (r == -1) {
-		perror("Error unlocking: ");
-	}
-}
-
 void DoubleBuffer_Imp::unlock() {
 	assert(created);
 
-	if (locked1) {
-		unlock1();
+	if (pageHandles[1].locked) {
+		unlock(1);
+		return;
 	}
-	if (locked0) {
-		unlock0();
+	if (pageHandles[0].locked) {
+		unlock(0);
 	}
 }
 
 void* DoubleBuffer_Imp::get() {
 	assert(created);
 
-	if (!(locked0 || locked1))
+	if (!(pageHandles[0].locked || pageHandles[1].locked))
 		std::cerr << "Error: No buffer locked" << std::endl;
 	char* p = static_cast<char*>(buffer);
 	p = p+sizeof(int);
@@ -180,43 +179,31 @@ void* DoubleBuffer_Imp::get() {
 void DoubleBuffer_Imp::copyFrom() {
 	char* src;
 	char* dst;
+	int other;
 
-	if (!(locked0 || locked1))
+	if (!(pageHandles[0].locked || pageHandles[1].locked))
 		std::cerr << "Error: No buffer locked" << std::endl;
-	if (buffer==page0) {
-		lock1();
-		src= static_cast<char*>(page1);
-		dst= static_cast<char*>(page0);
-		memcpy (dst, src, size+sizeof(int));
-		unlock1();
-	}
-	else {
-		lock0();
-		src= static_cast<char*>(page0);
-		dst= static_cast<char*>(page1);
-		memcpy (dst, src, size+sizeof(int));
-		unlock0();
-	}
+
+	other = (buffer==pageHandles[0].page) ? 1 : 0;
+	lock(other);
+	src= static_cast<char*>(pageHandles[other].page);
+	dst= static_cast<char*>(pageHandles[1-other].page);
+	memcpy (dst, src, size+sizeof(int));
+	unlock(other);
 }
 
 void DoubleBuffer_Imp::copyTo() {
 	char* src;
 	char* dst;
+	int other;
 
-	if (!(locked0 || locked1))
+	if (!(pageHandles[0].locked || pageHandles[1].locked))
 		std::cerr << "Error: No buffer locked" << std::endl;
-	if (buffer==page0) {
-		lock1();
-		src= static_cast<char*>(page0);
-		dst= static_cast<char*>(page1);
-		memcpy (dst, src, size+sizeof(int));
-		unlock1();
-	}
-	else {
-		lock0();
-		src= static_cast<char*>(page1);
-		dst= static_cast<char*>(page0);
-		memcpy (dst, src, size+sizeof(int));
-		unlock0();
-	}
+
+	other = (buffer==pageHandles[0].page) ? 1 : 0;
+	lock(other);
+	src= static_cast<char*>(pageHandles[1-other].page);
+	dst= static_cast<char*>(pageHandles[other].page);
+	memcpy (dst, src, size+sizeof(int));
+	unlock(other);
 }

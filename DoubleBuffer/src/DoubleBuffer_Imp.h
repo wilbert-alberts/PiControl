@@ -33,23 +33,22 @@ public:
 
 
 private:
-	sem_t* semLock0;
-	bool   locked0;
-	void*  page0;
+	struct PageHandle {
+		sem_t* sem;
+		bool   locked;
+		void*  page;
+	};
 
-	sem_t* semLock1;
-	bool   locked1;
-	void*  page1;
+	PageHandle pageHandles[2];
 
 	int    size;
 	void*  buffer;
 	int    shmfd;
 	bool   created;
 
-	void lock0();
-	void lock1();
-	void unlock1();
-	void unlock0();
+	void lockAny();
+	void lock(int page);
+	void unlock(int page);
 	void initSemaphores();
 };
 
