@@ -113,6 +113,7 @@ void PeriodicTimer::updateStats() {
 	 }
 	 margin = m.it_value.tv_nsec / 1000;
 	 minMargin = margin<minMargin? margin: minMargin;
+	 maxMargin = margin>maxMargin? margin: maxMargin;
 }
 
 unsigned int PeriodicTimer::getMargin() {
@@ -123,6 +124,10 @@ unsigned int PeriodicTimer::getMinMargin() {
 	return minMargin;
 }
 
+unsigned int PeriodicTimer::getMaxMargin() {
+	return maxMargin;
+}
+
 unsigned int PeriodicTimer::getPeriod() {
 	return period;
 }
@@ -130,6 +135,7 @@ unsigned int PeriodicTimer::getPeriod() {
 void PeriodicTimer::resetStats(){
 	margin = period;
 	minMargin = period;
+	maxMargin = 0;
 	wakeups_missed = 0;
 }
 
