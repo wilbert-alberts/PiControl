@@ -17,8 +17,9 @@
 
 PeriodicTimer::PeriodicTimer(unsigned int p)
 : timer_fd(0), period(p),
-  wakeups_missed(0), stopped(false),
-  margin(0), minMargin(0)
+  wakeups_missed(0),
+  margin(0), minMargin(0),
+  stopped(false)
 {
 }
 
@@ -120,6 +121,10 @@ unsigned int PeriodicTimer::getMargin() {
 
 unsigned int PeriodicTimer::getMinMargin() {
 	return minMargin;
+}
+
+unsigned int PeriodicTimer::getPeriod() {
+	return period;
 }
 
 void PeriodicTimer::resetStats(){

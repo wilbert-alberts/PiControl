@@ -27,14 +27,15 @@ public:
 	unsigned int getNrOverruns();
 	unsigned int getMargin();
 	unsigned int getMinMargin();
+	unsigned int getPeriod();
 	void resetStats();
 
 private:
 	int timer_fd;
 	unsigned int period;
 	unsigned int wakeups_missed;
-	unsigned int minMargin;
 	unsigned int margin;
+	unsigned int minMargin;
 	bool stopped;
 
 	std::vector<CallbackContext> callbacks;
