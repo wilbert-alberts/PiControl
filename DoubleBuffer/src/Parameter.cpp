@@ -32,7 +32,7 @@ Parameter::Parameter(DoubleBuffer* _db, const std::string& name)
 	DB_mem* p=static_cast<DB_mem*>(db->get());
 
 	idx = findParameter(_db, name);
-	if (idx<1) {
+	if (idx<0) {
 		// Create parameter in double buffer.
 		idx = p->nrParameters;
 		p->nrParameters++;
