@@ -18,7 +18,6 @@ int main(int argc, char* argv[])
 {
 	PeriodicTimer* pt;
 	DoubleBuffer*  db;
-	TimeStats*     ts;
 
 	db = new DoubleBuffer_Imp();
 	db->create(1024);
@@ -26,12 +25,12 @@ int main(int argc, char* argv[])
 	pt = new PeriodicTimer(1000000);
 
 	db->lock();
-	ts = new TimeStats(pt, db);
+	TimeStats::initSample(db,pt);
 	db->copyTo();
 	db->unlock();
 
 	pt->addPeriodicFunction(lockDB, db);
-	pt->addPeriodicFunction(TimeStats::tick, ts);
+	pt->addPeriodicFunction(TimeStats::sampleCommand, pt);
 	pt->addPeriodicFunction(unlockDB, db);
 
 	pt->start();
