@@ -28,8 +28,8 @@ void TimeStats::tick(void* context)
 {
 	TimeStats* my = static_cast<TimeStats*>(context);
 
-	my->par->set(1000000-my->pt->getMargin());
+	my->par->set(my->pt->getPeriod()-my->pt->getMargin());
 
-	std::cout << "." << std::endl;
+//	std::cout << "." << std::endl;
 }
 
