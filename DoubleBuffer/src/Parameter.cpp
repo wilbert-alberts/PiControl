@@ -31,37 +31,19 @@ Parameter::Parameter(DoubleBuffer* _db, const std::string& name)
 {
 	DB_mem* p=static_cast<DB_mem*>(db->get());
 
-	idx = p->nrParameters;
-
-	DB_Parameter* par = (p->params)+(idx);
-
-	strncpy(par->name, name.c_str(), MAXNAMESIZE-1);
-	par->value = 0.0;
-
-	p->nrParameters++;
-}
-
-Parameter::Parameter(DoubleBuffer* _db, int i)
-: db(_db),idx(i)
-{
-	DB_mem* p=static_cast<DB_mem*>(db->get());
-	if (i>=p->nrParameters) {
-		std::cerr << "Trying to retrieve Parameter by illegal index" <<  std::endl;
-		exit(-1);
+	idx = findParameter(_db, name);
+	if (idx<1) {
+		// Create parameter in double buffer.
+		idx = p->nrParameters;
+		p->nrParameters++;
+		DB_Parameter* par = (p->params)+(idx);
+		strncpy(par->name, name.c_str(), MAXNAMESIZE-1);
+		par->value = 0.0;
 	}
 }
 
-
 Parameter::~Parameter() {
 
-}
-
-void Parameter::getName(std::string& n) {
-	DB_mem* p=static_cast<DB_mem*>(db->get());
-	DB_Parameter* par = &p->params[idx];
-	std::string result;
-
-	result.assign(par->name);
 }
 
 std::string Parameter::getName() {
@@ -90,5 +72,16 @@ void Parameter::set(double v) {
 int Parameter::getNrParameters(DoubleBuffer* db) {
 	DB_mem* p=static_cast<DB_mem*>(db->get());
 	return p->nrParameters;
+}
+
+int Parameter::findParameter(DoubleBuffer* db, const std::string& name) 
+{
+	DB_mem* p=static_cast<DB_mem*>(db->get());
+	for (int i=0; i<p->nrParameters; i++) {
+		if (strncmp(name.c_str(), p->params[i].name,MAXNAMESIZE-1)==0) {
+			return i;
+		}
+	}
+	return  -1;
 }
 

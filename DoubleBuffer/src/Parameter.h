@@ -17,15 +17,14 @@ class DoubleBuffer;
 class Parameter {
 public:
 	Parameter(DoubleBuffer* db, const std::string& name);
-	Parameter(DoubleBuffer* db, int idx);
 	virtual ~Parameter();
 
-	void getName(std::string& name);
 	std::string getName();
 	double get();
 	void set(double v);
 
 	static int getNrParameters(DoubleBuffer* db);
+	static int findParameter(DoubleBuffer* db, const std::string& name);
 
 private:
 	DoubleBuffer* db;
