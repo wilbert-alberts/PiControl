@@ -1,35 +1,58 @@
 /*
  * TimeStats.cpp
  *
- *  Created on: Jun 16, 2013
+ *  Created on: Jun 18, 2013
  *      Author: wilbert
  */
 
 #include <iostream>
-
-#include "TimeStats.h"
+#include <string>
+#include <cstring>
 
 #include "Parameter.h"
-#include "DoubleBuffer.h"
+#include "TimeStats.h"
 #include "PeriodicTimer.h"
 
-TimeStats::TimeStats(PeriodicTimer* _pt, DoubleBuffer* db)
-: pt(_pt)
-{
+const std::string TimeStats::par_minMargin("minMargin");
+const std::string TimeStats::par_maxMargin("maxMargin");
+const std::string TimeStats::par_margin("margin");
+const std::string TimeStats::par_reset("reset");
+
+
+Parameter* TimeStats::minMargin = 0;
+Parameter* TimeStats::maxMargin = 0;
+Parameter* TimeStats::margin = 0;
+Parameter* TimeStats::reset = 0;
+
+TimeStats::TimeStats() {
 	// TODO Auto-generated constructor stub
-	par = new Parameter(db, "sampleDuration");
+
 }
 
 TimeStats::~TimeStats() {
 	// TODO Auto-generated destructor stub
 }
 
-void TimeStats::tick(void* context)
+void TimeStats::initSample(DoubleBuffer* db, PeriodicTimer* pt)
 {
-	TimeStats* my = static_cast<TimeStats*>(context);
+	minMargin = new Parameter(db, par_minMargin);
+	maxMargin = new Parameter(db, par_maxMargin);
+	margin = new Parameter(db, par_margin);
+	reset = new Parameter(db, par_reset);
 
-	my->par->set(my->pt->getPeriod()-my->pt->getMargin());
-
-//	std::cout << "." << std::endl;
+	pt->resetStats();
 }
 
+void TimeStats::sampleCommand(void* context)
+{
+	PeriodicTimer* pt = static_cast<PeriodicTimer*>(context);
+
+	margin->set(pt->getMargin());
+	minMargin->set(pt->getMinMargin());
+	maxMargin->set(pt->getMaxMargin());
+
+	if (reset->get() > 0.0) {
+		pt->resetStats();
+		reset->set(0.0);
+	}
+}
