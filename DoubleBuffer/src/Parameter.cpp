@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <string>
+#include <assert.h>
 
 #include "Parameter.h"
 #include "DoubleBuffer.h"
@@ -55,6 +56,12 @@ std::string Parameter::getName() {
 	return result;
 }
 
+std::string Parameter::getNameByIdx(DoubleBuffer* db, int i) {
+	DB_mem* p=static_cast<DB_mem*>(db->get());
+	DB_Parameter* par = &p->params[i];
+	return std::string(par->name);
+}
+
 double Parameter::get() {
 	DB_mem* p=static_cast<DB_mem*>(db->get());
 	DB_Parameter* par = &p->params[idx];
@@ -62,9 +69,29 @@ double Parameter::get() {
 	return par->value;
 }
 
+double Parameter::getByIdx(DoubleBuffer* db, int i) {
+	DB_mem* p=static_cast<DB_mem*>(db->get());
+
+	assert(i<p->nrParameters);
+
+	DB_Parameter* par = &p->params[i];
+
+	return par->value;
+}
+
 void Parameter::set(double v) {
 	DB_mem* p=static_cast<DB_mem*>(db->get());
 	DB_Parameter* par = &p->params[idx];
+
+	par->value = v;
+}
+
+void Parameter::setByIdx(DoubleBuffer* db, int i, double v) {
+	DB_mem* p=static_cast<DB_mem*>(db->get());
+
+	assert(i<p->nrParameters);
+
+	DB_Parameter* par = &p->params[i];
 
 	par->value = v;
 }

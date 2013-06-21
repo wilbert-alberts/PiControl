@@ -26,6 +26,10 @@ public:
 	static int getNrParameters(DoubleBuffer* db);
 	static int findParameter(DoubleBuffer* db, const std::string& name);
 
+	static void setByIdx(DoubleBuffer* db, int i, double v);
+	static double getByIdx(DoubleBuffer* db, int i);
+	static std::string getNameByIdx(DoubleBuffer* db, int i);
+
 private:
 	DoubleBuffer* db;
 	int idx;
