@@ -13,14 +13,16 @@
 #include <stdlib.h>
 
 #include "PeriodicTimer.h"
+#include "Parameter.h"
+#include "DoubleBuffer.h"
 
-
-PeriodicTimer::PeriodicTimer(unsigned int p)
+PeriodicTimer::PeriodicTimer(DoubleBuffer* db, unsigned int p)
 : timer_fd(0), period(p),
   wakeups_missed(0),
-  margin(0), minMargin(0),
+  margin(0), minMargin(0), maxMargin(p),
   stopped(false)
 {
+	par_stopRunning = new Parameter(db, "PeriodicTimer.stopRunning");
 }
 
 PeriodicTimer::~PeriodicTimer() {
@@ -77,9 +79,10 @@ void PeriodicTimer::start()
 	close(timer_fd);
 }
 
-void PeriodicTimer::stop()
+void PeriodicTimer::checkStop(void* context)
 {
-	stopped=true;
+	PeriodicTimer* me = static_cast<PeriodicTimer*>(context);
+	me->stopped = me->par_stopRunning->get()!=0.0;
 }
 
 void PeriodicTimer::wait()

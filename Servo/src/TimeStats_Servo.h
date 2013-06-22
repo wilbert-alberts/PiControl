@@ -5,19 +5,21 @@
  *      Author: wilbert
  */
 
-#ifndef TIMESTATS_H_
-#define TIMESTATS_H_
+#ifndef TIMESTATS_SERVO_H_
+#define TIMESTATS_SERVO_H_
 
 #include <string>
+
+#include "TimeStats.h"
 
 class DoubleBuffer;
 class Parameter;
 class PeriodicTimer;
 
-class TimeStats {
+class TimeStats_Servo : TimeStats {
 public:
-	TimeStats();
-	virtual ~TimeStats();
+	TimeStats_Servo();
+	virtual ~TimeStats_Servo();
 
 	static void initSample(DoubleBuffer* db, PeriodicTimer* pt);
 	static void sampleCommand(void* context);
@@ -27,11 +29,6 @@ private:
 	static Parameter* maxMargin;
 	static Parameter* reset;
 	static Parameter* margin;
-
-	static const std::string par_minMargin;
-	static const std::string par_maxMargin;
-	static const std::string par_margin;
-	static const std::string par_reset;
 };
 
 #endif /* TIMESTATS_H_ */

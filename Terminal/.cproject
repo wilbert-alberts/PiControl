@@ -25,6 +25,7 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1563122166" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1893106161" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/DoubleBuffer/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/src}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.220924231" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -38,11 +39,13 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.144921279" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1935048784" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="DoubleBuffer"/>
+									<listOptionValue builtIn="false" value="Common"/>
 									<listOptionValue builtIn="false" value="pthread"/>
 									<listOptionValue builtIn="false" value="rt"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.429926931" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/DoubleBuffer/Debug}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/Debug}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.820512429" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -121,16 +124,16 @@
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.826681767;cdt.managedbuild.config.gnu.exe.debug.826681767.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.281053842;cdt.managedbuild.tool.gnu.c.compiler.input.827985915">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile"/>
+			<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile"/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.344119406;cdt.managedbuild.config.gnu.exe.release.344119406.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1616542034;cdt.managedbuild.tool.gnu.cpp.compiler.input.785295759">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.826681767;cdt.managedbuild.config.gnu.exe.debug.826681767.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1211593779;cdt.managedbuild.tool.gnu.cpp.compiler.input.220924231">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile"/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.344119406;cdt.managedbuild.config.gnu.exe.release.344119406.;cdt.managedbuild.tool.gnu.c.compiler.exe.release.40911654;cdt.managedbuild.tool.gnu.c.compiler.input.556479285">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.826681767;cdt.managedbuild.config.gnu.exe.debug.826681767.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1211593779;cdt.managedbuild.tool.gnu.cpp.compiler.input.220924231">
+			<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile"/>
 		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

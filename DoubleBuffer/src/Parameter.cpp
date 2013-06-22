@@ -16,6 +16,9 @@
 
 #define MAXNAMESIZE (64)
 
+const std::string Parameter::dumpAllParametersCommand("dumpParameters");
+
+
 typedef struct {
 	double value;
 	char   name[MAXNAMESIZE];
@@ -112,3 +115,16 @@ int Parameter::findParameter(DoubleBuffer* db, const std::string& name)
 	return  -1;
 }
 
+void Parameter::execDumpAllParameters(DoubleBuffer* db, int argc, char* argv[])
+{
+	if (argc!=1) {
+		std::cerr << "Usage: "<< dumpAllParametersCommand << std:: endl;
+		exit (-1);
+	}
+
+	for (int i=0; i<Parameter::getNrParameters(db); i++) {
+		std::string parname = Parameter::getNameByIdx(db, i);
+		double value = Parameter::getByIdx(db, i);
+		std::cout << parname << "\t" << value << std::endl;
+	}
+}

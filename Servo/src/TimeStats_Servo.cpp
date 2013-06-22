@@ -10,30 +10,24 @@
 #include <cstring>
 
 #include "Parameter.h"
-#include "TimeStats.h"
+#include "TimeStats_Servo.h"
 #include "PeriodicTimer.h"
 
-const std::string TimeStats::par_minMargin("minMargin");
-const std::string TimeStats::par_maxMargin("maxMargin");
-const std::string TimeStats::par_margin("margin");
-const std::string TimeStats::par_reset("reset");
+Parameter* TimeStats_Servo::minMargin = 0;
+Parameter* TimeStats_Servo::maxMargin = 0;
+Parameter* TimeStats_Servo::margin = 0;
+Parameter* TimeStats_Servo::reset = 0;
 
-
-Parameter* TimeStats::minMargin = 0;
-Parameter* TimeStats::maxMargin = 0;
-Parameter* TimeStats::margin = 0;
-Parameter* TimeStats::reset = 0;
-
-TimeStats::TimeStats() {
+TimeStats_Servo::TimeStats_Servo() {
 	// TODO Auto-generated constructor stub
 
 }
 
-TimeStats::~TimeStats() {
+TimeStats_Servo::~TimeStats_Servo() {
 	// TODO Auto-generated destructor stub
 }
 
-void TimeStats::initSample(DoubleBuffer* db, PeriodicTimer* pt)
+void TimeStats_Servo::initSample(DoubleBuffer* db, PeriodicTimer* pt)
 {
 	minMargin = new Parameter(db, par_minMargin);
 	maxMargin = new Parameter(db, par_maxMargin);
@@ -43,7 +37,7 @@ void TimeStats::initSample(DoubleBuffer* db, PeriodicTimer* pt)
 	pt->resetStats();
 }
 
-void TimeStats::sampleCommand(void* context)
+void TimeStats_Servo::sampleCommand(void* context)
 {
 	PeriodicTimer* pt = static_cast<PeriodicTimer*>(context);
 

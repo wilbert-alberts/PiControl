@@ -7,8 +7,8 @@
 
 #include "Parameter.h"
 
-#include "TimeStats.h"
-
+#include "TimeStats_Servo.h"
+#include "Traces_Servo.h"
 
 
 void lockDB(void* context);
@@ -18,19 +18,24 @@ int main(int argc, char* argv[])
 {
 	PeriodicTimer* pt;
 	DoubleBuffer*  db;
+	Traces*        traces;
 
 	db = new DoubleBuffer_Imp();
 	db->create(1024);
 
-	pt = new PeriodicTimer(1000000);
+
 
 	db->lock();
-	TimeStats::initSample(db,pt);
+	pt = new PeriodicTimer(db,1000000);
+	TimeStats_Servo::initSample(db,pt);
+	traces = Traces_Servo::getInstance(db);
 	db->copyTo();
 	db->unlock();
 
 	pt->addPeriodicFunction(lockDB, db);
-	pt->addPeriodicFunction(TimeStats::sampleCommand, pt);
+	pt->addPeriodicFunction(Traces_Servo::sampleAllTraces, db);
+	pt->addPeriodicFunction(TimeStats_Servo::sampleCommand, pt);
+	pt->addPeriodicFunction(PeriodicTimer::checkStop, pt);
 	pt->addPeriodicFunction(unlockDB, db);
 
 	pt->start();

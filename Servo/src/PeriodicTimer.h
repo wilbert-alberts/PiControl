@@ -14,15 +14,18 @@ typedef void (*PeriodicFunction)(void* context);
 
 typedef std::pair<PeriodicFunction, void*> CallbackContext;
 
+class DoubleBuffer;
+class Parameter;
+
 class PeriodicTimer {
 public:
-	PeriodicTimer(unsigned int periodInUs);
+	PeriodicTimer(DoubleBuffer* db,unsigned int periodInUs);
 	virtual ~PeriodicTimer();
 
 	void addPeriodicFunction(PeriodicFunction pf, void* context);
 
 	void start();
-	void stop();
+	static void checkStop(void* context);
 
 	unsigned int getNrOverruns();
 	unsigned int getMargin();
@@ -30,6 +33,8 @@ public:
 	unsigned int getMaxMargin();
 	unsigned int getPeriod();
 	void resetStats();
+
+	static const std::string parid_stopRunning;
 
 private:
 	int timer_fd;
@@ -39,6 +44,8 @@ private:
 	unsigned int minMargin;
 	unsigned int maxMargin;
 	bool stopped;
+
+	Parameter* par_stopRunning;
 
 	std::vector<CallbackContext> callbacks;
 

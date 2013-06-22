@@ -21,9 +21,9 @@
 
 #include "DoubleBuffer_Imp.h"
 
-static const char* DB_MEM_ID = "/DB.mem";
-static const char* DB_LOCK0_ID = "DB.lock0";
-static const char* DB_LOCK1_ID = "DB.lock1";
+static const char* DB_MEM_ID = "/mem.DB.pages";
+static const char* DB_LOCK0_ID = "/DB.lock0";
+static const char* DB_LOCK1_ID = "/DB.lock1";
 
 
 DoubleBuffer_Imp::DoubleBuffer_Imp() {

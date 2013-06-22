@@ -23,6 +23,9 @@ public:
 	double get();
 	void set(double v);
 
+	static const std::string dumpAllParametersCommand;
+	static void execDumpAllParameters(DoubleBuffer* db, int argc, char* argv[]);
+
 	static int getNrParameters(DoubleBuffer* db);
 	static int findParameter(DoubleBuffer* db, const std::string& name);
 

@@ -11,26 +11,22 @@
 
 #include "Parameter.h"
 #include "TimeStats.h"
+#include "TimeStats_Term.h"
 
-const std::string TimeStats::dumpTimingName="dumpTiming";
-const std::string TimeStats::resetTimingName="resetTiming";
-
-const std::string par_minMargin("minMargin");
-const std::string par_maxMargin("maxMargin");
-const std::string par_margin("margin");
-const std::string par_reset("reset");
+const std::string TimeStats_Term::dumpTimingCommand="dumpTiming";
+const std::string TimeStats_Term::resetTimingCommand="resetTiming";
 
 
-TimeStats::TimeStats() {
+TimeStats_Term::TimeStats_Term() {
 	// TODO Auto-generated constructor stub
 
 }
 
-TimeStats::~TimeStats() {
+TimeStats_Term::~TimeStats_Term() {
 	// TODO Auto-generated destructor stub
 }
 
-void TimeStats::execDumpTimingCommand(DoubleBuffer* db, int argc, char* argv[])
+void TimeStats_Term::execDumpTiming(DoubleBuffer* db, int argc, char* argv[])
 {
 	if (argc==1) {
 		dumpTiming(db);
@@ -40,7 +36,7 @@ void TimeStats::execDumpTimingCommand(DoubleBuffer* db, int argc, char* argv[])
 	}
 }
 
-void TimeStats::execResetTimingCommand(DoubleBuffer* db, int argc, char* argv[])
+void TimeStats_Term::execResetTiming(DoubleBuffer* db, int argc, char* argv[])
 {
 	if (argc==1) {
 		resetTiming(db);
@@ -50,7 +46,7 @@ void TimeStats::execResetTimingCommand(DoubleBuffer* db, int argc, char* argv[])
 	}
 }
 
-void TimeStats::dumpTiming(DoubleBuffer* db) {
+void TimeStats_Term::dumpTiming(DoubleBuffer* db) {
 	Parameter* minMargin;
 	Parameter* maxMargin;
 	Parameter* margin;
@@ -64,7 +60,7 @@ void TimeStats::dumpTiming(DoubleBuffer* db) {
 	std::cout << "maxMargin: " << maxMargin->get() <<  std::endl;
 }
 
-void TimeStats::resetTiming(DoubleBuffer* db) {
+void TimeStats_Term::resetTiming(DoubleBuffer* db) {
 	Parameter* reset;
 	reset = new Parameter(db, par_reset);
 
