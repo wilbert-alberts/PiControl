@@ -30,12 +30,10 @@ TimeStats_Servo::~TimeStats_Servo() {
 
 void TimeStats_Servo::initSample(PeriodicTimer* pt)
 {
-	DoubleBuffer* db = DoubleBuffer::getInstance();
-
-	minMargin = new Parameter(db, par_minMargin);
-	maxMargin = new Parameter(db, par_maxMargin);
-	margin = new Parameter(db, par_margin);
-	reset = new Parameter(db, par_reset);
+	minMargin = new Parameter(par_minMargin);
+	maxMargin = new Parameter(par_maxMargin);
+	margin = new Parameter(par_margin);
+	reset = new Parameter(par_reset);
 
 	pt->resetStats();
 }

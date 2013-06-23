@@ -33,23 +33,23 @@ const std::string Traces_Term::dumpTracesCommand("dumpTraces");
 
 #define DEFAULT_TRACE_LENGTH (1000)
 
-Traces_Term::Traces_Term(DoubleBuffer* db, int nrTraces)
-: Traces(db, nrTraces)
+Traces_Term::Traces_Term(int nrTraces)
+: Traces(nrTraces)
 {
 }
 
-Traces_Term* Traces_Term::getInstance(DoubleBuffer* db)
+Traces_Term* Traces_Term::getInstance()
 {
 	if (traces == 0) {
-		traces = new Traces_Term(db, MAXNRTRACES);
+		traces = new Traces_Term(MAXNRTRACES);
 	}
 
 	return dynamic_cast<Traces_Term*>(traces);
 }
 
-void Traces_Term::createTrace(DoubleBuffer* db, const std::string& par, int size)
+void Traces_Term::createTrace(const std::string& par, int size)
 {
-	int parIdx =Parameter::findParameter(db, par);
+	int parIdx =Parameter::findParameter(par);
 	if(parIdx < 0) {
 		std::cerr << "Unable to find parameter: " << par << std::endl;
 		return;
@@ -64,9 +64,9 @@ void Traces_Term::createTrace(DoubleBuffer* db, const std::string& par, int size
 	addTrace(parIdx, size);
 }
 
-void Traces_Term::destroyTrace(DoubleBuffer* db, const std::string& par)
+void Traces_Term::destroyTrace(const std::string& par)
 {
-	int parIdx =Parameter::findParameter(db, par);
+	int parIdx =Parameter::findParameter(par);
 	if(parIdx < 0) {
 		std::cerr << "Unable to find parameter: " << par << std::endl;
 		return;
@@ -75,7 +75,7 @@ void Traces_Term::destroyTrace(DoubleBuffer* db, const std::string& par)
 	removeTrace(parIdx);
 }
 
-void Traces_Term::dumpTraces(DoubleBuffer* db)
+void Traces_Term::dumpTraces()
 {
 	int startCounter;
 	int endCounter;
@@ -89,7 +89,7 @@ void Traces_Term::dumpTraces(DoubleBuffer* db)
 		ss << "Samplecounter\t";
 		for (int i = 0; i < getNrTraces(); i++) {
 			TraceEntry* te = getTraceEntry(i);
-			ss << Parameter::getNameByIdx(db, te->getParameterIndex());
+			ss << Parameter::getNameByIdx(te->getParameterIndex());
 			if (i < getNrTraces() - 1)
 				ss << "\t";
 			int startOfTrace = te->getStart();
@@ -121,35 +121,35 @@ void Traces_Term::dumpTraces(DoubleBuffer* db)
 }
 
 
-void Traces_Term::execAddTrace(DoubleBuffer* db, int argc, char* argv[])
+void Traces_Term::execAddTrace(int argc, char* argv[])
 {
-	Traces_Term* instance = Traces_Term::getInstance(db);
+	Traces_Term* instance = Traces_Term::getInstance();
 	for (int i=1; i<argc; i++) {
 		std::string par(argv[i]);
-		instance->createTrace(db, par ,DEFAULT_TRACE_LENGTH);
+		instance->createTrace(par ,DEFAULT_TRACE_LENGTH);
 	}
 }
 
-void Traces_Term::execDelTrace(DoubleBuffer* db, int argc, char* argv[])
+void Traces_Term::execDelTrace(int argc, char* argv[])
 {
-	Traces_Term* instance = Traces_Term::getInstance(db);
+	Traces_Term* instance = Traces_Term::getInstance();
 	for (int i=1; i<argc; i++) {
 		std::string par(argv[i]);
-		instance->destroyTrace(db, par);
+		instance->destroyTrace(par);
 	}
 }
 
-void Traces_Term::execDumpTraces(DoubleBuffer* db, int argc, char* argv[])
+void Traces_Term::execDumpTraces(int argc, char* argv[])
 {
 	if (argc!=1) {
 		std::cerr << "Usage: " << dumpTracesCommand << std::endl;
 		exit(-1);
 	}
 
-	Traces_Term* instance = Traces_Term::getInstance(db);
+	Traces_Term* instance = Traces_Term::getInstance();
 
 	instance->attachForRead();
-	instance->dumpTraces(db);
+	instance->dumpTraces();
 }
 
 void Traces_Term::attachForRead()

@@ -9,6 +9,7 @@
 #include <string>
 #include <cstring>
 
+#include "DoubleBuffer.h"
 #include "Parameter.h"
 #include "TimeStats.h"
 #include "TimeStats_Term.h"
@@ -17,52 +18,54 @@ const std::string TimeStats_Term::dumpTimingCommand="dumpTiming";
 const std::string TimeStats_Term::resetTimingCommand="resetTiming";
 
 
-TimeStats_Term::TimeStats_Term() {
-	// TODO Auto-generated constructor stub
-
+TimeStats_Term::TimeStats_Term()
+{
 }
 
 TimeStats_Term::~TimeStats_Term() {
 	// TODO Auto-generated destructor stub
 }
 
-void TimeStats_Term::execDumpTiming(DoubleBuffer* db, int argc, char* argv[])
+void TimeStats_Term::execDumpTiming(int argc, char* argv[])
 {
 	if (argc==1) {
-		dumpTiming(db);
+		dumpTiming();
 	}
 	else {
 		std::cerr << "Usage: resetTiming" << std::endl;
 	}
 }
 
-void TimeStats_Term::execResetTiming(DoubleBuffer* db, int argc, char* argv[])
+void TimeStats_Term::execResetTiming(int argc, char* argv[])
 {
 	if (argc==1) {
-		resetTiming(db);
+		resetTiming();
 	}
 	else {
 		std::cerr << "Usage: resetTiming" << std::endl;
 	}
 }
 
-void TimeStats_Term::dumpTiming(DoubleBuffer* db) {
+void TimeStats_Term::dumpTiming() {
 	Parameter* minMargin;
 	Parameter* maxMargin;
 	Parameter* margin;
+	DoubleBuffer* db = DoubleBuffer::getInstance();
 
-	minMargin = new Parameter(db, par_minMargin);
-	maxMargin = new Parameter(db, par_maxMargin);
-	margin = new Parameter(db, par_margin);
+	minMargin = new Parameter(par_minMargin);
+	maxMargin = new Parameter(par_maxMargin);
+	margin = new Parameter(par_margin);
 
 	std::cout << "margin:    " << margin->get() <<  std::endl;
 	std::cout << "minMargin: " << minMargin->get() <<  std::endl;
 	std::cout << "maxMargin: " << maxMargin->get() <<  std::endl;
 }
 
-void TimeStats_Term::resetTiming(DoubleBuffer* db) {
+void TimeStats_Term::resetTiming() {
 	Parameter* reset;
-	reset = new Parameter(db, par_reset);
+	DoubleBuffer* db = DoubleBuffer::getInstance();
+
+	reset = new Parameter(par_reset);
 
 	reset->set(1.0);
 	std::cout<<"OK"<< std::endl;

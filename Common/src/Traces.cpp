@@ -57,8 +57,7 @@ Traces::Traces(int nrTraces) {
 	}
 
 
-	par_sampleCounter = new Parameter(DoubleBuffer::getInstance(),
-									  Traces::parid_sampleCounter);
+	par_sampleCounter = new Parameter(Traces::parid_sampleCounter);
 }
 
 void Traces::clearAllTraces() {

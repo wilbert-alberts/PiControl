@@ -13,20 +13,19 @@
 #include <cstdlib>
 
 #include "DoubleBuffer.h"
-#include "DoubleBuffer_Imp.h"
 #include "TimeStats_Term.h"
 #include "Parameter.h"
 #include "StopTimer.h"
 #include "Traces_Term.h"
 
 
-typedef void (*TerminalCommand)(DoubleBuffer* db, int argc, char* argv[]);
+typedef void (*TerminalCommand)(int argc, char* argv[]);
 typedef std::map<const std::string, TerminalCommand> CommandMap;
 
 void registerCommands();
-void processCommand(DoubleBuffer* db, int argc, char* argv[]);
+void processCommand(int argc, char* argv[]);
 void extractCommand(std::string& result, const char* p);
-void help(DoubleBuffer* db, int argc, char* argv[]);
+void help(int argc, char* argv[]);
 
 static CommandMap commands;
 
@@ -34,14 +33,14 @@ static const std::string cmdHelp("help");
 
 int main(int argc, char* argv[])
 {
-	DoubleBuffer* db = new DoubleBuffer_Imp();
+	DoubleBuffer* db = DoubleBuffer::getInstance();
 
 	registerCommands();
 
 	db->connect();
 	db->lock();
 
-	processCommand(db, argc, argv);
+	processCommand(argc, argv);
 
  	db->unlock();
 
@@ -60,7 +59,7 @@ void registerCommands()
 	commands[cmdHelp] = &help;
 }
 
-void processCommand(DoubleBuffer* db, int argc, char* argv[])
+void processCommand(int argc, char* argv[])
 {
 	std::string c;
 	extractCommand(c, argv[0]);
@@ -76,7 +75,7 @@ void processCommand(DoubleBuffer* db, int argc, char* argv[])
 
 	TerminalCommand cmd = commands[c];
 
-	cmd(db, argc, argv);
+	cmd(argc, argv);
 }
 
 void extractCommand(std::string& result, const char* p)
@@ -85,7 +84,7 @@ void extractCommand(std::string& result, const char* p)
 
 	result.assign(cmd+1);
 }
-void help(DoubleBuffer* db, int argc, char* argv[])
+void help(int argc, char* argv[])
 {
 	std::cout << "Available commands: " << std::endl;
 	for (CommandMap::iterator i=commands.begin();

@@ -15,7 +15,7 @@ public:
 	StopTimer();
 	virtual ~StopTimer();
 
-	static void execStopTimer(DoubleBuffer* db, int argc, char* argv[]);
+	static void execStopTimer(int argc, char* argv[]);
 
 	static const std::string stopTimerCommand;
 };

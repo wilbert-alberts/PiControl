@@ -30,12 +30,12 @@ typedef struct {
 } DB_mem;
 
 
-Parameter::Parameter(DoubleBuffer* _db, const std::string& name)
-: db(_db)
+Parameter::Parameter(const std::string& name)
+: db(DoubleBuffer::getInstance())
 {
-	DB_mem* p=static_cast<DB_mem*>(db->get());
+	DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 
-	idx = findParameter(_db, name);
+	idx = findParameter(name);
 	if (idx<0) {
 		// Create parameter in double buffer.
 		idx = p->nrParameters;
@@ -59,8 +59,8 @@ std::string Parameter::getName() {
 	return result;
 }
 
-std::string Parameter::getNameByIdx(DoubleBuffer* db, int i) {
-	DB_mem* p=static_cast<DB_mem*>(db->get());
+std::string Parameter::getNameByIdx(int i) {
+	DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 	DB_Parameter* par = &p->params[i];
 	return std::string(par->name);
 }
@@ -72,8 +72,8 @@ double Parameter::get() {
 	return par->value;
 }
 
-double Parameter::getByIdx(DoubleBuffer* db, int i) {
-	DB_mem* p=static_cast<DB_mem*>(db->get());
+double Parameter::getByIdx(int i) {
+	DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 
 	assert(i<p->nrParameters);
 
@@ -89,8 +89,8 @@ void Parameter::set(double v) {
 	par->value = v;
 }
 
-void Parameter::setByIdx(DoubleBuffer* db, int i, double v) {
-	DB_mem* p=static_cast<DB_mem*>(db->get());
+void Parameter::setByIdx(int i, double v) {
+	DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 
 	assert(i<p->nrParameters);
 
@@ -99,14 +99,14 @@ void Parameter::setByIdx(DoubleBuffer* db, int i, double v) {
 	par->value = v;
 }
 
-int Parameter::getNrParameters(DoubleBuffer* db) {
-	DB_mem* p=static_cast<DB_mem*>(db->get());
+int Parameter::getNrParameters() {
+	DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 	return p->nrParameters;
 }
 
-int Parameter::findParameter(DoubleBuffer* db, const std::string& name) 
+int Parameter::findParameter(const std::string& name)
 {
-	DB_mem* p=static_cast<DB_mem*>(db->get());
+	DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 	for (int i=0; i<p->nrParameters; i++) {
 		if (strncmp(name.c_str(), p->params[i].name,MAXNAMESIZE-1)==0) {
 			return i;
@@ -115,16 +115,16 @@ int Parameter::findParameter(DoubleBuffer* db, const std::string& name)
 	return  -1;
 }
 
-void Parameter::execDumpAllParameters(DoubleBuffer* db, int argc, char* argv[])
+void Parameter::execDumpAllParameters(int argc, char* argv[])
 {
 	if (argc!=1) {
 		std::cerr << "Usage: "<< dumpAllParametersCommand << std:: endl;
 		exit (-1);
 	}
 
-	for (int i=0; i<Parameter::getNrParameters(db); i++) {
-		std::string parname = Parameter::getNameByIdx(db, i);
-		double value = Parameter::getByIdx(db, i);
+	for (int i=0; i<Parameter::getNrParameters(); i++) {
+		std::string parname = Parameter::getNameByIdx(i);
+		double value = Parameter::getByIdx(i);
 		std::cout << parname << "\t" << value << std::endl;
 	}
 }

@@ -24,13 +24,12 @@ public:
 	static const std::string dumpTimingCommand;
 	static const std::string resetTimingCommand;
 
-	static void execDumpTiming(DoubleBuffer* db, int argc, char* argv[]);
-	static void execResetTiming(DoubleBuffer* db, int argc, char* argv[]);
+	static void execDumpTiming(int argc, char* argv[]);
+	static void execResetTiming(int argc, char* argv[]);
 
 private:
-	static void dumpTiming(DoubleBuffer* db);
-	static void resetTiming(DoubleBuffer* db);
-
+	static void dumpTiming();
+	static void resetTiming();
 };
 
 #endif /* TIMESTATS_H_ */

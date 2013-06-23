@@ -16,7 +16,7 @@ class DoubleBuffer;
 
 class Parameter {
 public:
-	Parameter(DoubleBuffer* db, const std::string& name);
+	Parameter(const std::string& name);
 	virtual ~Parameter();
 
 	std::string getName();
@@ -24,14 +24,14 @@ public:
 	void set(double v);
 
 	static const std::string dumpAllParametersCommand;
-	static void execDumpAllParameters(DoubleBuffer* db, int argc, char* argv[]);
+	static void execDumpAllParameters(int argc, char* argv[]);
 
-	static int getNrParameters(DoubleBuffer* db);
-	static int findParameter(DoubleBuffer* db, const std::string& name);
+	static int getNrParameters();
+	static int findParameter(const std::string& name);
 
-	static void setByIdx(DoubleBuffer* db, int i, double v);
-	static double getByIdx(DoubleBuffer* db, int i);
-	static std::string getNameByIdx(DoubleBuffer* db, int i);
+	static void setByIdx(int i, double v);
+	static double getByIdx(int i);
+	static std::string getNameByIdx(int i);
 
 private:
 	DoubleBuffer* db;

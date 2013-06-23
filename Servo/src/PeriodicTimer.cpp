@@ -22,8 +22,7 @@ PeriodicTimer::PeriodicTimer(unsigned int p)
   margin(0), minMargin(0), maxMargin(p),
   stopped(false)
 {
-	DoubleBuffer* db = DoubleBuffer::getInstance();
-	par_stopRunning = new Parameter(db, "PeriodicTimer.stopRunning");
+	par_stopRunning = new Parameter("PeriodicTimer.stopRunning");
 }
 
 PeriodicTimer::~PeriodicTimer() {

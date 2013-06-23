@@ -37,7 +37,7 @@ void TraceEntry::sample(DoubleBuffer* db, int sampleCounter)
 	if (wvalue == 0)
 		attachForWrite();
 	lastSampleCounter = sampleCounter;
-	double v = Parameter::getByIdx(db, parIdx);
+	double v = Parameter::getByIdx(parIdx);
 	wvalue[lastSampleIdx] = v;
 	lastSampleIdx = (lastSampleIdx+1) % (buffersize);
 	nrSamples++;
