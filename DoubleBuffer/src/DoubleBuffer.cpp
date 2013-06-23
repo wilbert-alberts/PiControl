@@ -19,22 +19,32 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "DoubleBuffer_Imp.h"
+#include "DoubleBuffer.h"
 
 static const char* DB_MEM_ID = "/mem.DB.pages";
 static const char* DB_LOCK0_ID = "/DB.lock0";
 static const char* DB_LOCK1_ID = "/DB.lock1";
 
-DoubleBuffer_Imp::DoubleBuffer_Imp() {
+DoubleBuffer* DoubleBuffer::instance = 0;
+
+DoubleBuffer::DoubleBuffer() {
 	// TODO Auto-generated constructor stub
 
 }
 
-DoubleBuffer_Imp::~DoubleBuffer_Imp() {
+DoubleBuffer::~DoubleBuffer() {
 	// TODO Auto-generated destructor stub
 }
 
-void DoubleBuffer_Imp::initSemaphores() {
+DoubleBuffer* DoubleBuffer::getInstance()
+{
+	if (instance==0) {
+		instance = new DoubleBuffer();
+	}
+	return instance;
+}
+
+void DoubleBuffer::initSemaphores() {
 	pageHandles[0].sem = sem_open(DB_LOCK0_ID, O_CREAT, S_IRUSR | S_IWUSR, 1);
 	if (pageHandles[0].sem == SEM_FAILED ) {
 		perror("Error, unable to create semaphore");
@@ -47,7 +57,7 @@ void DoubleBuffer_Imp::initSemaphores() {
 	}
 }
 
-void DoubleBuffer_Imp::create(int size) {
+void DoubleBuffer::create(int size) {
 	shmfd = shm_open(DB_MEM_ID, O_RDWR | O_CREAT, S_IRUSR|S_IWUSR);
 	if (shmfd == -1) {
 		perror("Error, unable to create shared memory" );
@@ -79,7 +89,7 @@ void DoubleBuffer_Imp::create(int size) {
 	initSemaphores();
 }
 
-void DoubleBuffer_Imp::connect() {
+void DoubleBuffer::connect() {
 	shmfd = shm_open(DB_MEM_ID, O_RDWR, S_IRUSR|S_IWUSR);
 	if (shmfd == -1) {
 		perror("Error, unable to create shared memory" );
@@ -103,7 +113,7 @@ void DoubleBuffer_Imp::connect() {
 	initSemaphores();
 }
 
-void DoubleBuffer_Imp::lock(int page) {
+void DoubleBuffer::lock(int page) {
 	int r = sem_wait(pageHandles[page].sem);
 	if (r == -1) {
 		perror("Error while locking in sem_wait: ");
@@ -111,7 +121,7 @@ void DoubleBuffer_Imp::lock(int page) {
 	pageHandles[page].locked = true;
 }
 
-void DoubleBuffer_Imp::lockAny() {
+void DoubleBuffer::lockAny() {
 	int idx;
 	
 	if (buffer == pageHandles[0].page) {
@@ -137,21 +147,21 @@ void DoubleBuffer_Imp::lockAny() {
 	}			
 }
 
-void DoubleBuffer_Imp::lock() {
+void DoubleBuffer::lock() {
 	assert(created);
 
 	lockAny();
 	return;
 }
 
-void DoubleBuffer_Imp::unlock(int page) {
+void DoubleBuffer::unlock(int page) {
 	pageHandles[page].locked = false;
 	int r = sem_post(pageHandles[page].sem);
 	if (r == -1) {
 		perror("Error unlocking: ");
 	}
 }
-void DoubleBuffer_Imp::unlock() {
+void DoubleBuffer::unlock() {
 	assert(created);
 
 	if (pageHandles[1].locked) {
@@ -163,7 +173,7 @@ void DoubleBuffer_Imp::unlock() {
 	}
 }
 
-void* DoubleBuffer_Imp::get() {
+void* DoubleBuffer::get() {
 	assert(created);
 
 	if (!(pageHandles[0].locked || pageHandles[1].locked))
@@ -172,7 +182,7 @@ void* DoubleBuffer_Imp::get() {
 	return buffer->mem;
 }
 
-void DoubleBuffer_Imp::copyFrom() {
+void DoubleBuffer::copyFrom() {
 	char* src;
 	char* dst;
 	int other;
@@ -188,7 +198,7 @@ void DoubleBuffer_Imp::copyFrom() {
 	unlock(other);
 }
 
-void DoubleBuffer_Imp::copyTo() {
+void DoubleBuffer::copyTo() {
 	char* src;
 	char* dst;
 	int other;
