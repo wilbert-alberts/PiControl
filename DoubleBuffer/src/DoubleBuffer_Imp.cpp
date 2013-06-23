@@ -25,7 +25,6 @@ static const char* DB_MEM_ID = "/mem.DB.pages";
 static const char* DB_LOCK0_ID = "/DB.lock0";
 static const char* DB_LOCK1_ID = "/DB.lock1";
 
-
 DoubleBuffer_Imp::DoubleBuffer_Imp() {
 	// TODO Auto-generated constructor stub
 
@@ -55,27 +54,26 @@ void DoubleBuffer_Imp::create(int size) {
 		exit(-1);
 	}
 
-	if (ftruncate(shmfd, (size+sizeof(int))*2)==-1) {
+	int memSize = (size+sizeof(DoubleBufferPage))*2;
+	if (ftruncate(shmfd, memSize)==-1) {
 		perror("Error, unable to set length of shared memory");
 		exit(-1);
 	}
 
-	pageHandles[0].page = mmap(0, (size+sizeof(int))*2, PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0);
+	pageHandles[0].page = static_cast<DoubleBufferPage*>(mmap(0, memSize, PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0));
 
-	memset(pageHandles[0].page, 0, (size+sizeof(int))*2);
+	memset(pageHandles[0].page, 0, memSize);
 
 	if (pageHandles[0].page == MAP_FAILED) {
 		perror("Error, unable to map shared memory");
 		exit(-1);
 	}
 
+	char* p1 = (char*)(pageHandles[0].page);
+	pageHandles[1].page = (DoubleBufferPage*)(p1+size+sizeof(DoubleBufferPage));
 
-
-	char* p1 = static_cast<char*>(pageHandles[0].page);
-	pageHandles[1].page = static_cast<void*>(p1+size+sizeof(int));
-	*((int*)pageHandles[0].page)=size;
-	*((int*)pageHandles[1].page)=size;
-
+	pageHandles[0].page->pagesize = size;
+	pageHandles[1].page->pagesize = size;
 	created=true;
 
 	initSemaphores();
@@ -88,10 +86,9 @@ void DoubleBuffer_Imp::connect() {
 		exit(-1);
 	}
 
-	pageHandles[0].page = mmap(0, sizeof(int), PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0);
+	pageHandles[0].page = static_cast<DoubleBufferPage*>(mmap(0, sizeof(DoubleBufferPage), PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0));
 
-	size = ((int*)pageHandles[0].page)[0];
-	if (ftruncate(shmfd, (size+sizeof(int))*2)==-1) {
+	if (ftruncate(shmfd, (pageHandles[0].page->pagesize+sizeof(DoubleBufferPage))*2)==-1) {
 		perror("Error, unable to set length of shared memory");
 		exit(-1);
 	}
@@ -132,6 +129,7 @@ void DoubleBuffer_Imp::lockAny() {
 		if (r==0) {
 			pageHandles[idx].locked=true;
 			buffer=pageHandles[idx].page;
+			std::cout << "l" << idx << std::endl;
 			return;
 		}
 		// Try to lock the other page.
@@ -170,10 +168,8 @@ void* DoubleBuffer_Imp::get() {
 
 	if (!(pageHandles[0].locked || pageHandles[1].locked))
 		std::cerr << "Error: No buffer locked" << std::endl;
-	char* p = static_cast<char*>(buffer);
-	p = p+sizeof(int);
 
-	return static_cast<void*>(p);
+	return buffer->mem;
 }
 
 void DoubleBuffer_Imp::copyFrom() {
@@ -186,9 +182,9 @@ void DoubleBuffer_Imp::copyFrom() {
 
 	other = (buffer==pageHandles[0].page) ? 1 : 0;
 	lock(other);
-	src= static_cast<char*>(pageHandles[other].page);
-	dst= static_cast<char*>(pageHandles[1-other].page);
-	memcpy (dst, src, size+sizeof(int));
+	src= (char*)(pageHandles[other].page->mem);
+	dst= (char*)(pageHandles[1-other].page->mem);
+	memcpy (dst, src, pageHandles[1-other].page->pagesize);
 	unlock(other);
 }
 
@@ -202,8 +198,8 @@ void DoubleBuffer_Imp::copyTo() {
 
 	other = (buffer==pageHandles[0].page) ? 1 : 0;
 	lock(other);
-	src= static_cast<char*>(pageHandles[1-other].page);
-	dst= static_cast<char*>(pageHandles[other].page);
-	memcpy (dst, src, size+sizeof(int));
+	src= (char*)(pageHandles[1-other].page->mem);
+	dst= (char*)(pageHandles[other].page->mem);
+	memcpy (dst, src, pageHandles[1-other].page->pagesize);
 	unlock(other);
 }

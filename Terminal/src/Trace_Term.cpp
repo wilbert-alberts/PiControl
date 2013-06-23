@@ -83,13 +83,19 @@ void Traces_Term::dumpTraces(DoubleBuffer* db)
 	std::ostringstream ss;
 
 	lockTraceDB();
-	startCounter = getTraceEntry(0)->getStart();
-	endCounter = getTraceEntry(0)->getEnd();
-	for (int i=0; i<getNrTraces(); i++) {
-		TraceEntry* te = getTraceEntry(i);
-		ss << Parameter::getNameByIdx(db, i) << ",\t";
-		int startOfTrace = te->getStart();
-		startCounter = startOfTrace < startCounter ? startOfTrace : startCounter;
+	if (getNrTraces() > 0) {
+		startCounter = getTraceEntry(0)->getStart();
+		endCounter = getTraceEntry(0)->getEnd();
+		ss << "Samplecounter\t";
+		for (int i = 0; i < getNrTraces(); i++) {
+			TraceEntry* te = getTraceEntry(i);
+			ss << Parameter::getNameByIdx(db, te->getParameterIndex());
+			if (i < getNrTraces() - 1)
+				ss << "\t";
+			int startOfTrace = te->getStart();
+			startCounter =
+					startOfTrace < startCounter ? startOfTrace : startCounter;
+		}
 	}
 	unlockTraceDB();
 
@@ -98,13 +104,16 @@ void Traces_Term::dumpTraces(DoubleBuffer* db)
 	for (int counter= startCounter; counter<endCounter; counter++) {
 
 		ss.str("");
+		ss << counter << "\t";
 		for (int i=0; i<getNrTraces(); i++) {
 			TraceEntry* te = getTraceEntry(i);
 
 			lockTraceDB();
 			v = te->getSample(counter);
 			unlockTraceDB();
-			ss << v << ", \t";
+			ss << v;
+			if (i<getNrTraces()-1)
+				ss << "\t";
 		}
 
 		std::cout << ss.str() << std::endl;
@@ -139,5 +148,14 @@ void Traces_Term::execDumpTraces(DoubleBuffer* db, int argc, char* argv[])
 
 	Traces_Term* instance = Traces_Term::getInstance(db);
 
+	instance->attachForRead();
 	instance->dumpTraces(db);
+}
+
+void Traces_Term::attachForRead()
+{
+	for (int i=0; i<getNrTraces(); i++) {
+		TraceEntry* te = getTraceEntry(i);
+		te->attachForRead();
+	}
 }

@@ -10,6 +10,7 @@
 #include <string>
 #include <cstring>
 #include <map>
+#include <cstdlib>
 
 #include "DoubleBuffer.h"
 #include "DoubleBuffer_Imp.h"
@@ -68,6 +69,11 @@ void processCommand(DoubleBuffer* db, int argc, char* argv[])
 		argc--;
 		c=argv[0];
 	}
+	if (commands.find(c) == commands.end()) {
+		std::cerr << "Unknown command: " << c << std::endl;
+		exit(-1);
+	}
+
 	TerminalCommand cmd = commands[c];
 
 	cmd(db, argc, argv);

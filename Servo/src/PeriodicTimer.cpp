@@ -74,6 +74,7 @@ void PeriodicTimer::start()
 			pf(context);
 		}
 		updateStats();
+		std::cout << "." << std::endl;
 		wait();
 	}
 	close(timer_fd);

@@ -30,40 +30,64 @@ void TraceEntry::initialize(int idx, int size)
 {
 	parIdx = idx;
 	buffersize = size;
-
-	std::string n;
-	getValueMemID(n);
-	createSharedMemory(n.c_str(), sizeof(double)*size);
-
 }
 
 void TraceEntry::sample(DoubleBuffer* db, int sampleCounter)
 {
-	if (value==0)
-		attachValues();
+	if (wvalue == 0)
+		attachForWrite();
 	lastSampleCounter = sampleCounter;
 	double v = Parameter::getByIdx(db, parIdx);
-	value[lastSampleIdx] = v;
+	wvalue[lastSampleIdx] = v;
 	lastSampleIdx = (lastSampleIdx+1) % (buffersize);
 	nrSamples++;
+	std::cout << "Tracing par: " << parIdx << " - " << v << std::endl;
+}
 
+void TraceEntry::attachForRead()
+{
+	std::ostringstream id;
+	id << MEMID_TRACEVAR << parIdx;
+	rvalue = static_cast<double*>(createSharedMemory(id.str().c_str(), sizeof(double)*buffersize));
+}
+
+void TraceEntry::attachForWrite()
+{
+	std::ostringstream id;
+	id << MEMID_TRACEVAR << parIdx;
+	wvalue = static_cast<double*>(createSharedMemory(id.str().c_str(), sizeof(double)*buffersize));
 }
 
 double TraceEntry::getSample(int i)
 {
-	if (value==0)
-		attachValues();
 	// Test for sample in the future
 	if (i> lastSampleCounter)
 		return 0.0;
 	// Test for too old sample
 	int delta = lastSampleCounter - i;
-	if (delta>buffersize )
+
+	// Either, trace started early enough but sample
+	// has already disappeared from buffer or
+	// trace is not running long enough.
+	if (delta>buffersize || delta > nrSamples)
 		return 0.0;
 
 	// delta is in range, return corresponding value.
-	int idx = (lastSampleIdx - delta)%buffersize;
-	return value[idx];
+	//std::cout << "getSample at: " << i << std:: endl;
+	//dumpDebug();
+
+	// Note adding buffersize in formula below ensures idx larger then 0.
+	int idx = (buffersize + lastSampleIdx - delta)%buffersize;
+	return rvalue[idx];
+}
+
+void TraceEntry::dumpDebug()
+{
+	std::cout << "paridx:             " << parIdx << std::endl;
+	std::cout << "buffersize:         " << buffersize << std::endl;
+	std::cout << "lastSampleCounter:  " << lastSampleCounter << std::endl;
+	std::cout << "lastSampleIndex:    " << lastSampleIdx << std::endl;
+	std::cout << "nrSamples:          " << nrSamples << std::endl;
 }
 
 int TraceEntry::getParameterIndex()
@@ -82,22 +106,6 @@ int TraceEntry::getStart()
 int TraceEntry::getEnd()
 {
 	return lastSampleCounter;
-}
-
-void TraceEntry::getValueMemID(std::string& id)
-{
-	std::ostringstream c;
-	c << MEMID_TRACEVAR << parIdx;
-	id.assign(c.str());
-}
-
-void TraceEntry::attachValues()
-{
-	if (value == 0) {
-		std::string n;
-		getValueMemID(n);
-		value = static_cast<double*>(createSharedMemory(n.c_str(), sizeof(double)*buffersize));
-	}
 }
 
 void* TraceEntry::createSharedMemory(const std::string& id, int size)

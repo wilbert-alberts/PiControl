@@ -30,8 +30,11 @@ public:
 	int         getNrTraces();
 
 	static const std::string parid_sampleCounter;
+
 	void lockTraceDB();
 	void unlockTraceDB();
+
+	void clearAllTraces();
 
 	void addTrace(int parIdx, int buffersize);
 	void removeTrace(int parIdx);

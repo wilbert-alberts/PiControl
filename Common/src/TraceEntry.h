@@ -23,13 +23,16 @@ public:
 	int      getStart();
 	int      getEnd();
 
+	void 	 attachForRead();
+
 protected:
 
 private:
-	void     attachValues();
-	void* createSharedMemory(const std::string& id, int size);
-	void getValueMemID(std::string& id);
+	void*    createSharedMemory(const std::string& id, int size);
+	void     getValueMemID(std::string& id);
+	void 	 attachForWrite();
 
+	void     dumpDebug();
 
 	// Set by Terminal
 	int     parIdx;
@@ -40,7 +43,8 @@ private:
 	int     lastSampleIdx;
 	int     nrSamples;
 
-	double* value;
+	double* wvalue;
+	double* rvalue;
 };
 
 #endif /* TRACE_H_ */

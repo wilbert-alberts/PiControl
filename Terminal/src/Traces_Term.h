@@ -39,6 +39,7 @@ public:
 
 private:
 	Traces_Term(DoubleBuffer* db, int nrTraces);
+	void attachForRead();
 };
 
 #endif /* TRACE_H_ */

@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 {
 	PeriodicTimer* pt;
 	DoubleBuffer*  db;
-	Traces*        traces;
+	Traces_Servo*  traces;
 
 	db = new DoubleBuffer_Imp();
 	db->create(1024);
@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
 	pt = new PeriodicTimer(db,1000000);
 	TimeStats_Servo::initSample(db,pt);
 	traces = Traces_Servo::getInstance(db);
+	traces->clearAllTraces();
 	db->copyTo();
 	db->unlock();
 

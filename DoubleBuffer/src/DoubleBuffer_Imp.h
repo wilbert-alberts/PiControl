@@ -15,6 +15,18 @@
 
 #include "DoubleBuffer.h"
 
+typedef struct DoubleBufferPage
+{
+	int   pagesize;
+	void* mem[0];
+} DoubleBufferPage;
+
+typedef struct PageHandle {
+		sem_t* sem;
+		bool   locked;
+		DoubleBufferPage*  page;
+} PageHandle ;
+
 class DoubleBuffer_Imp: public DoubleBuffer {
 public:
 	DoubleBuffer_Imp();
@@ -33,16 +45,10 @@ public:
 
 
 private:
-	struct PageHandle {
-		sem_t* sem;
-		bool   locked;
-		void*  page;
-	};
 
 	PageHandle pageHandles[2];
 
-	int    size;
-	void*  buffer;
+	DoubleBufferPage*  buffer;
 	int    shmfd;
 	bool   created;
 

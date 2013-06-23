@@ -48,7 +48,6 @@ Traces::~Traces(){
 Traces::Traces(DoubleBuffer* db, int nrTraces) {
 	int size = sizeof(int) + sizeof(TraceEntry)* nrTraces;
 	traceDB = static_cast<TraceDB*>(createSharedMemory(std::string(MEMID_TRACEDB), size));
-	memset(traceDB, 0, size);
 	maxNrTraces = nrTraces;
 
 	semDB = sem_open(SEMID_TRACEDB, O_CREAT, S_IRUSR | S_IWUSR, 1);
@@ -60,6 +59,11 @@ Traces::Traces(DoubleBuffer* db, int nrTraces) {
 	par_sampleCounter = new Parameter(db, Traces::parid_sampleCounter);
 }
 
+void Traces::clearAllTraces() {
+	memset(traceDB, 0, maxNrTraces);
+}
+
+
 void Traces::lockTraceDB()
 {
 	int r = sem_wait(semDB);
@@ -67,6 +71,8 @@ void Traces::lockTraceDB()
 	if (r!=0) {
 		perror("Unable to lock traceDB semaphore");
 	}
+
+	//std::cout << "traces locked" << std::endl;
 }
 
 void Traces::unlockTraceDB()
@@ -76,6 +82,7 @@ void Traces::unlockTraceDB()
 	if (r!=0) {
 		perror("Unable to lock traceDB semaphore");
 	}
+	//std::cout << "traces unlocked" << std::endl;
 }
 
 void* Traces::createSharedMemory(const std::string& id, int size)
@@ -115,10 +122,14 @@ void Traces::addTrace(int parIdx, int size)
 {
 	TraceEntry* te = &traces->traceDB->entries[traces->traceDB->nrTraces];
 
+	std::cout << "> Traces::addTrace" << std::endl;
 	te->initialize(parIdx, size);
+	std::cout << "> Traces::trace initialized" << std::endl;
 	lockTraceDB();
 	traceDB->nrTraces++;
+	std::cout << "> Traces::nr traces increased" << std::endl;
 	unlockTraceDB();
+	std::cout << "< Traces::addTrace" << std::endl;
 }
 
 void Traces::removeTrace(int parIdx){
