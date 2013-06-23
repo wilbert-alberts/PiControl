@@ -12,7 +12,6 @@
 
 #include "TimeStats.h"
 
-class DoubleBuffer;
 class Parameter;
 class PeriodicTimer;
 
@@ -21,7 +20,7 @@ public:
 	TimeStats_Servo();
 	virtual ~TimeStats_Servo();
 
-	static void initSample(DoubleBuffer* db, PeriodicTimer* pt);
+	static void initSample(PeriodicTimer* pt);
 	static void sampleCommand(void* context);
 
 private:

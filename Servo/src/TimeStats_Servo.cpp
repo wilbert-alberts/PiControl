@@ -9,6 +9,7 @@
 #include <string>
 #include <cstring>
 
+#include "DoubleBuffer.h"
 #include "Parameter.h"
 #include "TimeStats_Servo.h"
 #include "PeriodicTimer.h"
@@ -27,8 +28,10 @@ TimeStats_Servo::~TimeStats_Servo() {
 	// TODO Auto-generated destructor stub
 }
 
-void TimeStats_Servo::initSample(DoubleBuffer* db, PeriodicTimer* pt)
+void TimeStats_Servo::initSample(PeriodicTimer* pt)
 {
+	DoubleBuffer* db = DoubleBuffer::getInstance();
+
 	minMargin = new Parameter(db, par_minMargin);
 	maxMargin = new Parameter(db, par_maxMargin);
 	margin = new Parameter(db, par_margin);
