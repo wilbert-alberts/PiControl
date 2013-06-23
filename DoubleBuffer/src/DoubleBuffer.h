@@ -23,10 +23,9 @@ typedef struct PageHandle {
 
 class DoubleBuffer {
 public:
-	DoubleBuffer();
+	static DoubleBuffer* getInstance();
 	virtual ~DoubleBuffer();
 
-	static DoubleBuffer* getInstance();
 
 	void create(int size);
 	void connect();
@@ -47,6 +46,8 @@ private:
 	DoubleBufferPage*  buffer;
 	int    shmfd;
 	bool   created;
+
+	DoubleBuffer();
 
 	void lockAny();
 	void lock(int page);

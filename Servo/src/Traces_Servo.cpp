@@ -44,7 +44,7 @@ Traces_Servo::Traces_Servo(int nrTraces)
 
 void Traces_Servo::sampleAllTraces(void* context)
 {
-	DoubleBuffer* db = static_cast<DoubleBuffer*>(context);
+	DoubleBuffer* db = DoubleBuffer::getInstance();
 	Traces_Servo* instance = Traces_Servo::getInstance();
 
 	instance->lockTraceDB();

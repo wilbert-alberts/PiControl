@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 	db->unlock();
 
 	pt->addPeriodicFunction(lockDB, db);
-	pt->addPeriodicFunction(Traces_Servo::sampleAllTraces, db);
+	pt->addPeriodicFunction(Traces_Servo::sampleAllTraces, 0);
 	pt->addPeriodicFunction(TimeStats_Servo::sampleCommand, 0);
 	pt->addPeriodicFunction(PeriodicTimer::checkStop, 0);
 	pt->addPeriodicFunction(unlockDB, db);
