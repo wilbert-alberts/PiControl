@@ -45,7 +45,7 @@ Traces::~Traces(){
 
 }
 
-Traces::Traces(DoubleBuffer* db, int nrTraces) {
+Traces::Traces(int nrTraces) {
 	int size = sizeof(int) + sizeof(TraceEntry)* nrTraces;
 	traceDB = static_cast<TraceDB*>(createSharedMemory(std::string(MEMID_TRACEDB), size));
 	maxNrTraces = nrTraces;
@@ -56,7 +56,9 @@ Traces::Traces(DoubleBuffer* db, int nrTraces) {
 		exit(-1);
 	}
 
-	par_sampleCounter = new Parameter(db, Traces::parid_sampleCounter);
+
+	par_sampleCounter = new Parameter(DoubleBuffer::getInstance(),
+									  Traces::parid_sampleCounter);
 }
 
 void Traces::clearAllTraces() {

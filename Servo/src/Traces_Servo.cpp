@@ -28,24 +28,24 @@
 #include "Parameter.h"
 
 
-Traces_Servo* Traces_Servo::getInstance(DoubleBuffer* db)
+Traces_Servo* Traces_Servo::getInstance()
 {
 	if (traces == 0) {
-		traces = new Traces_Servo(db, MAXNRTRACES);
+		traces = new Traces_Servo(MAXNRTRACES);
 	}
 
 	return dynamic_cast<Traces_Servo*>(traces);
 }
 
-Traces_Servo::Traces_Servo(DoubleBuffer* db, int nrTraces)
-: Traces(db, nrTraces), sampleCounter(0)
+Traces_Servo::Traces_Servo(int nrTraces)
+: Traces(nrTraces), sampleCounter(0)
 {
 }
 
 void Traces_Servo::sampleAllTraces(void* context)
 {
 	DoubleBuffer* db = static_cast<DoubleBuffer*>(context);
-	Traces_Servo* instance = Traces_Servo::getInstance(db);
+	Traces_Servo* instance = Traces_Servo::getInstance();
 
 	instance->lockTraceDB();
 	for (int i=0; i<instance->getNrTraces(); i++) {

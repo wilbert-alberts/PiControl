@@ -51,7 +51,7 @@ protected:
 	void* createSharedMemory(const std::string& id, int size);
 	void  createDBSem();
 
-	Traces(DoubleBuffer* db, int maxNrTraces);
+	Traces(int maxNrTraces);
 
 };
 

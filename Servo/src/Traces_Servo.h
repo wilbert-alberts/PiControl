@@ -21,10 +21,10 @@ class Traces_Servo: public Traces {
 public:
 
 	static void sampleAllTraces(void* db);
-	static Traces_Servo* getInstance(DoubleBuffer* db);
+	static Traces_Servo* getInstance();
 
 private:
-	Traces_Servo(DoubleBuffer* db, int maxNrTraces);
+	Traces_Servo(int maxNrTraces);
 	int sampleCounter;
 };
 
