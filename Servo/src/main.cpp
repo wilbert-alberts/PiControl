@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "DoubleBuffer.h"
-#include "DoubleBuffer_Imp.h"
 
 #include "PeriodicTimer.h"
 
@@ -20,13 +19,13 @@ int main(int argc, char* argv[])
 	DoubleBuffer*  db;
 	Traces_Servo*  traces;
 
-	db = new DoubleBuffer_Imp();
+	db = DoubleBuffer::getInstance();
 	db->create(1024);
 
 
 
 	db->lock();
-	pt = new PeriodicTimer(db,1000000);
+	pt = new PeriodicTimer(1000000);
 	TimeStats_Servo::initSample(db,pt);
 	traces = Traces_Servo::getInstance(db);
 	traces->clearAllTraces();

@@ -19,7 +19,7 @@ class Parameter;
 
 class PeriodicTimer {
 public:
-	PeriodicTimer(DoubleBuffer* db,unsigned int periodInUs);
+	PeriodicTimer(unsigned int periodInUs);
 	virtual ~PeriodicTimer();
 
 	void addPeriodicFunction(PeriodicFunction pf, void* context);

@@ -16,12 +16,13 @@
 #include "Parameter.h"
 #include "DoubleBuffer.h"
 
-PeriodicTimer::PeriodicTimer(DoubleBuffer* db, unsigned int p)
+PeriodicTimer::PeriodicTimer(unsigned int p)
 : timer_fd(0), period(p),
   wakeups_missed(0),
   margin(0), minMargin(0), maxMargin(p),
   stopped(false)
 {
+	DoubleBuffer* db = DoubleBuffer::getInstance();
 	par_stopRunning = new Parameter(db, "PeriodicTimer.stopRunning");
 }
 
