@@ -40,8 +40,8 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.243211991" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.351908529" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1716980868" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="DoubleBuffer"/>
 									<listOptionValue builtIn="false" value="Common"/>
+									<listOptionValue builtIn="false" value="DoubleBuffer"/>
 									<listOptionValue builtIn="false" value="rt"/>
 									<listOptionValue builtIn="false" value="pthread"/>
 								</option>

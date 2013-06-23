@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <errno.h>
+
+#include "PosixException.h"
 #include "PeriodicTimer.h"
 #include "Parameter.h"
 #include "DoubleBuffer.h"
@@ -69,8 +72,7 @@ void PeriodicTimer::setupTimer(unsigned int p) {
 	timer_fd = timerfd_create(CLOCK_MONOTONIC, 0);
 	wakeups_missed = 0;
 	if (timer_fd == -1) {
-		perror("Unable creating timer");
-		exit(-1);
+		throw new PosixException("Unable to create timer", errno);
 	}
 	/* Make the timer periodic */
 	sec = p / 1000000;
@@ -81,8 +83,7 @@ void PeriodicTimer::setupTimer(unsigned int p) {
 	itval.it_value.tv_nsec = ns;
 	ret = timerfd_settime(timer_fd, 0, &itval, NULL);
 	if (ret == -1) {
-		perror("Unable to start timer");
-		exit(-1);
+		throw new PosixException("Unable to start timer", errno);
 	}
 }
 

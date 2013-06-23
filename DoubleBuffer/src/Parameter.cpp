@@ -11,6 +11,7 @@
 #include <string>
 #include <assert.h>
 
+#include "UsageException.h"
 #include "Parameter.h"
 #include "DoubleBuffer.h"
 
@@ -118,8 +119,7 @@ int Parameter::findParameter(const std::string& name)
 void Parameter::execDumpAllParameters(int argc, char* argv[])
 {
 	if (argc!=1) {
-		std::cerr << "Usage: "<< dumpAllParametersCommand << std:: endl;
-		exit (-1);
+		throw new UsageException(std::string("Usage: ")+ dumpAllParametersCommand );
 	}
 
 	for (int i=0; i<Parameter::getNrParameters(); i++) {

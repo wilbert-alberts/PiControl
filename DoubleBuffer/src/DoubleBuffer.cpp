@@ -18,7 +18,9 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 
+#include "PosixException.h"
 #include "DoubleBuffer.h"
 
 static const char* DB_MEM_ID = "/mem.DB.pages";
@@ -47,27 +49,23 @@ DoubleBuffer* DoubleBuffer::getInstance()
 void DoubleBuffer::initSemaphores() {
 	pageHandles[0].sem = sem_open(DB_LOCK0_ID, O_CREAT, S_IRUSR | S_IWUSR, 1);
 	if (pageHandles[0].sem == SEM_FAILED ) {
-		perror("Error, unable to create semaphore");
-		exit(-1);
+		throw new PosixException(std::string("Unable to create semaphore"), errno);
 	}
 	pageHandles[1].sem = sem_open(DB_LOCK1_ID, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR, 1);
 	if (pageHandles[1].sem == SEM_FAILED ) {
-		perror("Error, unable to create semaphore");
-		exit(-1);
+		throw new PosixException(std::string("Unable to create semaphore"), errno);
 	}
 }
 
 void DoubleBuffer::create(int size) {
 	shmfd = shm_open(DB_MEM_ID, O_RDWR | O_CREAT, S_IRUSR|S_IWUSR);
 	if (shmfd == -1) {
-		perror("Error, unable to create shared memory" );
-		exit(-1);
+		throw new PosixException(std::string("Unable to create shared memory"), errno);
 	}
 
 	int memSize = (size+sizeof(DoubleBufferPage))*2;
 	if (ftruncate(shmfd, memSize)==-1) {
-		perror("Error, unable to set length of shared memory");
-		exit(-1);
+		throw new PosixException(std::string("Unable to set length of shared memory"), errno);
 	}
 
 	pageHandles[0].page = static_cast<DoubleBufferPage*>(mmap(0, memSize, PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0));
@@ -75,8 +73,7 @@ void DoubleBuffer::create(int size) {
 	memset(pageHandles[0].page, 0, memSize);
 
 	if (pageHandles[0].page == MAP_FAILED) {
-		perror("Error, unable to map shared memory");
-		exit(-1);
+		throw new PosixException(std::string("Unable to map shared memory"), errno);
 	}
 
 	char* p1 = (char*)(pageHandles[0].page);
@@ -92,20 +89,17 @@ void DoubleBuffer::create(int size) {
 void DoubleBuffer::connect() {
 	shmfd = shm_open(DB_MEM_ID, O_RDWR, S_IRUSR|S_IWUSR);
 	if (shmfd == -1) {
-		perror("Error, unable to create shared memory" );
-		exit(-1);
+		throw new PosixException(std::string("Unable to create shared memory"), errno);
 	}
 
 	pageHandles[0].page = static_cast<DoubleBufferPage*>(mmap(0, sizeof(DoubleBufferPage), PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0));
 
 	if (ftruncate(shmfd, (pageHandles[0].page->pagesize+sizeof(DoubleBufferPage))*2)==-1) {
-		perror("Error, unable to set length of shared memory");
-		exit(-1);
+		throw new PosixException(std::string("Unable to set length of shared memory"), errno);
 	}
 
 	if (pageHandles[0].page == MAP_FAILED) {
-		perror("Error, unable to map shared memory");
-		exit(-1);
+		throw new PosixException(std::string("Unable to map shared memory"), errno);
 	}
 
 	created=true;
@@ -116,7 +110,7 @@ void DoubleBuffer::connect() {
 void DoubleBuffer::lock(int page) {
 	int r = sem_wait(pageHandles[page].sem);
 	if (r == -1) {
-		perror("Error while locking in sem_wait: ");
+		throw new PosixException(std::string("Unable to lock DoubleBuffer semaphore"), errno);
 	}
 	pageHandles[page].locked = true;
 }
@@ -139,7 +133,7 @@ void DoubleBuffer::lockAny() {
 		if (r==0) {
 			pageHandles[idx].locked=true;
 			buffer=pageHandles[idx].page;
-			std::cout << "l" << idx << std::endl;
+			//std::cout << "l" << idx << std::endl;
 			return;
 		}
 		// Try to lock the other page.

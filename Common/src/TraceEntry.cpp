@@ -14,13 +14,14 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <errno.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>        /* For mode constants */
 #include <fcntl.h>           /* For O_* constants */
 #include <sys/types.h>
 
-
+#include "PosixException.h"
 #include "TraceEntry.h"
 
 #include "DoubleBuffer.h"
@@ -114,13 +115,11 @@ void* TraceEntry::createSharedMemory(const std::string& id, int size)
 
 	shmfd = shm_open(id.c_str(), O_RDWR | O_CREAT, S_IRUSR|S_IWUSR);
 	if (shmfd == -1) {
-		perror("Error, unable to create shared memory for trace" );
-		exit(-1);
+		throw new PosixException(std::string("Unable to create shared memory for trace"), errno);
 	}
 
 	if (ftruncate(shmfd, size)==-1) {
-		perror("Error, unable to set length of shared memory of trace");
-		exit(-1);
+		throw new PosixException(std::string("Unable to set length of shared memory of trace"), errno);
 	}
 
 	return mmap(0, size, PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0);

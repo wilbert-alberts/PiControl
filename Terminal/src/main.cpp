@@ -12,6 +12,9 @@
 #include <map>
 #include <cstdlib>
 
+#include "ValException.h"
+
+#include "Exception.h"
 #include "DoubleBuffer.h"
 #include "TimeStats_Term.h"
 #include "Parameter.h"
@@ -37,12 +40,17 @@ int main(int argc, char* argv[])
 
 	registerCommands();
 
-	db->connect();
-	db->lock();
+	try {
 
-	processCommand(argc, argv);
-
- 	db->unlock();
+		db->connect();
+		db->lock();
+		processCommand(argc, argv);
+	 	db->unlock();
+	}
+	catch (Exception& ex) {
+		std::cerr << ex.msg() << std::endl;
+		db->unlock();
+	}
 
 	return 0;
 }
@@ -69,8 +77,7 @@ void processCommand(int argc, char* argv[])
 		c=argv[0];
 	}
 	if (commands.find(c) == commands.end()) {
-		std::cerr << "Unknown command: " << c << std::endl;
-		exit(-1);
+		throw new ValException("Unknown command" + c);
 	}
 
 	TerminalCommand cmd = commands[c];

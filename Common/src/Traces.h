@@ -33,6 +33,7 @@ public:
 
 	void lockTraceDB();
 	void unlockTraceDB();
+	bool isTraceDBLocked();
 
 	void clearAllTraces();
 

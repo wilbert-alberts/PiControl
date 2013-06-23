@@ -50,7 +50,6 @@ void TimeStats_Term::dumpTiming() {
 	Parameter* minMargin;
 	Parameter* maxMargin;
 	Parameter* margin;
-	DoubleBuffer* db = DoubleBuffer::getInstance();
 
 	minMargin = new Parameter(par_minMargin);
 	maxMargin = new Parameter(par_maxMargin);
@@ -63,7 +62,6 @@ void TimeStats_Term::dumpTiming() {
 
 void TimeStats_Term::resetTiming() {
 	Parameter* reset;
-	DoubleBuffer* db = DoubleBuffer::getInstance();
 
 	reset = new Parameter(par_reset);
 
