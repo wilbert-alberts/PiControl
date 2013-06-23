@@ -20,7 +20,7 @@ public:
 	TimeStats_Servo();
 	virtual ~TimeStats_Servo();
 
-	static void initSample(PeriodicTimer* pt);
+	static void initSample();
 	static void sampleCommand(void* context);
 
 private:

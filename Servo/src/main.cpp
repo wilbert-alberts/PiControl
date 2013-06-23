@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
 	db->lock();
 	pt = PeriodicTimer::getInstance(1000000);
-	TimeStats_Servo::initSample(pt);
+	TimeStats_Servo::initSample();
 	traces = Traces_Servo::getInstance();
 	traces->clearAllTraces();
 	db->copyTo();
@@ -34,8 +34,8 @@ int main(int argc, char* argv[])
 
 	pt->addPeriodicFunction(lockDB, db);
 	pt->addPeriodicFunction(Traces_Servo::sampleAllTraces, db);
-	pt->addPeriodicFunction(TimeStats_Servo::sampleCommand, pt);
-	pt->addPeriodicFunction(PeriodicTimer::checkStop, pt);
+	pt->addPeriodicFunction(TimeStats_Servo::sampleCommand, 0);
+	pt->addPeriodicFunction(PeriodicTimer::checkStop, 0);
 	pt->addPeriodicFunction(unlockDB, db);
 
 	pt->start();

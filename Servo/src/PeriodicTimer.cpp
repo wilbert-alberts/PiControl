@@ -107,7 +107,7 @@ void PeriodicTimer::start()
 
 void PeriodicTimer::checkStop(void* context)
 {
-	PeriodicTimer* me = static_cast<PeriodicTimer*>(context);
+	PeriodicTimer* me = PeriodicTimer::getInstance();
 	me->stopped = me->par_stopRunning->get()!=0.0;
 }
 

@@ -28,19 +28,19 @@ TimeStats_Servo::~TimeStats_Servo() {
 	// TODO Auto-generated destructor stub
 }
 
-void TimeStats_Servo::initSample(PeriodicTimer* pt)
+void TimeStats_Servo::initSample()
 {
 	minMargin = new Parameter(par_minMargin);
 	maxMargin = new Parameter(par_maxMargin);
 	margin = new Parameter(par_margin);
 	reset = new Parameter(par_reset);
 
-	pt->resetStats();
+	PeriodicTimer::getInstance()->resetStats();
 }
 
 void TimeStats_Servo::sampleCommand(void* context)
 {
-	PeriodicTimer* pt = static_cast<PeriodicTimer*>(context);
+	PeriodicTimer* pt = PeriodicTimer::getInstance();
 
 	margin->set(pt->getMargin());
 	minMargin->set(pt->getMinMargin());
