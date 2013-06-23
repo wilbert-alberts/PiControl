@@ -16,6 +16,31 @@
 #include "Parameter.h"
 #include "DoubleBuffer.h"
 
+PeriodicTimer* PeriodicTimer::instance = 0;
+
+PeriodicTimer* PeriodicTimer::getInstance(unsigned int p)
+{
+	if (instance == 0) {
+		instance = new PeriodicTimer(p);
+	}
+	else {
+		if (instance->period != p) {
+			std::cerr << "Only one instance can be created." << std::endl;
+			exit(-1);
+		}
+	}
+	return instance;
+}
+
+PeriodicTimer* PeriodicTimer::getInstance()
+{
+	if (instance == 0) {
+		std::cerr << "Creation of PeriodicTimer instance requires period." << std::endl;
+		exit(-1);
+	}
+	return instance;
+}
+
 PeriodicTimer::PeriodicTimer(unsigned int p)
 : timer_fd(0), period(p),
   wakeups_missed(0),

@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
 
 	db->lock();
-	pt = new PeriodicTimer(1000000);
+	pt = PeriodicTimer::getInstance(1000000);
 	TimeStats_Servo::initSample(pt);
 	traces = Traces_Servo::getInstance();
 	traces->clearAllTraces();

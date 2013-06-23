@@ -19,7 +19,9 @@ class Parameter;
 
 class PeriodicTimer {
 public:
-	PeriodicTimer(unsigned int periodInUs);
+	static PeriodicTimer* getInstance(unsigned int periodInUs);
+	static PeriodicTimer* getInstance();
+
 	virtual ~PeriodicTimer();
 
 	void addPeriodicFunction(PeriodicFunction pf, void* context);
@@ -37,6 +39,9 @@ public:
 	static const std::string parid_stopRunning;
 
 private:
+	PeriodicTimer(unsigned int periodInUs);
+	static PeriodicTimer* instance;
+
 	int timer_fd;
 	unsigned int period;
 	unsigned int wakeups_missed;
