@@ -37,6 +37,8 @@ public:
   unsigned int getPeriod();
   void resetStats();
 
+  unsigned int getTimeElapsed();
+
   static const std::string parid_stopRunning;
 
 private:

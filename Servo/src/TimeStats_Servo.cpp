@@ -32,6 +32,15 @@ void TimeStats_Servo::initSample()
   PeriodicTimer::getInstance()->resetStats();
 }
 
+void TimeStats_Servo::takeTimeStamp(void* context)
+{
+	unsigned int t = PeriodicTimer::getInstance()->getTimeElapsed();
+
+	Parameter* p = static_cast<Parameter*>(context);
+
+	p->set(t);
+}
+
 void TimeStats_Servo::sampleCommand(void* /*context*/)
 {
   PeriodicTimer* pt = PeriodicTimer::getInstance();

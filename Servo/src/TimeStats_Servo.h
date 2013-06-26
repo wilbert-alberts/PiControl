@@ -22,6 +22,7 @@ public:
 
   static void initSample();
   static void sampleCommand(void* context);
+  static void takeTimeStamp(void* context); // context should be Parameter*
 
 private:
   static Parameter* minMargin;
