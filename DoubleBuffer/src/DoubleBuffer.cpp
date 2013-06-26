@@ -5,6 +5,7 @@
  *      Author: wilbert
  */
 
+#include "DoubleBuffer.h"
 
 #include <iostream>
 
@@ -22,6 +23,7 @@
 #include <cstring>
 #include <iostream>
 #include <system_error>
+
 
 static const char* DB_MEM_ID = "/mem.DB.pages";
 static const char* DB_LOCK0_ID = "/DB.lock0";

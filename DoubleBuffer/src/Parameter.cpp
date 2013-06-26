@@ -5,6 +5,9 @@
  *      Author: wilbert
  */
 
+#include "Parameter.h"
+#include "DoubleBuffer.h"
+
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
