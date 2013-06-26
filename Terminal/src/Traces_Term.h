@@ -8,14 +8,14 @@
 #ifndef TRACES_TERM_H_
 #define TRACES_TERM_H_
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <semaphore.h>
-
-#include <string>
-#include <map>
-
 #include "Traces.h"
+
+#include <fcntl.h>
+#include <semaphore.h>
+#include <sys/stat.h>
+
+#include <map>
+#include <string>
 
 class DoubleBuffer;
 class Parameter;
@@ -23,23 +23,23 @@ class Parameter;
 class Traces_Term: public Traces {
 public:
 
-	static Traces_Term* getInstance();
+  static Traces_Term* getInstance();
 
-	void createTrace(const std::string& par, int size);
-	void destroyTrace(const std::string& par);
-	void dumpTraces();
+  void createTrace(const std::string& par, int size);
+  void destroyTrace(const std::string& par);
+  void dumpTraces();
 
-	static void execAddTrace(int argc, char* argv[]);
-	static void execDelTrace(int argc, char* argv[]);
-	static void execDumpTraces(int argc, char* argv[]);
+  static void execAddTrace(int argc, char* argv[]);
+  static void execDelTrace(int argc, char* argv[]);
+  static void execDumpTraces(int argc, char* argv[]);
 
-	static const std::string addTraceCommand;
-	static const std::string delTraceCommand;
-	static const std::string dumpTracesCommand;
+  static const std::string addTraceCommand;
+  static const std::string delTraceCommand;
+  static const std::string dumpTracesCommand;
 
 private:
-	Traces_Term(int nrTraces);
-	void attachForRead();
+  Traces_Term(int nrTraces);
+  void attachForRead();
 };
 
 #endif /* TRACE_H_ */

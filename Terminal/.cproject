@@ -27,6 +27,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/DoubleBuffer/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/src}&quot;"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.other.other.160173874" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.warnings.extrawarn.1992271698" superClass="gnu.cpp.compiler.option.warnings.extrawarn" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.220924231" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.281053842" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">

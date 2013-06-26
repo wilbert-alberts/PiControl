@@ -5,38 +5,27 @@
  *      Author: wilbert
  */
 
-#include <iostream>
-#include <string>
-#include <cstdlib>
-
 #include "DoubleBuffer.h"
 #include "Parameter.h"
-
-#include "UsageException.h"
-
 #include "StopTimer.h"
 
+#include <cstdlib>
+#include <iostream>
+#include <stdexcept>
+#include <string>
 
 const std::string StopTimer::stopTimerCommand("stopTimer");
 
+StopTimer::StopTimer() {}
 
-StopTimer::StopTimer() {
-	// TODO Auto-generated constructor stub
+StopTimer::~StopTimer() {}
 
-}
-
-StopTimer::~StopTimer() {
-	// TODO Auto-generated destructor stub
-}
-
-void StopTimer::execStopTimer(int argc, char* argv[])
+void StopTimer::execStopTimer(int argc, char** /*argv[]*/)
 {
-	if (argc!=1) {
-		throw new UsageException(std::string("Usage")+stopTimerCommand);
-	}
+  if (argc!=1)
+    throw std::runtime_error("Usage " +  stopTimerCommand);
 
-	// TODO: replace hardcoded parameter id by reference.
-	Parameter* par = new Parameter("PeriodicTimer.stopRunning");
-	par->set(1.0);
+  // TODO: replace hardcoded parameter id by reference.
+  Parameter* par = new Parameter("PeriodicTimer.stopRunning");
+  par->set(1.0);
 }
-

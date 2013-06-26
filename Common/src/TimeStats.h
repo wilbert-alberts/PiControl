@@ -12,10 +12,10 @@
 
 class TimeStats{
 protected:
-	static const std::string par_minMargin;
-	static const std::string par_maxMargin;
-	static const std::string par_margin;
-	static const std::string par_reset;
+  static const std::string par_minMargin;
+  static const std::string par_maxMargin;
+  static const std::string par_margin;
+  static const std::string par_reset;
 };
 
 #endif /* TIMESTATS_H_ */

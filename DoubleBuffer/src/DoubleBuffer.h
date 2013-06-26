@@ -15,51 +15,51 @@
 struct DoubleBufferPage;
 
 typedef struct PageHandle {
-		sem_t* sem;
-		bool   locked;
-		DoubleBufferPage*  page;
+  sem_t* sem;
+  bool   locked;
+  DoubleBufferPage*  page;
 } PageHandle ;
 
 
 class DoubleBuffer {
 public:
-	static DoubleBuffer* getInstance();
-	virtual ~DoubleBuffer();
+  static DoubleBuffer* getInstance();
+  virtual ~DoubleBuffer();
 
 
-	void create(int size);
-	void connect();
+  void create(int size);
+  void connect();
 
-	void lock();
-	void unlock();
-	void* get();
+  void lock();
+  void unlock();
+  void* get();
 
-	void copyFrom();
-	void copyTo();
+  void copyFrom();
+  void copyTo();
 
 
 private:
-	static DoubleBuffer* instance;
+  static DoubleBuffer* instance;
 
-	PageHandle pageHandles[2];
+  PageHandle pageHandles[2];
 
-	DoubleBufferPage*  buffer;
-	int    shmfd;
-	bool   created;
+  DoubleBufferPage*  buffer;
+  int    shmfd;
+  bool   created;
 
-	DoubleBuffer();
+  DoubleBuffer();
 
-	void lockAny();
-	void lock(int page);
-	void unlock(int page);
-	void initSemaphores();
+  void lockAny();
+  void lock(int page);
+  void unlock(int page);
+  void initSemaphores();
 };
 
 
 typedef struct DoubleBufferPage
 {
-	int   pagesize;
-	void* mem[0];
+  int   pagesize;
+  void* mem[0];
 } DoubleBufferPage;
 
 

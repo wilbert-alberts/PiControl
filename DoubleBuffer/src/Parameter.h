@@ -16,25 +16,25 @@ class DoubleBuffer;
 
 class Parameter {
 public:
-	Parameter(const std::string& name);
-	virtual ~Parameter();
+  Parameter(const std::string& name);
+  virtual ~Parameter();
 
-	std::string getName();
-	double get();
-	void set(double v);
+  std::string getName();
+  double get();
+  void set(double v);
 
-	static const std::string dumpAllParametersCommand;
-	static void execDumpAllParameters(int argc, char* argv[]);
+  static const std::string dumpAllParametersCommand;
+  static void execDumpAllParameters(int argc, char* argv[]);
 
-	static int getNrParameters();
-	static int findParameter(const std::string& name);
+  static int getNrParameters();
+  static int findParameter(const std::string& name);
 
-	static void setByIdx(int i, double v);
-	static double getByIdx(int i);
-	static std::string getNameByIdx(int i);
+  static void setByIdx(int i, double v);
+  static double getByIdx(int i);
+  static std::string getNameByIdx(int i);
 
 private:
-	DoubleBuffer* db;
-	int idx;
+  DoubleBuffer* db;
+  int idx;
 };
 #endif /* PARAMETER_H_ */

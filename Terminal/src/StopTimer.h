@@ -12,12 +12,12 @@ class DoubleBuffer;
 
 class StopTimer {
 public:
-	StopTimer();
-	virtual ~StopTimer();
+  StopTimer();
+  virtual ~StopTimer();
 
-	static void execStopTimer(int argc, char* argv[]);
+  static void execStopTimer(int argc, char* argv[]);
 
-	static const std::string stopTimerCommand;
+  static const std::string stopTimerCommand;
 };
 
 #endif /* STOPTIMER_H_ */

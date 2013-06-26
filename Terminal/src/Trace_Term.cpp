@@ -5,28 +5,26 @@
  *      Author: wilbert
  */
 
-#include <map>
-#include <string>
-#include <iostream>
-#include <sstream>
+#include "Traces_Term.h"
+#include "TraceEntry.h"
+#include "DoubleBuffer.h"
+#include "Parameter.h"
+
+#include <fcntl.h>           /* For O_* constants */
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/stat.h>        /* For mode constants */
+#include <sys/types.h>
+
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/stat.h>        /* For mode constants */
-#include <fcntl.h>           /* For O_* constants */
-#include <sys/types.h>
-
-#include "ValException.h"
-#include "UsageException.h"
-#include "Traces_Term.h"
-#include "TraceEntry.h"
-
-#include "DoubleBuffer.h"
-#include "Parameter.h"
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 
 const std::string Traces_Term::addTraceCommand("addTrace");
 const std::string Traces_Term::delTraceCommand("delTrace");
@@ -34,122 +32,122 @@ const std::string Traces_Term::dumpTracesCommand("dumpTraces");
 
 #define DEFAULT_TRACE_LENGTH (1000)
 
-Traces_Term::Traces_Term(int nrTraces) :
-		Traces(nrTraces) {
-}
+Traces_Term::Traces_Term(int nrTraces)
+: Traces(nrTraces)
+{}
 
 Traces_Term* Traces_Term::getInstance() {
-	if (traces == 0) {
-		traces = new Traces_Term(MAXNRTRACES);
-	}
-
-	return dynamic_cast<Traces_Term*>(traces);
+  if (traces == 0) {
+    traces = new Traces_Term(MAXNRTRACES);
+  }
+  return dynamic_cast<Traces_Term*>(traces);
 }
 
 void Traces_Term::createTrace(const std::string& par, int size) {
-	int parIdx = Parameter::findParameter(par);
-	if (parIdx < 0) {
-		throw new ValException("Unknown parameter name: " + par);
-	}
+  int parIdx = Parameter::findParameter(par);
+  if (parIdx < 0) {
+    throw std::runtime_error("unknown parameter name: " + par);
+  }
 
-	if (getNrTraces() >= maxNrTraces) {
-		throw new ValException("Max nr. of traces exceeded");
-	}
+  if (getNrTraces() >= maxNrTraces) {
+    throw std::runtime_error("max nr. of traces exceeded");
+  }
 
-	addTrace(parIdx, size);
+  addTrace(parIdx, size);
 }
 
 void Traces_Term::destroyTrace(const std::string& par) {
-	int parIdx = Parameter::findParameter(par);
-	if (parIdx < 0) {
-		throw new ValException("Unknown parameter name: " + par);
-	}
+  int parIdx = Parameter::findParameter(par);
+  if (parIdx < 0) {
+    throw std::runtime_error("unknown parameter name: " + par);
+  }
 
-	removeTrace(parIdx);
+  removeTrace(parIdx);
 }
 
 void Traces_Term::dumpTraces() {
-	int startCounter;
-	int endCounter;
-	double v;
-	std::ostringstream ss;
+  int startCounter;
+  int endCounter;
+  double v;
+  std::ostringstream ss;
 
-	try {
-		lockTraceDB();
-		if (getNrTraces() > 0) {
-			startCounter = getTraceEntry(0)->getStart();
-			endCounter = getTraceEntry(0)->getEnd();
-			ss << "Samplecounter\t";
-			for (int i = 0; i < getNrTraces(); i++) {
-				TraceEntry* te = getTraceEntry(i);
-				ss << Parameter::getNameByIdx(te->getParameterIndex());
-				if (i < getNrTraces() - 1)
-					ss << "\t";
-				int startOfTrace = te->getStart();
-				startCounter =
-						startOfTrace < startCounter ?
-								startOfTrace : startCounter;
-			}
-		}
-		unlockTraceDB();
+  try {
+    lockTraceDB();
+    if (getNrTraces() > 0) {
+      startCounter = getTraceEntry(0)->getStart();
+      endCounter = getTraceEntry(0)->getEnd();
+      ss << "Samplecounter\t";
+      for (int i = 0; i < getNrTraces(); i++) {
+        TraceEntry* te = getTraceEntry(i);
+        ss << Parameter::getNameByIdx(te->getParameterIndex());
+        if (i < getNrTraces() - 1)
+          ss << "\t";
+        int startOfTrace = te->getStart();
+        startCounter =
+          startOfTrace < startCounter ?
+                         startOfTrace : startCounter;
+      }
+    }
+    unlockTraceDB();
 
-		std::cout << ss.str() << std::endl;
+    std::cout << ss.str() << std::endl;
 
-		for (int counter = startCounter; counter < endCounter; counter++) {
+    for (int counter = startCounter; counter < endCounter; counter++) {
 
-			ss.str("");
-			ss << counter << "\t";
-			for (int i = 0; i < getNrTraces(); i++) {
-				TraceEntry* te = getTraceEntry(i);
+      ss.str("");
+      ss << counter << "\t";
+      for (int i = 0; i < getNrTraces(); i++) {
+        TraceEntry* te = getTraceEntry(i);
 
-				lockTraceDB();
-				v = te->getSample(counter);
-				unlockTraceDB();
-				ss << v;
-				if (i < getNrTraces() - 1)
-					ss << "\t";
-			}
+        lockTraceDB();
+        v = te->getSample(counter);
+        unlockTraceDB();
+        ss << v;
+        if (i < getNrTraces() - 1)
+          ss << "\t";
+      }
 
-			std::cout << ss.str() << std::endl;
-		}
-	} catch (ValException& e) {
-		if (isTraceDBLocked()) {
-			unlockTraceDB();
-		}
-		throw(e);
-	}
+      std::cout << ss.str() << std::endl;
+    }
+  } catch (...) {
+    if (isTraceDBLocked())
+    {
+      unlockTraceDB();
+    }
+    throw;
+  }
 }
 
 void Traces_Term::execAddTrace(int argc, char* argv[]) {
-	Traces_Term* instance = Traces_Term::getInstance();
-	for (int i = 1; i < argc; i++) {
-		std::string par(argv[i]);
-		instance->createTrace(par, DEFAULT_TRACE_LENGTH);
-	}
+  Traces_Term* instance = Traces_Term::getInstance();
+  for (int i = 1; i < argc; i++) {
+    std::string par(argv[i]);
+    instance->createTrace(par, DEFAULT_TRACE_LENGTH);
+  }
 }
 
 void Traces_Term::execDelTrace(int argc, char* argv[]) {
-	Traces_Term* instance = Traces_Term::getInstance();
-	for (int i = 1; i < argc; i++) {
-		std::string par(argv[i]);
-		instance->destroyTrace(par);
-	}
+  Traces_Term* instance = Traces_Term::getInstance();
+  for (int i = 1; i < argc; i++) {
+    std::string par(argv[i]);
+    instance->destroyTrace(par);
+  }
 }
 
-void Traces_Term::execDumpTraces(int argc, char* argv[]) {
-	if (argc != 1) {
-		throw new UsageException(std::string("Usage: ") + dumpTracesCommand);
-	}
+void Traces_Term::execDumpTraces(int argc, char** /*argv[]*/) {
+  if (argc != 1) {
+    throw std::runtime_error("usage: " + dumpTracesCommand);
+  }
 
-	Traces_Term* instance = Traces_Term::getInstance();
+  Traces_Term* instance = Traces_Term::getInstance();
 
-	instance->attachForRead();
-	instance->dumpTraces();
+  instance->attachForRead();
+  instance->dumpTraces();
 }
 
 void Traces_Term::attachForRead() {
-	for (int i = 0; i < getNrTraces(); i++) {
-		TraceEntry* te = getTraceEntry(i);
-		te->attachForRead();
-	}
+  for (int i = 0; i < getNrTraces(); i++) {
+    TraceEntry* te = getTraceEntry(i);
+    te->attachForRead();
+  }
 }
