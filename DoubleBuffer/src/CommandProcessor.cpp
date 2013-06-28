@@ -46,7 +46,7 @@ void CommandProcessor::processCommand(int argc, char* argv[])
 		throw std::runtime_error("unknown command " + cmd);
 	}
 	while (argc>0) {
-		args << argv[0];
+		args << argv[0] << " ";
 		argv++;
 		argc--;
 	}
