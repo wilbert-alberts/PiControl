@@ -11,7 +11,7 @@
 #include <string>
 
 class TimeStats{
-protected:
+public:
   static const std::string par_minMargin;
   static const std::string par_maxMargin;
   static const std::string par_margin;

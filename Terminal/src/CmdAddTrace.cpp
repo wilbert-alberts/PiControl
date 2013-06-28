@@ -22,10 +22,11 @@ CmdAddTrace::~CmdAddTrace() {
 }
 
 void CmdAddTrace::displayHelp() {
-	std::cout << "Usage: " << getName() << " <parameter> [ <length> ]" << std::endl;
+	std::cout << "Usage: " << getName() << " <parameter> [ <length> ]"
+			<< std::endl;
 	std::cout << "\tStart tracing <parameter>." << std::endl;
-
 }
+
 void CmdAddTrace::execute(std::list<std::string>& args) {
 	int length;
 
@@ -39,7 +40,7 @@ void CmdAddTrace::execute(std::list<std::string>& args) {
 
 	if (!args.empty()) {
 		std::stringstream ss(args.front());
-		ss>>length;
+		ss >> length;
 
 	} else {
 		length = Traces_Term::DefaultTraceLength;
