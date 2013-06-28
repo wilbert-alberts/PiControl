@@ -31,6 +31,9 @@ public:
 	void transmitBus();
 	void receiveBus();
 
+	static void readBitBus(void* context);
+	static void writeBitBus(void* context);
+
 private:
 	void clearBit(int bit);
 	void setBit(int bit);

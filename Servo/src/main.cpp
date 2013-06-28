@@ -30,6 +30,9 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		Parameter* tsTracing = new Parameter("TimeStats.tracing");
 		Parameter* tsCheckStop = new Parameter("TimeStats.checkStop");
 
+		// TODO: assign channel and pins for BitBus
+		BitBus* bitbus = new BitBus(0,0,0,60);
+
 		pt = PeriodicTimer::getInstance(1000000);
 		TimeStats_Servo::initSample();
 		traces = Traces_Servo::getInstance();
@@ -40,8 +43,16 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(lockDB, db);
 		pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsStart);
 		// add sample functions
-		// Start with capturing digital Is
+		// Start with capturing digital Ins
 		pt->addPeriodicFunction(DigitalIn::captureAllIns, 0);
+
+		// Read Bitbus
+		pt->addPeriodicFunction(BitBus::readBitBus, bitbus);
+
+		// Run servo
+
+		// Write Bitbus
+		pt->addPeriodicFunction(BitBus::writeBitBus, bitbus);
 
 		// Activate digital outs.
 		pt->addPeriodicFunction(DigitalOut::activateAllOuts, 0);

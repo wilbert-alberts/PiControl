@@ -127,7 +127,7 @@ void BitBus::transmitBus()
 {
 	memcpy (shadowBytes, bytes, nrBits/8+1);
 	req->set(0);
-	while (ack->get() != 0.0);
+	while (ack->get() != 0.0)  { std::cout << "tb.";  std::cout.flush(); }
 
 #ifdef WIRINGPI
 	wiringPiSPIDataRW (int channel, shadowBytes, nrBits/8+1);
@@ -137,10 +137,21 @@ void BitBus::transmitBus()
 void BitBus::receiveBus()
 {
 	req->set(1);
-	while (ack->get() == 0.0);
+	while (ack->get() == 0.0)  { std::cout << "rb.";  std::cout.flush(); };
 
 #ifdef WIRINGPI
 	wiringPiSPIDataRW (int channel, shadowBytes, nrBits/8+1);
 #endif
 	memcpy (bytes, shadowBytes, nrBits/8+1);
+}
+
+void BitBus::readBitBus(void* context)
+{
+	BitBus* bb = static_cast<BitBus*> (context);
+	bb->receiveBus();
+}
+void BitBus::writeBitBus(void* context)
+{
+	BitBus* bb = static_cast<BitBus*> (context);
+	bb->transmitBus();
 }
