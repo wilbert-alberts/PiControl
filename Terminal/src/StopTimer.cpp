@@ -14,18 +14,22 @@
 #include <stdexcept>
 #include <string>
 
-const std::string StopTimer::stopTimerCommand("stopTimer");
+StopTimer::StopTimer() :
+		Command("stopTimer") {
+}
 
-StopTimer::StopTimer() {}
+StopTimer::~StopTimer() {
+}
 
-StopTimer::~StopTimer() {}
+void StopTimer::displayHelp() {
+	std::cout << "Usage: " << getName() << std::endl;
+	std::cout << "\tStops execution of Servo loop." << std::endl;
+}
 
-void StopTimer::execStopTimer(int argc, char** /*argv[]*/)
-{
-  if (argc!=1)
-    throw std::runtime_error("Usage " +  stopTimerCommand);
+void StopTimer::execute(std::list<std::string>& args) {
+	if (!args.empty())
+		throw std::runtime_error("Usage " + getName());
 
-  // TODO: replace hardcoded parameter id by reference.
-  Parameter* par = new Parameter("PeriodicTimer.stopRunning");
-  par->set(1.0);
+	Parameter* par = new Parameter("PeriodicTimer.stopRunning");
+	par->set(1.0);
 }

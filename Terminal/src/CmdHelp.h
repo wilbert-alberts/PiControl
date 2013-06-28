@@ -16,7 +16,7 @@ public:
 	virtual ~CmdHelp();
 
 	virtual void displayHelp();
-	virtual void execute(std::stringstream& args);
+	virtual void execute(std::list<std::string>& args);
 };
 
 #endif /* CMDHELP_H_ */

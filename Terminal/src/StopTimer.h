@@ -8,16 +8,18 @@
 #ifndef STOPTIMER_H_
 #define STOPTIMER_H_
 
-class DoubleBuffer;
+#include "Command.h"
 
-class StopTimer {
+#include <list>
+#include <string>
+
+class StopTimer: Command {
 public:
-  StopTimer();
-  virtual ~StopTimer();
+	StopTimer();
+	virtual ~StopTimer();
 
-  static void execStopTimer(int argc, char* argv[]);
-
-  static const std::string stopTimerCommand;
+	virtual void displayHelp();
+	virtual void execute(std::list<std::string>& args);
 };
 
 #endif /* STOPTIMER_H_ */

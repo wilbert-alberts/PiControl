@@ -9,7 +9,7 @@
 #define _COMMAND_H_
 
 #include <string>
-#include <sstream>
+#include <list>
 
 class Command
 {
@@ -20,7 +20,7 @@ public:
 	const std::string& getName();
 
 	virtual void displayHelp()=0;
-	virtual void execute(std::stringstream& args)=0;
+	virtual void execute(std::list<std::string>& args)=0;
 
 private:
 	std::string name;

@@ -32,10 +32,12 @@ CommandProcessor* CommandProcessor::getInstance()
 
 void CommandProcessor::processCommand(int argc, char* argv[])
 {
-	std::stringstream args;
+	std::list<std::string> args;
 	std::string cmd(strrchr(argv[0], '/')+1);
 	CommandProcessor* inst = CommandProcessor::getInstance();
 
+	// In case command is invoked via Terminal, extrace
+	// real command by looking to next argument.
 	if (cmd == "Terminal") {
 		argv++;
 		argc--;
@@ -45,8 +47,15 @@ void CommandProcessor::processCommand(int argc, char* argv[])
 	if (inst->commands.find(cmd) == inst->commands.end()) {
 		throw std::runtime_error("unknown command " + cmd);
 	}
+
+	// Ensure that commandname itself is not
+	// added as argument.
+	argv++;
+	argc--;
+
+	// Create stream holding arguments.
 	while (argc>0) {
-		args << argv[0] << " ";
+		args.push_back(argv[0]);
 		argv++;
 		argc--;
 	}

@@ -8,7 +8,7 @@
 #include "CmdHelp.h"
 #include "CommandProcessor.h"
 
-#include <vector>
+#include <list>
 #include <string>
 #include <iostream>
 
@@ -20,13 +20,13 @@ CmdHelp::~CmdHelp() {
 	// TODO Auto-generated destructor stub
 }
 
-void CmdHelp::execute(std::stringstream& args) {
+void CmdHelp::execute(std::list<std::string>& args)
+{
 	std::string c;
-	args >> c; // Chop off help command first.
-	if (args.eof()) {
+	args.pop_front(); // Chop off help command first.
+	if (args.empty()) {
 		displayHelp();
 	} else {
-		args >> c;
 
 		Command* cmd = CommandProcessor::getInstance()->lookupCommand(c);
 		if (cmd != 0) {
