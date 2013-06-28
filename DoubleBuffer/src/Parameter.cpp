@@ -17,8 +17,6 @@
 
 constexpr int MAXNAMESIZE = 64;
 
-const std::string Parameter::dumpAllParametersCommand("dumpParameters");
-
 typedef struct {
   double value;
   char   name[MAXNAMESIZE];
@@ -113,17 +111,4 @@ int Parameter::findParameter(const std::string& name)
     }
   }
   return  -1;
-}
-
-void Parameter::execDumpAllParameters(int argc, char** /*argv[]*/)
-{
-  if (argc!=1) {
-    throw std::runtime_error("Usage: " + dumpAllParametersCommand );
-  }
-
-  for (int i=0; i<Parameter::getNrParameters(); i++) {
-    std::string parname = Parameter::getNameByIdx(i);
-    double value = Parameter::getByIdx(i);
-    std::cout << parname << "\t" << value << std::endl;
-  }
 }

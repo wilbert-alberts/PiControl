@@ -17,6 +17,7 @@
 #include "CmdDelTrace.h"
 #include "CmdResetTimeStats.h"
 #include "CmdDumpTiming.h"
+#include "CmdDumpAllParams.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -46,10 +47,6 @@ int main(int argc, char* argv[]) {
 }
 
 void registerCommands() {
-	/*
- commands[Parameter::dumpAllParametersCommand] = &Parameter::execDumpAllParameters;
- */
-
 	new CmdHelp();
 	new StopTimer();
 	new CmdDumpTraces();
@@ -57,4 +54,5 @@ void registerCommands() {
 	new CmdDelTrace();
 	new CmdResetTimeStats();
 	new CmdDumpTiming();
+	new CmdDumpAllParams();
 }

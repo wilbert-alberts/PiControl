@@ -23,9 +23,6 @@ public:
   double get();
   void set(double v);
 
-  static const std::string dumpAllParametersCommand;
-  static void execDumpAllParameters(int argc, char* argv[]);
-
   static int getNrParameters();
   static int findParameter(const std::string& name);
 
