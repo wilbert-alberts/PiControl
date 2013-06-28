@@ -20,7 +20,7 @@ public:
 	const std::string& getName();
 
 	virtual void displayHelp()=0;
-	virtual void execute(const std::stringstream& args)=0;
+	virtual void execute(std::stringstream& args)=0;
 
 private:
 	std::string name;
