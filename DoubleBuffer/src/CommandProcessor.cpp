@@ -17,6 +17,10 @@
 
 CommandProcessor* CommandProcessor::instance=0;
 
+CommandProcessor::CommandProcessor() {}
+
+CommandProcessor::~CommandProcessor() {}
+
 CommandProcessor* CommandProcessor::getInstance()
 {
 	if (instance ==0) {
@@ -61,4 +65,14 @@ Command* CommandProcessor::lookupCommand(const std::string& cmd)
 		return 0;
 
 	return commands[cmd];
+}
+
+void CommandProcessor::retrieveAllCommands(std::vector<Command*>& r)
+{
+	r.clear();
+	for (CommandMap::iterator i = commands.begin(); i!= commands.end(); i++) {
+		Command* p;
+		p = i->second;
+		r.push_back(p);
+	}
 }

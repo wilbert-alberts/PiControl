@@ -30,6 +30,9 @@ public:
 protected:
 	static CommandProcessor* instance;
 	CommandMap commands;
+
+private:
+	CommandProcessor();
 };
 
 #endif
