@@ -11,6 +11,9 @@
 #include "StopTimer.h"
 #include "Traces_Term.h"
 
+#include "CommandProcessor.h"
+#include "CmdHelp.h"
+
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -18,17 +21,7 @@
 #include <stdexcept>
 #include <string>
 
-typedef void (*TerminalCommand)(int argc, char* argv[]);
-typedef std::map<const std::string, TerminalCommand> CommandMap;
-
 void registerCommands();
-void processCommand(int argc, char* argv[]);
-void extractCommand(std::string& result, const char* p);
-void help(int argc, char* argv[]);
-
-static CommandMap commands;
-
-static const std::string cmdHelp("help");
 
 int main(int argc, char* argv[])
 {
@@ -39,7 +32,7 @@ int main(int argc, char* argv[])
   try {
     db->connect();
     db->lock();
-    processCommand(argc, argv);
+    CommandProcessor::getInstance()->processCommand(argc, argv);
     db->unlock();
   }
   catch (const std::exception& e) {
@@ -51,7 +44,7 @@ int main(int argc, char* argv[])
 }
 
 void registerCommands()
-{
+{/*
   commands[TimeStats_Term::dumpTimingCommand]=&TimeStats_Term::execDumpTiming;
   commands[TimeStats_Term::resetTimingCommand]=&TimeStats_Term::execResetTiming;
   commands[Parameter::dumpAllParametersCommand] = &Parameter::execDumpAllParameters;
@@ -59,38 +52,6 @@ void registerCommands()
   commands[Traces_Term::addTraceCommand] = &Traces_Term::execAddTrace;
   commands[Traces_Term::delTraceCommand] = &Traces_Term::execDelTrace;
   commands[Traces_Term::dumpTracesCommand] = &Traces_Term::execDumpTraces;
-  commands[cmdHelp] = &help;
-}
-
-void processCommand(int argc, char* argv[])
-{
-  std::string c;
-  extractCommand(c, argv[0]);
-  if (c == "Terminal") {
-    argv++;
-    argc--;
-    c=argv[0];
-  }
-  if (commands.find(c) == commands.end()) {
-    throw std::runtime_error("unknown command " + c);
-  }
-
-  TerminalCommand cmd = commands[c];
-
-  cmd(argc, argv);
-}
-
-void extractCommand(std::string& result, const char* p)
-{
-  const char* cmd = strrchr(p, '/');
-
-  result.assign(cmd+1);
-}
-void help(int /*argc*/, char** /*argv[]*/)
-{
-  std::cout << "Available commands: " << std::endl;
-  for (CommandMap::iterator i=commands.begin();
-       i!= commands.end(); i++) {
-    std::cout << "\t" << (*i).first << std::endl;
-  }
+  */
+  new CmdHelp();
 }
