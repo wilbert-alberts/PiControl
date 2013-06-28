@@ -18,15 +18,17 @@ int main(int /*argc*/, char** /*argv[]*/)
   try
   {
     PeriodicTimer* pt;
-    DoubleBuffer*  db;
+    DoubleBuffer*  db(DoubleBuffer::getInstance());
     Traces_Servo*  traces;
 
-    db = DoubleBuffer::getInstance();
     db->create(1024);
-
-
-
     db->lock();
+
+    Parameter* tsStart = new Parameter("TimeStats.start");
+    Parameter* tsEnd   = new Parameter("TimeStats.end");
+    Parameter* tsTracing = new Parameter("TimeStats.tracing");
+    Parameter* tsCheckStop = new Parameter("TimeStats.checkStop");
+
     pt = PeriodicTimer::getInstance(1000000);
     TimeStats_Servo::initSample();
     traces = Traces_Servo::getInstance();
@@ -35,9 +37,17 @@ int main(int /*argc*/, char** /*argv[]*/)
     db->unlock();
 
     pt->addPeriodicFunction(lockDB, db);
+    pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp,tsStart);
+    // add sample functions
+
+    pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsTracing);
     pt->addPeriodicFunction(Traces_Servo::sampleAllTraces, 0);
     pt->addPeriodicFunction(TimeStats_Servo::sampleCommand, 0);
+
+    pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsCheckStop);
     pt->addPeriodicFunction(PeriodicTimer::checkStop, 0);
+
+    pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsEnd);
     pt->addPeriodicFunction(unlockDB, db);
 
     pt->start();
