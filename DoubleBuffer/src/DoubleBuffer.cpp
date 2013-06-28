@@ -62,7 +62,7 @@ void DoubleBuffer::create(int size) {
 
 	int memSize = (size+sizeof(DoubleBufferPage))*2;
 	if (ftruncate(shmfd, memSize)==-1) {
-		throw std::system_error(errno, std::system_category(),"nable to set length of shared memory");
+		throw std::system_error(errno, std::system_category(),"unable to set length of shared memory");
 	}
 
 	pageHandles[0].page = static_cast<DoubleBufferPage*>(mmap(0, memSize, PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0));
