@@ -15,11 +15,11 @@
 #include <stdexcept>
 #include <string>
 
-constexpr int MAXNAMESIZE = 64;
+constexpr int MaxNameLength = 64;
 
 typedef struct {
   double value;
-  char   name[MAXNAMESIZE];
+  char   name[MaxNameLength];
 } DB_Parameter;
 
 typedef struct {
@@ -39,9 +39,18 @@ Parameter::Parameter(const std::string& name)
     idx = p->nrParameters;
     p->nrParameters++;
     DB_Parameter* par = (p->params)+(idx);
-    strncpy(par->name, name.c_str(), MAXNAMESIZE-1);
+    if (name.length() > MaxNameLength-1) {
+    	std::clog << "Warning: only using " << MaxNameLength-1 << " characters from: " << name << std::endl;
+    }
+    strncpy(par->name, name.c_str(), MaxNameLength-1);
     par->value = 0.0;
   }
+}
+
+Parameter::Parameter(int i)
+: db(DoubleBuffer::getInstance()), idx(i)
+{
+
 }
 
 Parameter::~Parameter() {
@@ -106,7 +115,7 @@ int Parameter::findParameter(const std::string& name)
 {
   DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
   for (int i=0; i<p->nrParameters; i++) {
-    if (strncmp(name.c_str(), p->params[i].name,MAXNAMESIZE-1)==0) {
+    if (strncmp(name.c_str(), p->params[i].name,MaxNameLength-1)==0) {
       return i;
     }
   }

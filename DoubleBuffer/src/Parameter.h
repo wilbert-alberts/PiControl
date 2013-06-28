@@ -10,13 +10,13 @@
 
 #include <string>
 
-#define TYPE double
-
 class DoubleBuffer;
 
 class Parameter {
 public:
   Parameter(const std::string& name);
+  Parameter(int idx);
+
   virtual ~Parameter();
 
   std::string getName();

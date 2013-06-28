@@ -18,6 +18,8 @@
 #include "CmdResetTimeStats.h"
 #include "CmdDumpTiming.h"
 #include "CmdDumpAllParams.h"
+#include "CmdParameter.h"
+
 
 #include <cstdlib>
 #include <cstring>
@@ -31,11 +33,11 @@ void registerCommands();
 int main(int argc, char* argv[]) {
 	DoubleBuffer* db = DoubleBuffer::getInstance();
 
-	registerCommands();
-
 	try {
 		db->connect();
 		db->lock();
+		registerCommands();
+
 		CommandProcessor::getInstance()->processCommand(argc, argv);
 		db->unlock();
 	} catch (const std::exception& e) {
@@ -55,4 +57,5 @@ void registerCommands() {
 	new CmdResetTimeStats();
 	new CmdDumpTiming();
 	new CmdDumpAllParams();
+	CmdParameter::createParameterCommands();
 }
