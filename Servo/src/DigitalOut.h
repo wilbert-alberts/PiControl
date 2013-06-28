@@ -15,7 +15,7 @@ class Parameter;
 
 class DigitalOut {
 public:
-	DigitalOut* create(const std::string& name, int pin, int value);
+	static DigitalOut* create(const std::string& name, int pin, int value);
 	virtual ~DigitalOut();
 
 	void set(int value);

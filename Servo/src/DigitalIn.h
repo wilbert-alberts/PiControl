@@ -15,7 +15,7 @@ class Parameter;
 
 class DigitalIn {
 public:
-	DigitalIn* create(const std::string& name, int pin);
+	static DigitalIn* create(const std::string& name, int pin);
 	virtual ~DigitalIn();
 
 	int get();

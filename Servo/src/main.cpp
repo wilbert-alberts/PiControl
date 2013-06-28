@@ -10,6 +10,8 @@
 #include "Traces_Servo.h"
 #include "DigitalOut.h"
 #include "DigitalIn.h"
+#include "BitBus.h"
+
 
 void lockDB(void* context);
 void unlockDB(void* context);
