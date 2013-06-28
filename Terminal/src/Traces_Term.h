@@ -29,14 +29,7 @@ public:
   void destroyTrace(const std::string& par);
   void dumpTraces();
 
-  static void execAddTrace(int argc, char* argv[]);
-  static void execDelTrace(int argc, char* argv[]);
-  static void execDumpTraces(int argc, char* argv[]);
-
-  static const std::string addTraceCommand;
-  static const std::string delTraceCommand;
-  static const std::string dumpTracesCommand;
-
+  static const int DefaultTraceLength;
 private:
   Traces_Term(int nrTraces);
   void attachForRead();

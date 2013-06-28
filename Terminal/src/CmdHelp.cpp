@@ -22,11 +22,10 @@ CmdHelp::~CmdHelp() {
 
 void CmdHelp::execute(std::list<std::string>& args)
 {
-	std::string c;
-	args.pop_front(); // Chop off help command first.
 	if (args.empty()) {
 		displayHelp();
 	} else {
+		std::string c = args.front();
 
 		Command* cmd = CommandProcessor::getInstance()->lookupCommand(c);
 		if (cmd != 0) {

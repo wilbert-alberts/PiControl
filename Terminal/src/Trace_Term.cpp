@@ -26,11 +26,7 @@
 #include <stdexcept>
 #include <string>
 
-const std::string Traces_Term::addTraceCommand("addTrace");
-const std::string Traces_Term::delTraceCommand("delTrace");
-const std::string Traces_Term::dumpTracesCommand("dumpTraces");
-
-#define DEFAULT_TRACE_LENGTH (1000)
+const int Traces_Term::DefaultTraceLength = 1000;
 
 Traces_Term::Traces_Term(int nrTraces)
 : Traces(nrTraces)
@@ -72,6 +68,7 @@ void Traces_Term::dumpTraces() {
   std::ostringstream ss;
 
   try {
+	attachForRead();
     lockTraceDB();
     if (getNrTraces() > 0) {
       startCounter = getTraceEntry(0)->getStart();
@@ -116,33 +113,6 @@ void Traces_Term::dumpTraces() {
     }
     throw;
   }
-}
-
-void Traces_Term::execAddTrace(int argc, char* argv[]) {
-  Traces_Term* instance = Traces_Term::getInstance();
-  for (int i = 1; i < argc; i++) {
-    std::string par(argv[i]);
-    instance->createTrace(par, DEFAULT_TRACE_LENGTH);
-  }
-}
-
-void Traces_Term::execDelTrace(int argc, char* argv[]) {
-  Traces_Term* instance = Traces_Term::getInstance();
-  for (int i = 1; i < argc; i++) {
-    std::string par(argv[i]);
-    instance->destroyTrace(par);
-  }
-}
-
-void Traces_Term::execDumpTraces(int argc, char** /*argv[]*/) {
-  if (argc != 1) {
-    throw std::runtime_error("usage: " + dumpTracesCommand);
-  }
-
-  Traces_Term* instance = Traces_Term::getInstance();
-
-  instance->attachForRead();
-  instance->dumpTraces();
 }
 
 void Traces_Term::attachForRead() {
