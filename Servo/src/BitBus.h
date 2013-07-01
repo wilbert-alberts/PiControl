@@ -28,8 +28,8 @@ public:
 	void setRegister(int id, int value);
 	int  getRegister(int id);
 
-	void copyBytesTo(char* dst);
-	void copyBytesFrom(char* src);
+	void copyBytesTo(unsigned char* dst);
+	void copyBytesFrom(unsigned char* src);
 
 private:
 	void clearBit(int bit);

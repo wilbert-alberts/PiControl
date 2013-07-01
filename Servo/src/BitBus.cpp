@@ -120,12 +120,12 @@ void BitBus::setBit(int bit, int value)
 	bytes[byteNr] = (bytes[byteNr] & (~mask)) | vmask;
 }
 
-void BitBus::copyBytesTo(char* dst)
+void BitBus::copyBytesTo(unsigned char* dst)
 {
 	memcpy (dst, bytes, nrBits/8+1);
 }
 
-void BitBus::copyBytesFrom(char* src)
+void BitBus::copyBytesFrom(unsigned char* src)
 {
 	memcpy (bytes, src, nrBits/8+1);
 }
