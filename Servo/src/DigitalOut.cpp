@@ -12,6 +12,9 @@
 #include "wiringPi.h"
 #endif
 
+#include <iostream>
+
+
 std::map<const std::string, DigitalOut*> DigitalOut::instances;
 
 DigitalOut::DigitalOut(const std::string& name, int p, int v) :
@@ -19,6 +22,7 @@ DigitalOut::DigitalOut(const std::string& name, int p, int v) :
 #ifdef WIRINGPI
 	pinMode(pin, OUTPUT);
 	digitalWrite(pin, v);
+        std::cout << "digwrite" << pin << ", " << v << std::endl;
 #endif
 	par->set(v);
 }
@@ -34,6 +38,7 @@ DigitalOut* DigitalOut::create(const std::string& name, int pin, int value) {
 }
 
 void DigitalOut::set(int v) {
+        digitalWrite(pin, v);
 	par->set(v != 0 ? 1.0 : 0.0);
 }
 
@@ -54,7 +59,7 @@ void DigitalOut::activateAllOuts(void* /*context*/) {
 		DigitalOut* digo = iter->second;
 
 #ifdef WIRINGPI
-		digitalWrite(pin, digo->get());
+		digitalWrite(digo->pin, digo->get());
 #endif
 
 	}

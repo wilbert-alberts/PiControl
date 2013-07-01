@@ -33,7 +33,7 @@ int DigitalIn::get() {
 	int v;
 #ifdef WIRINGPI
 	pinMode(pin, INPUT);
-	v = digitalRead(pin)
+	v = digitalRead(pin);
 	par->set(v);
 #endif
 	return v;

@@ -26,7 +26,7 @@ public:
 	BitBus* getBB();
 
 private:
-	char*       byteArray;
+	unsigned char*       byteArray;
 	BitBus*     bb;
 	DigitalOut* Pi2Mbed;
 	DigitalIn*  Mbed2Pi;

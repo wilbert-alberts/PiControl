@@ -10,6 +10,7 @@
 #include "Traces_Servo.h"
 #include "DigitalOut.h"
 #include "DigitalIn.h"
+#include "SPI.h"
 #include "BitBus.h"
 
 #ifdef WIRINGPI
@@ -17,7 +18,7 @@
 #endif
 
 
-DigitalOut* hb = DigitalOut::create(std::string("hearbeat"), 0,0);
+DigitalOut* hb;
 
 void lockDB(void* context);
 void unlockDB(void* context);
@@ -35,6 +36,8 @@ int main(int /*argc*/, char** /*argv[]*/) {
 
 		db->create(1024);
 		db->lock();
+
+		hb = DigitalOut::create(std::string("hearbeat"), 0,0);
 
 		Parameter* tsStart = new Parameter("TimeStats.start");
 		Parameter* tsEnd = new Parameter("TimeStats.end");
@@ -55,19 +58,19 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsStart);
 		// add sample functions
 		// Start with capturing digital Ins
-		//pt->addPeriodicFunction(DigitalIn::captureAllIns, 0);
+		pt->addPeriodicFunction(DigitalIn::captureAllIns, 0);
 
 		// Read Bitbus
-		//pt->addPeriodicFunction(BitBus::readBus, bitbus);
+		//pt->addPeriodicFunction(SPIu::readBus, bitbus);
 
 		// Run servo
 		pt->addPeriodicFunction(flipper,0);
 
 		// Write Bitbus
-		//pt->addPeriodicFunction(BitBus::writeBus, bitbus);
+		pt->addPeriodicFunction(SPI::writeBus, bitbus);
 
 		// Activate digital outs.
-		//pt->addPeriodicFunction(DigitalOut::activateAllOuts, 0);
+		pt->addPeriodicFunction(DigitalOut::activateAllOuts, 0);
 
 		pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsTracing);
 		pt->addPeriodicFunction(Traces_Servo::sampleAllTraces, 0);
@@ -98,6 +101,8 @@ void unlockDB(void* context) {
 void flipper(void* /*context*/)
 {
 	static int i = 1;
-	hb->set(1-i);
+	hb->set(i);
+	i=1-i;
+	std::cout << i << std::endl;
 }
 

@@ -10,8 +10,13 @@
 #include "DigitalOut.h"
 #include "DigitalIn.h"
 
+#ifdef WIRINGPI
+#include <wiringPi.h>
+#include <wiringPiSPI.h>
+#endif
 
 #include <string>
+#include <iostream>
 
 SPI::SPI() {
 	bb = new BitBus(60);
@@ -31,12 +36,12 @@ SPI::SPI() {
 	//bb.createRegister();
 
 
-	byteArray = new char[1+60/8];
+	byteArray = new unsigned char[1+60/8];
 	Pi2Mbed = DigitalOut::create(std::string("pi2mbed"), 16, 1);
 	Mbed2Pi = DigitalIn::create("mbed2pi", 18);
 
 #ifdef WIRINGPI
-	wiringPiSetup(0,1000000); //1 Mhz, channel doesn't matter
+	wiringPiSPISetup(0,1000000); //1 Mhz, channel doesn't matter
 #endif
 
 
@@ -53,13 +58,17 @@ void SPI::writeBus()
 	// 2) Wait until Mbed2Pi is zero
 	// 3) Transmit over spi
 
+	std::cerr << "Copying to bytearray" << std::endl;
 	bb->copyBytesTo(byteArray);
 
+	std::cerr << "Set P2Mbed to 1" <<std::endl;
 	Pi2Mbed->set(1);
+	std::cerr << "Wait for mbed to acknowlegde" << std::endl;
 	while (Mbed2Pi->get() != 1.0);
 
 #ifdef WIRINGPI
-	wiringPiSPIDataRW(0, bytearray, 8);
+	std::cerr << "Initiating spi transfer" << std::endl;
+	wiringPiSPIDataRW(0, byteArray, 8);
 #endif
 
 
@@ -73,13 +82,17 @@ void SPI::readBus()
 	// 2) Wait until Mbed2Pi is zero
 	// 3) Transmit over spi
 
+	std::cerr << "Setting Pi2Mbed to 0" << std::endl;
 	Pi2Mbed->set(0);
+	std::cerr << "Waiting for mbed to acknowledge" << std::endl;
 	while (Mbed2Pi->get() != 0.0);
 
 #ifdef WIRINGPI
-	wiringPiSPIDataRW(0, bytearray, 8);
+	std::cerr << "Initiating spi transfer" << std::endl;
+	wiringPiSPIDataRW(0, byteArray, 8);
 #endif
 
+	std::cerr << "Copying bytes to array" << std::endl;
 	bb->copyBytesFrom(byteArray);
 }
 
