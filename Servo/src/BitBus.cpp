@@ -17,8 +17,8 @@
 #include <iostream>
 #include <cstring>
 
-BitBus::BitBus(int spichannel, int reqPin, int ackPin, int n)
-: nrBits(n), spiChannel(spichannel)
+BitBus::BitBus(int n)
+: nrBits(n)
 {
 	bytes = new char[nrBits/8+1];
 	shadowBytes = new char[nrBits/8+1];
@@ -26,9 +26,6 @@ BitBus::BitBus(int spichannel, int reqPin, int ackPin, int n)
 	for (int i=0; i<=nrBits/8; i++) {
 		bytes[i] = 0;
 	}
-
-	req = DigitalOut::create(std::string("BitBus.req"), reqPin, 0);
-	ack = DigitalIn::create(std::string("BitBus.ack"),ackPin);
 }
 
 BitBus::~BitBus() {
@@ -123,35 +120,12 @@ void BitBus::setBit(int bit, int value)
 	bytes[byteNr] = (bytes[byteNr] & (~mask)) | vmask;
 }
 
-void BitBus::transmitBus()
+void BitBus::copyBytesTo(char* dst)
 {
-	memcpy (shadowBytes, bytes, nrBits/8+1);
-	req->set(0);
-	while (ack->get() != 0.0)  { std::cout << "tb.";  std::cout.flush(); }
-
-#ifdef WIRINGPI
-	wiringPiSPIDataRW (int channel, shadowBytes, nrBits/8+1);
-#endif
+	memcpy (dst, bytes, nrBits/8+1);
 }
 
-void BitBus::receiveBus()
+void BitBus::copyBytesFrom(char* src)
 {
-	req->set(1);
-	while (ack->get() == 0.0)  { std::cout << "rb.";  std::cout.flush(); };
-
-#ifdef WIRINGPI
-	wiringPiSPIDataRW (int channel, shadowBytes, nrBits/8+1);
-#endif
-	memcpy (bytes, shadowBytes, nrBits/8+1);
-}
-
-void BitBus::readBitBus(void* context)
-{
-	BitBus* bb = static_cast<BitBus*> (context);
-	bb->receiveBus();
-}
-void BitBus::writeBitBus(void* context)
-{
-	BitBus* bb = static_cast<BitBus*> (context);
-	bb->transmitBus();
+	memcpy (bytes, src, nrBits/8+1);
 }

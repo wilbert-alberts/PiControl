@@ -19,7 +19,7 @@ class Parameter;
 
 class BitBus {
 public:
-	BitBus(int spiChannel, int reqPin, int ackPin, int nrBits);
+	BitBus(int nrBits);
 	virtual ~BitBus();
 
 	void createRegister(int id, const std::string& name, int startBit,
@@ -28,11 +28,8 @@ public:
 	void setRegister(int id, int value);
 	int  getRegister(int id);
 
-	void transmitBus();
-	void receiveBus();
-
-	static void readBitBus(void* context);
-	static void writeBitBus(void* context);
+	void copyBytesTo(char* dst);
+	void copyBytesFrom(char* src);
 
 private:
 	void clearBit(int bit);
