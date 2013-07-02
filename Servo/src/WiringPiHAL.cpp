@@ -7,6 +7,8 @@
 
 #include "WiringPiHAL.h"
 
+#ifdef REALMODE
+
 #include <stdexcept>
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
@@ -42,3 +44,5 @@ void WiringPiHAL::digitalWrite(int pin, int value) {
 void WiringPiHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len) {
 	wiringPiSPIDataRW(channel, data, len);
 }
+
+#endif

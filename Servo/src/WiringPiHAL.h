@@ -8,6 +8,8 @@
 #ifndef WIRINGPIHAL_H_
 #define WIRINGPIHAL_H_
 
+#ifdef REALMODE
+
 #include "HAL.h"
 
 class WiringPiHAL : public HAL {
@@ -20,4 +22,8 @@ public:
 	virtual void digitalWrite(int pin, int value);
 	virtual void wiringPiSPIDataRW(int channel, unsigned char *data, int len);
 };
+
+#endif
+
 #endif /* HAL_H_ */
+
