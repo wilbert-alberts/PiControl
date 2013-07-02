@@ -8,22 +8,17 @@
 #include "DigitalOut.h"
 #include "Parameter.h"
 
-#ifdef WIRINGPI
-#include "wiringPi.h"
-#endif
+#include "HAL.h"
 
 #include <iostream>
-
 
 std::map<const std::string, DigitalOut*> DigitalOut::instances;
 
 DigitalOut::DigitalOut(const std::string& name, int p, int v) :
 		pin(p), par(new Parameter(name)) {
-#ifdef WIRINGPI
-	pinMode(pin, OUTPUT);
-	digitalWrite(pin, v);
-        std::cout << "digwrite" << pin << ", " << v << std::endl;
-#endif
+	HAL::getInstance()->pinMode(pin, HAL::OUT);
+	HAL::getInstance()->digitalWrite(pin, v);
+	std::cout << "digwrite" << pin << ", " << v << std::endl;
 	par->set(v);
 }
 
@@ -38,7 +33,7 @@ DigitalOut* DigitalOut::create(const std::string& name, int pin, int value) {
 }
 
 void DigitalOut::set(int v) {
-        digitalWrite(pin, v);
+	HAL::getInstance()->digitalWrite(pin, v);
 	par->set(v != 0 ? 1.0 : 0.0);
 }
 
@@ -58,9 +53,7 @@ void DigitalOut::activateAllOuts(void* /*context*/) {
 			instances.begin(); iter != instances.end(); iter++) {
 		DigitalOut* digo = iter->second;
 
-#ifdef WIRINGPI
-		digitalWrite(digo->pin, digo->get());
-#endif
+		HAL::getInstance()->digitalWrite(digo->pin, digo->get());
 
 	}
 }

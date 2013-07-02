@@ -13,27 +13,29 @@
 #include "SPI.h"
 #include "BitBus.h"
 
-#ifdef WIRINGPI
-#include <wiringPi.h>
-#endif
+#include "HAL.h"
+#include "SimulatedHAL.h"
+#include "WiringPiHAL.h"
 
-
-DigitalOut* hb;
+static DigitalOut* hb;
 
 void lockDB(void* context);
 void unlockDB(void* context);
 void flipper(void* context);
 
 int main(int /*argc*/, char** /*argv[]*/) {
-#ifdef WIRINGPI
-	wiringPiSetup();
-#endif
 
 	try {
 		PeriodicTimer* pt;
 		DoubleBuffer* db(DoubleBuffer::getInstance());
 		Traces_Servo* traces;
 
+#ifdef REALMODE
+		WiringPiHAL::registerHAL();
+#else
+		SimulatedHAL::registerHAL();
+#endif
+		HAL::getInstance()->setup();
 		db->create(1024);
 		db->lock();
 

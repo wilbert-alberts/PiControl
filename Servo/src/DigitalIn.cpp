@@ -8,9 +8,7 @@
 #include "DigitalIn.h"
 #include "Parameter.h"
 
-#ifdef WIRINGPI
-#include "wiringPi.h"
-#endif
+#include "HAL.h"
 
 std::map<const std::string, DigitalIn*> DigitalIn::instances;
 
@@ -26,16 +24,14 @@ DigitalIn::~DigitalIn() {
 DigitalIn* DigitalIn::create(const std::string& name, int pin) {
 	DigitalIn* r = new DigitalIn(name, pin);
 	DigitalIn::instances[name] = r;
+	HAL::getInstance()->pinMode(pin, HAL::IN);
 	return r;
 }
 
 int DigitalIn::get() {
 	int v;
-#ifdef WIRINGPI
-	pinMode(pin, INPUT);
-	v = digitalRead(pin);
+	v = HAL::getInstance()->digitalRead(pin);
 	par->set(v);
-#endif
 	return v;
 }
 

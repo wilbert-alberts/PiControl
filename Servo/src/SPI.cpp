@@ -10,10 +10,7 @@
 #include "DigitalOut.h"
 #include "DigitalIn.h"
 
-#ifdef WIRINGPI
-#include <wiringPi.h>
-#include <wiringPiSPI.h>
-#endif
+#include "HAL.h"
 
 #include <string>
 #include <iostream>
@@ -40,11 +37,6 @@ SPI::SPI() {
 	Pi2Mbed = DigitalOut::create(std::string("pi2mbed"), 16, 1);
 	Mbed2Pi = DigitalIn::create("mbed2pi", 18);
 
-#ifdef WIRINGPI
-	wiringPiSPISetup(0,1000000); //1 Mhz, channel doesn't matter
-#endif
-
-
 }
 
 SPI::~SPI() {
@@ -66,10 +58,8 @@ void SPI::writeBus()
 	std::cerr << "Wait for mbed to acknowlegde" << std::endl;
 	while (Mbed2Pi->get() != 1.0);
 
-#ifdef WIRINGPI
 	std::cerr << "Initiating spi transfer" << std::endl;
-	wiringPiSPIDataRW(0, byteArray, 8);
-#endif
+	HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, 8);
 
 
 
@@ -87,10 +77,8 @@ void SPI::readBus()
 	std::cerr << "Waiting for mbed to acknowledge" << std::endl;
 	while (Mbed2Pi->get() != 0.0);
 
-#ifdef WIRINGPI
 	std::cerr << "Initiating spi transfer" << std::endl;
-	wiringPiSPIDataRW(0, byteArray, 8);
-#endif
+	HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, 8);
 
 	std::cerr << "Copying bytes to array" << std::endl;
 	bb->copyBytesFrom(byteArray);
