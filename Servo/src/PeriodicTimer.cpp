@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <system_error>
+#include <stdexcept>
 
 #include "PeriodicTimer.h"
 #include "Parameter.h"
@@ -23,20 +24,16 @@ PeriodicTimer* PeriodicTimer::getInstance(unsigned int p) {
 	if (instance == 0) {
 		instance = new PeriodicTimer(p);
 	} else {
-		if (instance->period != p) {
-			std::cerr << "Only one instance can be created." << std::endl;
-			exit(-1);
-		}
+		if (instance->period != p)
+			throw std::runtime_error("Only one PeriodicTimer can be created.");
 	}
 	return instance;
 }
 
 PeriodicTimer* PeriodicTimer::getInstance() {
-	if (instance == 0) {
-		std::cerr << "Creation of PeriodicTimer instance requires period."
-				<< std::endl;
-		exit(-1);
-	}
+	if (instance == 0)
+		throw std::runtime_error(
+				"No PeriodicTimer instance created, creation of PeriodicTimer instance requires period.");
 	return instance;
 }
 
@@ -138,13 +135,13 @@ void PeriodicTimer::updateStats() {
 	maxMargin = margin > maxMargin ? margin : maxMargin;
 }
 
-unsigned int  PeriodicTimer::getTimeElapsed() {
+unsigned int PeriodicTimer::getTimeElapsed() {
 	static struct itimerspec m;
 	int ret = timerfd_gettime(timer_fd, &m);
 	if (ret == -1) {
 		perror("Reading margin");
 	}
-	return period - m.it_value.tv_nsec/1000;
+	return period - m.it_value.tv_nsec / 1000;
 }
 
 unsigned int PeriodicTimer::getMargin() {
