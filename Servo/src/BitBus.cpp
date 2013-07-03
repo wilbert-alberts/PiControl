@@ -39,7 +39,6 @@ void BitBus::createRegister(int id, const std::string& name, int startBit, int l
 	Register r;
 	r.startBit = startBit;
 	r.length = length;
-	r.par = new Parameter(name);
 
 	registers[id] = r;
 }
@@ -52,11 +51,9 @@ void BitBus::setRegister(int id, int value) {
 
 	if (value > (1<<r.length)) {
 		std::ostringstream ss;
-		ss << "value " << value << " does not fit in register " << r.par->getName();
+		ss << "value " << value << " does not fit in register " << id;
 		throw std::invalid_argument(ss.str());
 	}
-
-	r.par->set(value);
 
 	for (int i=0; i<r.length;i++) {
 		setBit(i+r.startBit, value&1);

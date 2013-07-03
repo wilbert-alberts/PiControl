@@ -11,12 +11,6 @@
 #include <string>
 #include <map>
 
-
-class DigitalOut;
-class DigitalIn;
-class Parameter;
-
-
 class BitBus {
 public:
 	BitBus(unsigned char* bytes, int nrBytes);
@@ -40,7 +34,6 @@ private:
 	public:
 		int startBit;
 		int length;
-		Parameter* par;
 	};
 
 	std::map<int, Register> registers;
