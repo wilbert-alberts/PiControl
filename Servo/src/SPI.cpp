@@ -17,7 +17,10 @@
 #include <sys/time.h>
 
 SPI::SPI() {
-	bb = new BitBus(90);
+	// 90 bits. +7/8 results in number of bytes.
+	nrBytes = (90+7)/8;
+	byteArray = new unsigned char[nrBytes];
+	bb = new BitBus(byteArray, nrBytes);
 
 	bb->createRegister(1, std::string("Height1"),    0, 16);
 	bb->createRegister(2, std::string("Height2"),   16, 16);
@@ -27,14 +30,8 @@ SPI::SPI() {
 	bb->createRegister(11, std::string("PWM"),      64, 16);
 	bb->createRegister(12, std::string("MotorDir"), 72,  8);
 
-	//bb.createRegister();
-	//bb.createRegister();
-	//bb.createRegister();
-
-	byteArray = new unsigned char[90 / 8];
 	Pi2Mbed = DigitalOut::create(std::string("pi2mbed"), 16, 1);
 	Mbed2Pi = DigitalIn::create("mbed2pi", 18);
-
 }
 
 SPI::~SPI() {
@@ -49,16 +46,15 @@ void SPI::writeBus() {
 
 	try {
 		waitOnSignal(Mbed2Pi, 0.0, 1000);
-		std::cerr << "Copying to bytearray" << std::endl;
-		bb->copyBytesTo(byteArray);
 
 		std::cerr << "Set P2Mbed to 1" << std::endl;
 		Pi2Mbed->set(1);
+
 		std::cerr << "Wait for mbed to acknowlegde" << std::endl;
 		waitOnSignal(Mbed2Pi, 1.0, 1000);
 
 		std::cerr << "Initiating spi transfer" << std::endl;
-		HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, 8);
+		HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
 	} catch (int to) {
 		std::cerr << "Timeout on SPI bus during write, reset" << std::endl;
 		Pi2Mbed->set(1.0);
@@ -79,10 +75,9 @@ void SPI::readBus() {
 		waitOnSignal(Mbed2Pi, 0.0, 1000);
 
 		std::cerr << "Initiating spi transfer" << std::endl;
-		HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, 8);
+		HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
 
 		std::cerr << "Copying bytes to array" << std::endl;
-		bb->copyBytesFrom(byteArray);
 	} catch (int to) {
 		std::cerr << "Timeout on SPI bus read, reset" << std::endl;
 		Pi2Mbed->set(1.0);

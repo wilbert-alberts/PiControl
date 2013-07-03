@@ -19,7 +19,7 @@ class Parameter;
 
 class BitBus {
 public:
-	BitBus(int nrBits);
+	BitBus(unsigned char* bytes, int nrBytes);
 	virtual ~BitBus();
 
 	void createRegister(int id, const std::string& name, int startBit,
@@ -28,22 +28,13 @@ public:
 	void setRegister(int id, int value);
 	int  getRegister(int id);
 
-	void copyBytesTo(unsigned char* dst);
-	void copyBytesFrom(unsigned char* src);
-
 private:
 	void clearBit(int bit);
 	void setBit(int bit);
 	void setBit(int bit, int value);
 
-	int nrBits;
-	char* bytes;
-	char* shadowBytes;
-
-	int spiChannel;
-	DigitalOut* req;
-	DigitalIn*  ack;
-
+	int nrBytes;
+	unsigned char* bytes;
 
 	class Register {
 	public:

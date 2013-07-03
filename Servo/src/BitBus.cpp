@@ -17,24 +17,17 @@
 #include <iostream>
 #include <cstring>
 
-BitBus::BitBus(int n)
-: nrBits(n)
+BitBus::BitBus(unsigned char* b, int n)
+: nrBytes(n), bytes(b)
 {
-	bytes = new char[nrBits/8+1];
-	shadowBytes = new char[nrBits/8+1];
-
-	for (int i=0; i<=nrBits/8; i++) {
-		bytes[i] = 0;
-	}
 }
 
 BitBus::~BitBus() {
-	delete[] bytes;
 }
 
 void BitBus::createRegister(int id, const std::string& name, int startBit, int length)
 {
-	if (startBit + length > nrBits)
+	if (startBit*8 + length > nrBytes)
 		throw std::range_error("startBit + length exceeds size of BitBus");
 
 	if (registers.find(id) != registers.end())
@@ -87,7 +80,7 @@ int BitBus::getRegister(int id) {
 
 void BitBus::clearBit(int bit)
 {
-	if (bit >= nrBits)
+	if (bit >= nrBytes*8)
 		throw std::range_error("bit exceeds size of BitBus in clearBit");
 
 	int byteNr = bit/8;
@@ -98,7 +91,7 @@ void BitBus::clearBit(int bit)
 
 void BitBus::setBit(int bit)
 {
-	if (bit >= nrBits)
+	if (bit >= nrBytes*8)
 		throw std::range_error("bit exceeds size of BitBus in setBit");
 
 	int byteNr = bit/8;
@@ -110,7 +103,7 @@ void BitBus::setBit(int bit)
 
 void BitBus::setBit(int bit, int value)
 {
-	if (bit >= nrBits)
+	if (bit >= nrBytes*8)
 		throw std::range_error("bit exceeds size of BitBus in setBit");
 
 	int byteNr = bit/8;
@@ -118,14 +111,4 @@ void BitBus::setBit(int bit, int value)
 	char vmask = (value==0) ? 0 : 1<< (bit%8);
 
 	bytes[byteNr] = (bytes[byteNr] & (~mask)) | vmask;
-}
-
-void BitBus::copyBytesTo(unsigned char* dst)
-{
-	memcpy (dst, bytes, nrBits/8+1);
-}
-
-void BitBus::copyBytesFrom(unsigned char* src)
-{
-	memcpy (bytes, src, nrBits/8+1);
 }
