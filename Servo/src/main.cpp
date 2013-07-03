@@ -47,7 +47,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		Parameter* tsCheckStop = new Parameter("TimeStats.checkStop");
 
 		// TODO: assign channel and pins for BitBus
-		BitBus* bitbus = new BitBus(60);
+		SPI* spibus= new SPI();
 
 		pt = PeriodicTimer::getInstance(1000000);
 		TimeStats_Servo::initSample();
@@ -69,7 +69,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(flipper,0);
 
 		// Write Bitbus
-		pt->addPeriodicFunction(SPI::writeBus, bitbus);
+		pt->addPeriodicFunction(SPI::writeBus, spibus);
 
 		// Activate digital outs.
 		pt->addPeriodicFunction(DigitalOut::activateAllOuts, 0);
