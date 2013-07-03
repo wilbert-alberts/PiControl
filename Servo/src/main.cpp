@@ -63,7 +63,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(DigitalIn::captureAllIns, 0);
 
 		// Read Bitbus
-		//pt->addPeriodicFunction(SPIu::readBus, bitbus);
+		pt->addPeriodicFunction(SPI::readBus, spibus);
 
 		// Run servo
 		pt->addPeriodicFunction(flipper,0);
