@@ -19,13 +19,13 @@
 SPI::SPI() {
 	bb = new BitBus(90);
 
-	bb->createRegister(1, std::string("Height1"), 16, 0);
-	bb->createRegister(2, std::string("Height2"), 16, 16);
-	bb->createRegister(3, std::string("UBat"), 16, 32);
-	bb->createRegister(4, std::string("EncPos"), 16, 48);
+	bb->createRegister(1, std::string("Height1"),    0, 16);
+	bb->createRegister(2, std::string("Height2"),   16, 16);
+	bb->createRegister(3, std::string("UBat"),      32, 16);
+	bb->createRegister(4, std::string("EncPos"),    48, 16);
 
-	bb->createRegister(11, std::string("PWM"), 16, 0);
-	bb->createRegister(12, std::string("MotorDir"), 8, 16);
+	bb->createRegister(11, std::string("PWM"),      64, 16);
+	bb->createRegister(12, std::string("MotorDir"), 72,  8);
 
 	//bb.createRegister();
 	//bb.createRegister();
@@ -93,16 +93,14 @@ void SPI::waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs) {
 	static struct timeval tv;
 	static struct timeval to;
 
-	gettimeofday(&to, 0);
-	to.tv_sec = to.tv_sec + (to.tv_usec + timeoutInUs) / 1000000;
-	to.tv_usec = to.tv_usec + (to.tv_usec + timeoutInUs) % 1000000;
-	std::clog << "Waiting until: " << to.tv_sec << "," << to.tv_usec << std::endl;
+	gettimeofday(&tv, 0);
+	to.tv_sec = tv.tv_sec + ((tv.tv_usec + timeoutInUs) / 1000000);
+	to.tv_usec = (tv.tv_usec + timeoutInUs) % 1000000;
 	do {
 		if (in->get() == value)
 			return;
 
 		gettimeofday(&tv, 0);
-		std::clog << "Now: " << tv.tv_sec << "," << tv.tv_usec << std::endl;
 	} while ((to.tv_sec > tv.tv_sec) || (to.tv_usec > tv.tv_usec));
 	throw(1);
 }
