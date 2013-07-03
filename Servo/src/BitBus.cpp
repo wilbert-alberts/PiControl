@@ -27,12 +27,15 @@ BitBus::~BitBus() {
 
 void BitBus::createRegister(int id, const std::string& name, int startBit, int length)
 {
-	if (startBit*8 + length > nrBytes)
-		throw std::range_error("startBit + length exceeds size of BitBus");
+	if (startBit + length > nrBytes*8)
+		throw std::range_error("startBit + length exceeds size of BitBus for register: " + name);
 
 	if (registers.find(id) != registers.end())
-		throw std::invalid_argument("register id already present in BitBus");
-
+	{
+		std::string n = "register id " + id;
+		n += " ("+ name +") already present in BitBus";
+		throw std::invalid_argument(n);
+	}
 	Register r;
 	r.startBit = startBit;
 	r.length = length;
