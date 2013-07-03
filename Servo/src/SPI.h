@@ -26,6 +26,8 @@ public:
 	BitBus* getBB();
 
 private:
+	void waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs);
+
 	unsigned char*       byteArray;
 	BitBus*     bb;
 	DigitalOut* Pi2Mbed;
