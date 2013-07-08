@@ -24,25 +24,25 @@ void WiringPiHAL::setup() {
 
 void WiringPiHAL::pinMode(int pin, int mode) {
 	if (mode == HAL::IN) {
-		pinMode(pin, INPUT);
+		::pinMode(pin, INPUT);
 		return;
 	}
 
 	if (mode == HAL::OUT) {
-		pinMode(pin, OUTPUT);
+		::pinMode(pin, OUTPUT);
 		return;
 	}
-	throw std::out_of_range("Illegal pinMode");
+	throw std::out_of_range("Illegal pinMode: ");
 }
 
 int WiringPiHAL::digitalRead(int pin) {
-	return digitalRead(pin);
+	return ::digitalRead(pin);
 }
 void WiringPiHAL::digitalWrite(int pin, int value) {
-	digitalWrite(pin, value);
+	::digitalWrite(pin, value);
 }
 void WiringPiHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len) {
-	wiringPiSPIDataRW(channel, data, len);
+	::wiringPiSPIDataRW(channel, data, len);
 }
 
 #endif
