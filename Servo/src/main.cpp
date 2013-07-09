@@ -12,10 +12,14 @@
 #include "DigitalIn.h"
 #include "SPI.h"
 #include "BitBus.h"
-
+#include "Motor.h"
 #include "HAL.h"
 #include "SimulatedHAL.h"
 #include "WiringPiHAL.h"
+
+
+constexpr int MEMORYSIZE=16*1024;  // 16 Kilobytes.
+constexpr int SERVOFREQUENCY=2;    // 2 Hz
 
 static DigitalOut* hb;
 
@@ -36,7 +40,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		SimulatedHAL::registerHAL();
 #endif
 		HAL::getInstance()->setup();
-		db->create(1024);
+		db->create(MEMORYSIZE);
 		db->lock();
 
 		hb = DigitalOut::create(std::string("hearbeat"), 0,0);
@@ -47,9 +51,11 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		Parameter* tsCheckStop = new Parameter("TimeStats.checkStop");
 
 		// TODO: assign channel and pins for BitBus
-		SPI* spibus= new SPI();
+		SPI* spibus(SPI::getInstance());
 
-		pt = PeriodicTimer::getInstance(1000000);
+		Motor* motor(Motor::getInstance());
+
+		pt = PeriodicTimer::getInstance(1000000 / SERVOFREQUENCY );
 		TimeStats_Servo::initSample();
 		traces = Traces_Servo::getInstance();
 		traces->clearAllTraces();
@@ -63,13 +69,14 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(DigitalIn::captureAllIns, 0);
 
 		// Read Bitbus
-		pt->addPeriodicFunction(SPI::readBus, spibus);
+		//pt->addPeriodicFunction(SPI::readBus, spibus);
 
 		// Run servo
 		pt->addPeriodicFunction(flipper,0);
+		pt->addPeriodicFunction(Motor::sample, motor);
 
 		// Write Bitbus
-		pt->addPeriodicFunction(SPI::writeBus, spibus);
+		//pt->addPeriodicFunction(SPI::writeBus, spibus);
 
 		// Activate digital outs.
 		pt->addPeriodicFunction(DigitalOut::activateAllOuts, 0);
