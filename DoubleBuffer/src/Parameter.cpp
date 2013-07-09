@@ -33,6 +33,12 @@ Parameter::Parameter(const std::string& name)
 {
   DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 
+  int memSize = DoubleBuffer::getInstance()->size();
+  int maxNrParameters = (memSize - sizeof(DB_mem))/sizeof(DB_Parameter);
+  if (p->nrParameters == maxNrParameters)
+	  throw std::runtime_error("Exceeding memory space while creating Parameter: " + name);
+
+
   idx = findParameter(name);
   if (idx<0) {
     // Create parameter in double buffer.
