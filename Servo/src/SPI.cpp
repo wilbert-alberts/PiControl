@@ -29,8 +29,8 @@ SPI::SPI() {
 	createRegister(11, std::string("SPI.PWM"),      64, 16);
 	createRegister(12, std::string("SPI.MotorDir"), 72,  8);
 
-	Pi2Mbed = DigitalOut::create(std::string("pi2mbed"), 4, 1);
-	Mbed2Pi = DigitalIn::create("mbed2pi", 5);
+	Pi2Mbed = DigitalOut::create(std::string("SPI.pi2mbed"), 4, 1);
+	Mbed2Pi = DigitalIn::create("SPI.mbed2pi", 5);
 }
 
 SPI::~SPI() {
