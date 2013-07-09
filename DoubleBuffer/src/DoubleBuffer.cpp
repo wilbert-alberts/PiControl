@@ -108,6 +108,13 @@ void DoubleBuffer::connect() {
 	initSemaphores();
 }
 
+int DoubleBuffer::size() {
+	assert(created);
+	assert(pageHandles[0].page->pagesize==pageHandles[1].page->pagesize);
+
+	return pageHandles[0].page->pagesize;
+}
+
 void DoubleBuffer::lock(int page) {
 	int r = sem_wait(pageHandles[page].sem);
 	if (r == -1) {

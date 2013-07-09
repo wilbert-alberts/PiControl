@@ -29,6 +29,7 @@ public:
 
   void create(int size);
   void connect();
+  int  size();
 
   void lock();
   void unlock();
