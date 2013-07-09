@@ -96,6 +96,18 @@ void Parameter::set(double v) {
   par->value = v;
 }
 
+void Parameter::setDeep(double v) {
+	  DB_mem* p=static_cast<DB_mem*>(db->get());
+	  DB_Parameter* par = &p->params[idx];
+	  par->value = v;
+
+	  db->lockOther();
+	  DB_mem* o=static_cast<DB_mem*>(db->getOther());
+	  DB_Parameter* opar = &o->params[idx];
+	  opar->value = v;
+	  db->unlockOther();
+}
+
 void Parameter::setByIdx(int i, double v) {
   DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 

@@ -22,6 +22,7 @@ public:
   std::string getName();
   double get();
   void set(double v);
+  void setDeep(double v); // Carefull: requires locking both pages
 
   static int getNrParameters();
   static int findParameter(const std::string& name);

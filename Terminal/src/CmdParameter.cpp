@@ -38,7 +38,7 @@ void CmdParameter::execute(std::list<std::string>& args)
 		double v;
 		ss>>v;
 
-		par->set(v);
+		par->setDeep(v);
 	}
 }
 
