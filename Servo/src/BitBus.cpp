@@ -17,8 +17,7 @@
 #include <iostream>
 #include <cstring>
 
-BitBus::BitBus(unsigned char* b, int n)
-: nrBytes(n), bytes(b)
+BitBus::BitBus()
 {
 }
 
@@ -27,9 +26,6 @@ BitBus::~BitBus() {
 
 void BitBus::createRegister(int id, const std::string& name, int startBit, int length)
 {
-	if (startBit + length > nrBytes*8)
-		throw std::range_error("startBit + length exceeds size of BitBus for register: " + name);
-
 	if (registers.find(id) != registers.end())
 	{
 		std::string n = "register id " + id;
@@ -43,25 +39,25 @@ void BitBus::createRegister(int id, const std::string& name, int startBit, int l
 	registers[id] = r;
 }
 
-void BitBus::setRegister(int id, int value) {
+void BitBus::setRegister(unsigned char* bytes, int id, int value) {
 	if (registers.find(id) == registers.end())
 		throw std::invalid_argument("unknown register id in setRegister");
 
 	const Register& r = registers[id];
 
 	if (value > (1<<r.length)) {
-		std::ostringstream ss;
-		ss << "value " << value << " does not fit in register " << id;
-		throw std::invalid_argument(ss.str());
+		std::clog << "Warning: value " << value << " does not fit in register " << id << std::endl;
+		std::clog << "Skipping assignment." << std::endl;
+		return;
 	}
 
 	for (int i=0; i<r.length;i++) {
-		setBit(i+r.startBit, value&1);
+		setBit(bytes, i+r.startBit, value&1);
 		value = value>>1;
 	}
 }
 
-int BitBus::getRegister(int id) {
+int BitBus::getRegister(unsigned char* bytes, int id) {
 	if (registers.find(id) == registers.end())
 		throw std::invalid_argument("unknown register id in setRegister");
 
@@ -78,22 +74,16 @@ int BitBus::getRegister(int id) {
 	return result;
 }
 
-void BitBus::clearBit(int bit)
+void BitBus::clearBit(unsigned char* bytes, int bit)
 {
-	if (bit >= nrBytes*8)
-		throw std::range_error("bit exceeds size of BitBus in clearBit");
-
 	int byteNr = bit/8;
 	char mask = 1<< (bit % 8);
 
 	bytes[byteNr] = bytes[byteNr] & (~mask);
 }
 
-void BitBus::setBit(int bit)
+void BitBus::setBit(unsigned char* bytes, int bit)
 {
-	if (bit >= nrBytes*8)
-		throw std::range_error("bit exceeds size of BitBus in setBit");
-
 	int byteNr = bit/8;
 	char mask = 1 << (bit % 8);
 
@@ -101,11 +91,8 @@ void BitBus::setBit(int bit)
 }
 
 
-void BitBus::setBit(int bit, int value)
+void BitBus::setBit(unsigned char* bytes, int bit, int value)
 {
-	if (bit >= nrBytes*8)
-		throw std::range_error("bit exceeds size of BitBus in setBit");
-
 	int byteNr = bit/8;
 	char mask = 1 << (bit % 8);
 	char vmask = (value==0) ? 0 : 1<< (bit%8);

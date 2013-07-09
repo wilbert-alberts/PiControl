@@ -15,12 +15,11 @@
 #include <string>
 #include <iostream>
 #include <sys/time.h>
+#include <algorithm>
 
 SPI::SPI() {
 	// 90 bits. n+7/8 results in number of bytes.
-	nrBytes = (90+7)/8;
-	byteArray = new unsigned char[nrBytes];
-	bb = new BitBus(byteArray, nrBytes);
+	bb = new BitBus();
 
 	createRegister(1, std::string("SPI.Height1"),    0, 16);
 	createRegister(2, std::string("SPI.Height2"),   16, 16);
@@ -43,6 +42,15 @@ void SPI::createRegister(int id, const std::string& n, int start, int length)
 	bb->createRegister(id, n, start, length);
 	registers[id]=new Parameter(n);
 
+	int nb = (start+length)/8 + ((start+length)%8==0 ? 0 : 1);
+	if (nb > nrBytes) {
+		unsigned char* newBytes = new unsigned char[nb];
+		std::copy(byteArray, byteArray+nrBytes, newBytes);
+		delete[] byteArray;
+		byteArray = newBytes;
+		nrBytes = nb;
+	}
+
 }
 void SPI::writeBus() {
 	// Protocol to read from the bus consists of:
@@ -50,6 +58,7 @@ void SPI::writeBus() {
 	// 2) Wait until Mbed2Pi is zero
 	// 3) Transmit over spi
 
+	std::clog << "SPI::writeBus"<< std::endl;
 	copyFromParameters();
 
 	try {
@@ -76,7 +85,7 @@ void SPI::copyFromParameters()
 		Parameter* p = iter->second;
 		int id = iter->first;
 
-		bb->setRegister(id, p->get());
+		bb->setRegister(byteArray, id, p->get());
 	}
 }
 
@@ -86,7 +95,7 @@ void SPI::copyToParameters()
 		Parameter* p = iter->second;
 		int id = iter->first;
 
-		p->set(bb->getRegister(id));
+		p->set(bb->getRegister(byteArray, id));
 	}
 
 }
@@ -96,6 +105,7 @@ void SPI::readBus() {
 	// 2) Wait until Mbed2Pi is zero
 	// 3) Transmit over spi
 
+	std::clog << "SPI::readBus"<< std::endl;
 	try {
 		std::clog << "Verifying the Mbed2Pi line"<< std::endl;
 		waitOnSignal(Mbed2Pi, 1.0, 1000);
@@ -122,6 +132,7 @@ void SPI::waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs) {
 	static struct timeval tv;
 	static struct timeval to;
 
+#ifdef REALMODE
 	gettimeofday(&tv, 0);
 	to.tv_sec = tv.tv_sec + ((tv.tv_usec + timeoutInUs) / 1000000);
 	to.tv_usec = (tv.tv_usec + timeoutInUs) % 1000000;
@@ -132,6 +143,7 @@ void SPI::waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs) {
 		gettimeofday(&tv, 0);
 	} while ((to.tv_sec > tv.tv_sec) || (to.tv_usec > tv.tv_usec));
 	throw(1);
+#endif
 }
 
 void SPI::writeBus(void* context) {

@@ -13,22 +13,19 @@
 
 class BitBus {
 public:
-	BitBus(unsigned char* bytes, int nrBytes);
+	BitBus();
 	virtual ~BitBus();
 
 	void createRegister(int id, const std::string& name, int startBit,
 			int length);
 
-	void setRegister(int id, int value);
-	int  getRegister(int id);
+	void setRegister(unsigned char* bytes, int id, int value);
+	int  getRegister(unsigned char* bytes, int id);
 
 private:
-	void clearBit(int bit);
-	void setBit(int bit);
-	void setBit(int bit, int value);
-
-	int nrBytes;
-	unsigned char* bytes;
+	void clearBit(unsigned char* bytes, int bit);
+	void setBit(unsigned char* bytes, int bit);
+	void setBit(unsigned char* bytes, int bit, int value);
 
 	class Register {
 	public:
