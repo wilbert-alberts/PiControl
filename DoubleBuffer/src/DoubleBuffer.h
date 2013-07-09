@@ -34,6 +34,10 @@ public:
   void unlock();
   void* get();
 
+  void lockOther();
+  void unlockOther();
+  void* getOther();
+
   void copyFrom();
   void copyTo();
 

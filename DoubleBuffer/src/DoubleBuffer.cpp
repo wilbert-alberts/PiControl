@@ -90,7 +90,6 @@ void DoubleBuffer::connect() {
 	}
 
 	pageHandles[0].page = static_cast<DoubleBufferPage*>(mmap(0, sizeof(DoubleBufferPage), PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0));
-
 	if (ftruncate(shmfd, (pageHandles[0].page->pagesize+sizeof(DoubleBufferPage))*2)==-1) {
 		throw std::system_error(errno, std::system_category(), "unable to set length of shared memory");
 	}
@@ -98,6 +97,11 @@ void DoubleBuffer::connect() {
 	if (pageHandles[0].page == MAP_FAILED) {
 		throw std::system_error(errno, std::system_category(), "unable to map shared memory");
 	}
+
+	char* p1 = (char*)(pageHandles[0].page);
+	int size = pageHandles[0].page->pagesize;
+
+	pageHandles[1].page = (DoubleBufferPage*)(p1+size+sizeof(DoubleBufferPage));
 
 	created=true;
 
@@ -145,6 +149,14 @@ void DoubleBuffer::lock() {
 	return;
 }
 
+void DoubleBuffer::lockOther() {
+	assert(created);
+
+	int other = (buffer == pageHandles[0].page) ? 1: 0;
+
+	lock(other);
+}
+
 void DoubleBuffer::unlock(int page) {
 	pageHandles[page].locked = false;
 	int r = sem_post(pageHandles[page].sem);
@@ -152,25 +164,43 @@ void DoubleBuffer::unlock(int page) {
            throw std::system_error(errno, std::system_category());
 	}
 }
+
 void DoubleBuffer::unlock() {
 	assert(created);
 
-	if (pageHandles[1].locked) {
-		unlock(1);
-		return;
-	}
-	if (pageHandles[0].locked) {
-		unlock(0);
-	}
+	int page = (buffer == pageHandles[0].page) ? 0: 1;
+
+	unlock(page);
+}
+
+void DoubleBuffer::unlockOther() {
+	assert(created);
+
+	int page = (buffer == pageHandles[0].page) ? 1: 0;
+
+	unlock(page);
 }
 
 void* DoubleBuffer::get() {
 	assert(created);
 
-	if (!(pageHandles[0].locked || pageHandles[1].locked))
+	int page = (buffer == pageHandles[0].page) ? 0: 1;
+
+	if (!pageHandles[page].locked)
           throw std::runtime_error("error: No buffer locked");
 
 	return buffer->mem;
+}
+
+void* DoubleBuffer::getOther() {
+	assert(created);
+
+	int other = (buffer == pageHandles[0].page) ? 1: 0;
+
+	if (!pageHandles[other].locked)
+          throw std::runtime_error("error: No buffer locked");
+
+	return pageHandles[other].page->mem;
 }
 
 void DoubleBuffer::copyFrom() {
