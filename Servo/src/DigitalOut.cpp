@@ -18,7 +18,6 @@ DigitalOut::DigitalOut(const std::string& name, int p, int v) :
 		pin(p), par(new Parameter(name)) {
 	HAL::getInstance()->pinMode(pin, HAL::OUT);
 	HAL::getInstance()->digitalWrite(pin, v);
-	std::cout << "digwrite" << pin << ", " << v << std::endl;
 	par->set(v);
 }
 
