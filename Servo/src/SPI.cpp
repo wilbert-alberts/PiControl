@@ -17,17 +17,26 @@
 #include <sys/time.h>
 #include <algorithm>
 
+SPI* SPI::instance = 0;
+
+SPI* SPI::getInstance()
+{
+	if (instance==0)
+		instance = new SPI();
+	return instance;
+}
+
 SPI::SPI() {
 	// 90 bits. n+7/8 results in number of bytes.
 	bb = new BitBus();
 
-	createRegister(1, std::string("SPI.Height1"),    0, 16);
-	createRegister(2, std::string("SPI.Height2"),   16, 16);
-	createRegister(3, std::string("SPI.UBat"),      32, 16);
-	createRegister(4, std::string("SPI.EncPos"),    48, 16);
+	createRegister(HEIGHT1, std::string("SPI.Height1"),    0, 16);
+	createRegister(HEIGHT2, std::string("SPI.Height2"),   16, 16);
+	createRegister(UBAT, std::string("SPI.UBat"),      32, 16);
+	createRegister(ENCPOS, std::string("SPI.EncPos"),    48, 16);
 
-	createRegister(11, std::string("SPI.PWM"),      64, 16);
-	createRegister(12, std::string("SPI.MotorDir"), 72,  8);
+	createRegister(PWM, std::string("SPI.PWM"),      64, 16);
+	createRegister(MOTORDIR, std::string("SPI.MotorDir"), 72,  8);
 
 	Pi2Mbed = DigitalOut::create(std::string("SPI.pi2mbed"), 4, 1);
 	Mbed2Pi = DigitalIn::create("SPI.mbed2pi", 5);
@@ -154,7 +163,18 @@ void SPI::readBus(void* context) {
 	static_cast<SPI*>(context)->readBus();
 }
 
+double SPI::getRegister(int reg)
+{
+	return bb->getRegister(byteArray, reg);
+}
+
+void SPI::setRegister(int reg, double value)
+{
+	bb->setRegister(byteArray, reg, value);
+}
+
+/* TODO: REMOVE
 BitBus* SPI::getBB() {
 	return bb;
 }
-
+*/

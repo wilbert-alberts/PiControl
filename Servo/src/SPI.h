@@ -18,7 +18,7 @@ class Parameter;
 
 class SPI {
 public:
-	SPI();
+	static SPI* getInstance();
 	virtual ~SPI();
 
 	void readBus();
@@ -27,9 +27,21 @@ public:
 	static void writeBus(void* context);
 	static void readBus(void* context);
 
-	BitBus* getBB();
+	double getRegister(int reg);
+	void   setRegister(int reg, double value);
+	//BitBus* getBB();
+
+	static constexpr int HEIGHT1 = 1;
+	static constexpr int HEIGHT2 = 2;
+	static constexpr int UBAT = 3;
+	static constexpr int ENCPOS = 4;
+	static constexpr int PWM = 11;
+	static constexpr int MOTORDIR = 12;
 
 private:
+	static SPI* instance;
+	SPI();
+
 	void waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs);
 	void createRegister(int id, const std::string& n, int start, int length);
 	void copyFromParameters();
