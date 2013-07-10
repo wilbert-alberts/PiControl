@@ -20,26 +20,25 @@
 
 PeriodicTimer* PeriodicTimer::instance = 0;
 
-PeriodicTimer* PeriodicTimer::getInstance(unsigned int p) {
+PeriodicTimer* PeriodicTimer::getInstance(double f) {
 	if (instance == 0) {
-		instance = new PeriodicTimer(p);
+		instance = new PeriodicTimer(f);
 	} else {
-		if (instance->period != p)
-			throw std::runtime_error("Only one PeriodicTimer can be created.");
+		if (instance->frequency!= f)
+			instance->updateFrequency(f);
 	}
 	return instance;
 }
 
 PeriodicTimer* PeriodicTimer::getInstance() {
 	if (instance == 0)
-		throw std::runtime_error(
-				"No PeriodicTimer instance created, creation of PeriodicTimer instance requires period.");
+		return getInstance(1.0);
 	return instance;
 }
 
-PeriodicTimer::PeriodicTimer(unsigned int p) :
-		timer_fd(0), period(p), wakeups_missed(0), margin(0), minMargin(0), maxMargin(
-				p), stopped(false) {
+PeriodicTimer::PeriodicTimer(double f) :
+		timer_fd(0), frequency(f), wakeups_missed(0), margin(0), minMargin(0),
+		maxMargin(1000000*f), stopped(false) {
 	par_stopRunning = new Parameter("PeriodicTimer.stopRunning",0);
 }
 
@@ -52,7 +51,7 @@ void PeriodicTimer::addPeriodicFunction(PeriodicFunction pf, void* context) {
 	callbacks.push_back(c);
 }
 
-void PeriodicTimer::setupTimer(unsigned int p) {
+void PeriodicTimer::setupTimer(unsigned int periodInUs) {
 	int ret;
 	unsigned int ns;
 	unsigned int sec;
@@ -66,8 +65,8 @@ void PeriodicTimer::setupTimer(unsigned int p) {
 				"unable to create timer");
 	}
 	/* Make the timer periodic */
-	sec = p / 1000000;
-	ns = (p - (sec * 1000000)) * 1000;
+	sec = periodInUs / 1000000;
+	ns = (periodInUs - (sec * 1000000)) * 1000;
 	itval.it_interval.tv_sec = sec;
 	itval.it_interval.tv_nsec = ns;
 	itval.it_value.tv_sec = sec;
@@ -83,7 +82,7 @@ void PeriodicTimer::start() {
 
 	/* Create the timer */
 	stopped = false;
-	setupTimer(period);
+	setupTimer(static_cast<unsigned int>(1000000*frequency));
 	while (!stopped) {
 		for (std::vector<CallbackContext>::iterator iter = callbacks.begin();
 				iter != callbacks.end(); iter++) {
@@ -125,7 +124,7 @@ unsigned int PeriodicTimer::getNrOverruns() {
 }
 
 double PeriodicTimer::getFrequency() {
-	return 1000000.0/period;
+	return frequency;
 }
 
 void PeriodicTimer::updateStats() {
@@ -167,7 +166,7 @@ unsigned int PeriodicTimer::getTimeElapsed() {
 	if (ret == -1) {
 		perror("Reading margin");
 	}
-	return period - m.it_value.tv_nsec / 1000;
+	return (1000000*frequency)- m.it_value.tv_nsec / 1000;
 }
 
 unsigned int PeriodicTimer::getMargin() {
@@ -183,12 +182,12 @@ unsigned int PeriodicTimer::getMaxMargin() {
 }
 
 unsigned int PeriodicTimer::getPeriod() {
-	return period;
+	return static_cast<unsigned int>(1000000*frequency);
 }
 
 void PeriodicTimer::resetStats() {
-	margin = period;
-	minMargin = period;
+	margin = getPeriod();
+	minMargin = getPeriod();
 	maxMargin = 0;
 	wakeups_missed = 0;
 }

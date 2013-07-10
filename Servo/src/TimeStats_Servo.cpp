@@ -17,6 +17,7 @@ Parameter* TimeStats_Servo::minMargin = 0;
 Parameter* TimeStats_Servo::maxMargin = 0;
 Parameter* TimeStats_Servo::margin = 0;
 Parameter* TimeStats_Servo::reset = 0;
+Parameter* TimeStats_Servo::overruns = 0;
 
 TimeStats_Servo::TimeStats_Servo() {}
 
@@ -28,6 +29,7 @@ void TimeStats_Servo::initSample()
   maxMargin = new Parameter(par_maxMargin,0.0);
   margin = new Parameter(par_margin,0.0);
   reset = new Parameter(par_reset,0.0);
+  overruns = new Parameter(par_overruns,0.0);
 
   PeriodicTimer::getInstance()->resetStats();
 }
@@ -48,7 +50,7 @@ void TimeStats_Servo::sampleCommand(void* /*context*/)
   margin->set(pt->getMargin());
   minMargin->set(pt->getMinMargin());
   maxMargin->set(pt->getMaxMargin());
-
+  overruns->set(pt->getNrOverruns());
   if (reset->get() > 0.0) {
     pt->resetStats();
     reset->set(0.0);

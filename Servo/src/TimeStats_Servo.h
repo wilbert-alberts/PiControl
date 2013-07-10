@@ -29,6 +29,7 @@ private:
   static Parameter* maxMargin;
   static Parameter* reset;
   static Parameter* margin;
+  static Parameter* overruns;
 };
 
 #endif /* TIMESTATS_H_ */

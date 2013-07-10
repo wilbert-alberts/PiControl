@@ -20,7 +20,7 @@ class Parameter;
 
 class PeriodicTimer {
 public:
-  static PeriodicTimer* getInstance(unsigned int periodInUs);
+  static PeriodicTimer* getInstance(double freqInHz);
   static PeriodicTimer* getInstance();
 
   virtual ~PeriodicTimer();
@@ -44,11 +44,11 @@ public:
   static const std::string parid_stopRunning;
 
 private:
-  PeriodicTimer(unsigned int periodInUs);
+  PeriodicTimer(double freqInHz);
   static PeriodicTimer* instance;
 
   int timer_fd;
-  unsigned int period;
+  double frequency;
   unsigned int wakeups_missed;
   unsigned int margin;
   unsigned int minMargin;
