@@ -13,3 +13,4 @@ const std::string TimeStats::par_minMargin("TimeStats.minMargin");
 const std::string TimeStats::par_maxMargin("TimeStats.maxMargin");
 const std::string TimeStats::par_margin("TimeStats.margin");
 const std::string TimeStats::par_reset("TimeStats.reset");
+const std::string TimeStats::par_frequency("PeriodicTimer.frequency");

@@ -9,6 +9,7 @@
 
 #include "Parameter.h"
 #include "PeriodicTimer.h"
+#include "TimeStats.h"
 
 #include <iostream>
 
@@ -22,7 +23,7 @@ Cmd_UpdateFrequency* Cmd_UpdateFrequency::getInstance()
 }
 
 Cmd_UpdateFrequency::Cmd_UpdateFrequency() {
-	par_frequency = new Parameter(PAR_FREQUENCY);
+	par_frequency = new Parameter(TimeStats::par_frequency);
 	freq = PeriodicTimer::getInstance()->getFrequency();
 	par_frequency->setDeep(freq);
 }

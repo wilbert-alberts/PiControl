@@ -12,8 +12,6 @@
 
 class Parameter;
 
-const std::string PAR_FREQUENCY("PeriodicTimer.frequency");
-
 class Cmd_UpdateFrequency {
 public:
 	static Cmd_UpdateFrequency* getInstance();

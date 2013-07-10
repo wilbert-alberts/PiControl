@@ -16,6 +16,7 @@ public:
   static const std::string par_maxMargin;
   static const std::string par_margin;
   static const std::string par_reset;
+  static const std::string par_frequency;
 };
 
 #endif /* TIMESTATS_H_ */
