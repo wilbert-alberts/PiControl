@@ -89,13 +89,17 @@ void DoubleBuffer::connect() {
 		throw std::system_error(errno, std::system_category(), "unable to create shared memory");
 	}
 
+	// mmap in order to retrieve actual size
 	pageHandles[0].page = static_cast<DoubleBufferPage*>(mmap(0, sizeof(DoubleBufferPage), PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0));
-	if (ftruncate(shmfd, (pageHandles[0].page->pagesize+sizeof(DoubleBufferPage))*2)==-1) {
-		throw std::system_error(errno, std::system_category(), "unable to set length of shared memory");
-	}
+	int memsize = (pageHandles[0].page->pagesize+sizeof(DoubleBufferPage))*2;
+	if (munmap(pageHandles[0].page, sizeof(DoubleBufferPage))<0)
+		throw std::system_error(errno, std::system_category(), "unable to unmap shared memory");
+
+	// mmap again with correct size.
+	pageHandles[0].page = static_cast<DoubleBufferPage*>(mmap(0, memsize, PROT_READ|PROT_WRITE, MAP_SHARED, shmfd, 0));
 
 	if (pageHandles[0].page == MAP_FAILED) {
-		throw std::system_error(errno, std::system_category(), "unable to map shared memory");
+		throw std::system_error(errno, std::system_category(), "unable to remap shared memory with correct size.");
 	}
 
 	char* p1 = (char*)(pageHandles[0].page);

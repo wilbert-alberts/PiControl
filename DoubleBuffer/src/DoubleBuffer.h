@@ -64,7 +64,7 @@ private:
 typedef struct DoubleBufferPage
 {
   int   pagesize;
-  void* mem[0];
+  char* mem[0];
 } DoubleBufferPage;
 
 
