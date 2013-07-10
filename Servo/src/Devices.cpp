@@ -11,29 +11,42 @@
 #include "Parameter.h"
 #include "PeriodicTimer.h"
 
+#include <stdexcept>
+
+Devices* Devices::instance=0;
+
+Devices* Devices::getInstance()
+{
+	if (instance == 0)
+		instance = new Devices();
+	return instance;
+}
+
 Devices::Devices() :
 		spi(SPI::getInstance()), pt(PeriodicTimer::getInstance()),
 
-		par_rawAngle(new Parameter("Dev.rawAngle",0.0)),
-		par_angle(new Parameter("Dev.angle",0.0)),
-		par_angleV(new Parameter("Dev.angleV",0.0)),
-		par_angleA(new Parameter("Dev.angleA",0.0)),
-		par_angleGain(new Parameter("Dev.angleGain",1.0)),
-		par_angleOffset(new Parameter("Dev.angleOffset",0.0)),
+		par_rawAngle(createParameter("Dev.rawAngle",0.0, rawAngle)),
+		par_angle(createParameter("Dev.angle",0.0, angle)),
+		par_angleV(createParameter("Dev.angleV",0.0, angleV)),
+		par_angleA(createParameter("Dev.angleA",0.0, angleA)),
+		par_angleGain(createParameter("Dev.angleGain",1.0, angleGain)),
+		par_angleOffset(createParameter("Dev.angleOffset",0.0, angleOffset)),
 
 		prevRawPos(0), encPos(0),
 
-		par_rawPos(new Parameter("Dev.rawAngle",0.0)),
-		par_pos(new Parameter("Dev.pos",0.0)),
-		par_posV(new Parameter("Dev.posV",0.0)),
-		par_posA(new Parameter("Dev.posA",0.0)),
-		par_posGain(new Parameter("Dev.posGain",1.0)),
-		par_posOffset(new Parameter("Dev.posOffset",0.0)),
-		par_nrIncrements(new Parameter("Dev.nrIncrements",4096.0)),
+		par_rawPos(createParameter("Dev.rawPos",0.0, rawPos)),
+		par_pos(createParameter("Dev.pos",0.0, pos)),
+		par_posV(createParameter("Dev.posV",0.0, posV)),
+		par_posA(createParameter("Dev.posA",0.0, posA)),
+		par_posGain(createParameter("Dev.posGain",1.0, posGain)),
+		par_posOffset(createParameter("Dev.posOffset",0.0, posOffset)),
+		par_nrIncrements(createParameter("Dev.nrIncrements",4096.0, nrIncrements)),
 
-		par_voltage(new Parameter("Dev.voltage",0.0)),
-		par_voltageGain(new Parameter("Dev.voltageGain",1.0)),
-		par_voltageOffset(new Parameter("Dev.voltageOffset",0.0))
+		par_voltage(createParameter("Dev.voltage",0.0, voltage)),
+		par_voltageGain(createParameter("Dev.voltageGain",1.0, voltageGain)),
+		par_voltageOffset(createParameter("Dev.voltageOffset",0.0, voltageOffset)),
+
+		par_dutycycle(createParameter("Dev.dutycycle",0.0, dutycycle))
 {
 }
 
@@ -41,10 +54,36 @@ Devices::~Devices() {
 	// TODO Auto-generated destructor stub
 }
 
+Parameter* Devices::createParameter(const std::string& name, double v, Devices::DeviceID id)
+{
+	Parameter* result = new Parameter(name, v);
+
+	devices[id]=result;
+	return result;
+}
+
+double Devices::getDevice(DeviceID id) {
+	if (devices.find(id) == devices.end())
+		throw std::invalid_argument("Devices::getDevice: illegal value for deviceID: " + id);
+
+	Parameter* p = devices[id];
+
+	return p->get();
+}
+
+void Devices::setDevice(DeviceID id, double v) {
+	if (devices.find(id) == devices.end())
+		throw std::invalid_argument("Devices::getDevice: illegal value for deviceID: " + id);
+
+	Parameter* p = devices[id];
+
+	return p->set(v);
+}
+
 void Devices::sampleAngle(double frequency) {
 	// Start with shifting previous values
-	angle[2] = angle[1];
-	angle[1] = angle[0];
+	angle_[2] = angle_[1];
+	angle_[1] = angle_[0];
 	angle_v[1] = angle_v[0];
 	// determine raw angle
 	double hpos = spi->getRegister(SPI::HEIGHT1);
@@ -52,12 +91,12 @@ void Devices::sampleAngle(double frequency) {
 	double raw_angle = hpos - npos;
 	par_rawAngle->set(raw_angle);
 	// calculate new angle with gain and offset
-	angle[0] = raw_angle * par_angleGain->get() + par_angleOffset->get();
-	angle_v[0] = (angle[0] - angle[1]) * frequency;
-	angle_v[1] = (angle[1] - angle[2]) * frequency;
+	angle_[0] = raw_angle * par_angleGain->get() + par_angleOffset->get();
+	angle_v[0] = (angle_[0] - angle_[1]) * frequency;
+	angle_v[1] = (angle_[1] - angle_[2]) * frequency;
 	angle_a[0] = (angle_v[0] - angle_v[1]) * frequency;
 	// store calculated values into parameters
-	par_angle->set(angle[0]);
+	par_angle->set(angle_[0]);
 	par_angleV->set(angle_v[0]);
 	par_angleA->set(angle_a[0]);
 }
@@ -72,8 +111,8 @@ void Devices::sample() {
 
 void Devices::samplePosition(double frequency) {
 	// Start with shifting previous values
-	pos[2] = pos[1];
-	pos[1] = pos[0];
+	pos_[2] = pos_[1];
+	pos_[1] = pos_[0];
 	pos_v[1] = pos_v[0];
 
 	unsigned int rawpos = static_cast<unsigned int>(spi->getRegister(
@@ -99,15 +138,34 @@ void Devices::samplePosition(double frequency) {
 	encPos += delta;
 
 	// Transform into real position
-	pos[0] = encPos * par_posGain->get() + par_posOffset->get();
+	pos_[0] = encPos * par_posGain->get() + par_posOffset->get();
 
 	// Calculate velocity and acceleration
-	pos_v[0] = (pos[0] - pos[1]) * frequency;
-	pos_v[1] = (pos[1] - pos[2]) * frequency;
+	pos_v[0] = (pos_[0] - pos_[1]) * frequency;
+	pos_v[1] = (pos_[1] - pos_[2]) * frequency;
 	pos_a[0] = (pos_v[0] - pos_v[1]) * frequency;
 }
 
 void Devices::sampleBattery()
 {
 	par_voltage->set(spi->getRegister(SPI::UBAT)*par_voltageGain->get()+par_voltageOffset->get());
+}
+
+void Devices::update(void* /*context*/) {
+	Devices* d = Devices::getInstance();
+
+	d->update();
+}
+
+void Devices::update() {
+	updateDC();
+}
+
+void Devices::updateDC() {
+	double dc = par_dutycycle->get();
+	int dir = dc<0.0 ? 0 : 1;
+	int rawDC = 65535*abs(dc);
+
+	spi->setRegister(SPI::PWM, static_cast<double>(rawDC));
+	spi->setRegister(SPI::MOTORDIR, static_cast<double>(dir));
 }

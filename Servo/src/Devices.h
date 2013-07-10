@@ -8,30 +8,70 @@
 #ifndef DEVICES_H_
 #define DEVICES_H_
 
+#include <map>
+#include <string>
+
 class Parameter;
 class SPI;
 class PeriodicTimer;
 
+enum DeviceID {
+	rawAngle, angle, angleV, angleA, angleGain, angleOffset,
+
+	rawPos, pos, posV, posA, posGain, posOffset,
+
+	nrIncrements,
+
+	voltage, voltageGain, voltageOffset,
+
+	dutyCycle
+} ;
+
+
 class Devices {
 public:
-	static Devices* getInstane();
+	static Devices* getInstance();
 	virtual ~Devices();
 
 	void sample();
 	static void sample(void* context);
+	void update();
+	static void update(void* context);
+
+	enum DeviceID {
+		rawAngle, angle, angleV, angleA, angleGain, angleOffset,
+
+		rawPos, pos, posV, posA, posGain, posOffset,
+
+		nrIncrements,
+
+		voltage, voltageGain, voltageOffset,
+
+		dutycycle
+	} ;
+
+
+	double getDevice(DeviceID id);
+	void setDevice(DeviceID id, double val);
+
 
 private:
 	Devices();
+	Parameter* createParameter(const std::string& n, double v, DeviceID id);
 	void sampleAngle(double frequency);
 	void samplePosition(double frequency);
 	void sampleBattery();
+
+	void updateDC();
 
 	static Devices* instance;
 
 	SPI* spi;
 	PeriodicTimer* pt;
 
-	double angle[3];
+	std::map<DeviceID, Parameter*> devices;
+
+	double angle_[3];
 	double angle_v[2];
 	double angle_a[1];
 
@@ -42,7 +82,7 @@ private:
 	Parameter* par_angleGain;
 	Parameter* par_angleOffset;
 
-	double pos[3];
+	double pos_[3];
 	double pos_v[2];
 	double pos_a[1];
 
@@ -62,6 +102,7 @@ private:
 	Parameter* par_voltageGain;
 	Parameter* par_voltageOffset;
 
+	Parameter* par_dutycycle;
 };
 
 #endif /* DEVICES_H_ */
