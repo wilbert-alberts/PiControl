@@ -24,7 +24,7 @@ PeriodicTimer* PeriodicTimer::getInstance(double f) {
 	if (instance == 0) {
 		instance = new PeriodicTimer(f);
 	} else {
-		if (instance->frequency!= f)
+		if (instance->frequency != f)
 			instance->updateFrequency(f);
 	}
 	return instance;
@@ -37,9 +37,9 @@ PeriodicTimer* PeriodicTimer::getInstance() {
 }
 
 PeriodicTimer::PeriodicTimer(double f) :
-		timer_fd(0), frequency(f), wakeups_missed(0), margin(0), minMargin(0),
-		maxMargin(1000000*f), stopped(false) {
-	par_stopRunning = new Parameter("PeriodicTimer.stopRunning",0);
+		timer_fd(0), frequency(f), wakeups_missed(0), margin(0), minMargin(0), maxMargin(
+				1000000 * f), stopped(false) {
+	par_stopRunning = new Parameter("PeriodicTimer.stopRunning", 0);
 }
 
 PeriodicTimer::~PeriodicTimer() {
@@ -82,7 +82,7 @@ void PeriodicTimer::start() {
 
 	/* Create the timer */
 	stopped = false;
-	setupTimer(static_cast<unsigned int>(1000000*frequency));
+	setupTimer(static_cast<unsigned int>(1000000 * frequency));
 	while (!stopped) {
 		for (std::vector<CallbackContext>::iterator iter = callbacks.begin();
 				iter != callbacks.end(); iter++) {
@@ -143,19 +143,21 @@ void PeriodicTimer::updateFrequency(double frequency) {
 	unsigned int sec;
 	struct itimerspec itval;
 
-	int p = 1000000/frequency;
+	int p = 1000000 / frequency;
 	int ret;
 
-	sec = p / 1000000;
-	ns = (p - (sec * 1000000)) * 1000;
-	itval.it_interval.tv_sec = sec;
-	itval.it_interval.tv_nsec = ns;
-	itval.it_value.tv_sec = sec;
-	itval.it_value.tv_nsec = ns;
-	ret = timerfd_settime(timer_fd, 0, &itval, NULL);
-	if (ret == -1) {
-		throw std::system_error(errno, std::system_category(),
-				"unable to update timer");
+	if (timer_fd != 0) {
+		sec = p / 1000000;
+		ns = (p - (sec * 1000000)) * 1000;
+		itval.it_interval.tv_sec = sec;
+		itval.it_interval.tv_nsec = ns;
+		itval.it_value.tv_sec = sec;
+		itval.it_value.tv_nsec = ns;
+		ret = timerfd_settime(timer_fd, 0, &itval, NULL);
+		if (ret == -1) {
+			throw std::system_error(errno, std::system_category(),
+					"unable to update timer");
+		}
 	}
 	resetStats();
 }
@@ -166,7 +168,7 @@ unsigned int PeriodicTimer::getTimeElapsed() {
 	if (ret == -1) {
 		perror("Reading margin");
 	}
-	return (1000000*frequency)- m.it_value.tv_nsec / 1000;
+	return (1000000 * frequency) - m.it_value.tv_nsec / 1000;
 }
 
 unsigned int PeriodicTimer::getMargin() {
@@ -182,7 +184,7 @@ unsigned int PeriodicTimer::getMaxMargin() {
 }
 
 unsigned int PeriodicTimer::getPeriod() {
-	return static_cast<unsigned int>(1000000*frequency);
+	return static_cast<unsigned int>(1000000 * frequency);
 }
 
 void PeriodicTimer::resetStats() {

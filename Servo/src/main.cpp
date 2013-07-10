@@ -55,7 +55,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 
 		Motor* motor(Motor::getInstance());
 
-		pt = PeriodicTimer::getInstance(1000000 / SERVOFREQUENCY );
+		pt = PeriodicTimer::getInstance(SERVOFREQUENCY );
 		TimeStats_Servo::initSample();
 		Cmd_UpdateFrequency::execute(0);
 		traces = Traces_Servo::getInstance();
