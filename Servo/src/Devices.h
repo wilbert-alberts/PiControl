@@ -24,6 +24,7 @@ private:
 	Devices();
 	void sampleAngle(double frequency);
 	void samplePosition(double frequency);
+	void sampleBattery();
 
 	static Devices* instance;
 
@@ -57,7 +58,9 @@ private:
 
 	Parameter* par_nrIncrements;
 
-
+	Parameter* par_voltage;
+	Parameter* par_voltageGain;
+	Parameter* par_voltageOffset;
 
 };
 

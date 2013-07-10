@@ -21,12 +21,20 @@ Devices::Devices() :
 		par_angleGain(new Parameter("Dev.angleGain",1.0)),
 		par_angleOffset(new Parameter("Dev.angleOffset",0.0)),
 
+		prevRawPos(0), encPos(0),
+
 		par_rawPos(new Parameter("Dev.rawAngle",0.0)),
 		par_pos(new Parameter("Dev.pos",0.0)),
 		par_posV(new Parameter("Dev.posV",0.0)),
 		par_posA(new Parameter("Dev.posA",0.0)),
 		par_posGain(new Parameter("Dev.posGain",1.0)),
-		par_posOffset(new Parameter("Dev.posOffset",0.0)) {
+		par_posOffset(new Parameter("Dev.posOffset",0.0)),
+		par_nrIncrements(new Parameter("Dev.nrIncrements",4096.0)),
+
+		par_voltage(new Parameter("Dev.voltage",0.0)),
+		par_voltageGain(new Parameter("Dev.voltageGain",1.0)),
+		par_voltageOffset(new Parameter("Dev.voltageOffset",0.0))
+{
 }
 
 Devices::~Devices() {
@@ -59,6 +67,7 @@ void Devices::sample() {
 
 	sampleAngle(frequency);
 	samplePosition(frequency);
+	sampleBattery();
 }
 
 void Devices::samplePosition(double frequency) {
@@ -96,4 +105,9 @@ void Devices::samplePosition(double frequency) {
 	pos_v[0] = (pos[0] - pos[1]) * frequency;
 	pos_v[1] = (pos[1] - pos[2]) * frequency;
 	pos_a[0] = (pos_v[0] - pos_v[1]) * frequency;
+}
+
+void Devices::sampleBattery()
+{
+	par_voltage->set(spi->getRegister(SPI::UBAT)*par_voltageGain->get()+par_voltageOffset->get());
 }
