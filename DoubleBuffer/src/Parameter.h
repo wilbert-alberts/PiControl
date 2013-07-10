@@ -12,6 +12,8 @@
 
 class DoubleBuffer;
 
+struct DB_mem;
+
 class Parameter {
 public:
   Parameter(const std::string& name);
@@ -27,12 +29,16 @@ public:
   static int getNrParameters();
   static int findParameter(const std::string& name);
 
-  static void setByIdx(int i, double v);
+  //static void setByIdx(int i, double v);
   static double getByIdx(int i);
   static std::string getNameByIdx(int i);
 
 private:
   DoubleBuffer* db;
   int idx;
+
+  void createParameter(DB_mem* mem, const std::string& name);
+  static int findParameterInMem(DB_mem* mem, const std::string& name);
+
 };
 #endif /* PARAMETER_H_ */

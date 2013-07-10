@@ -22,7 +22,7 @@ typedef struct {
   char   name[MaxNameLength];
 } DB_Parameter;
 
-typedef struct {
+typedef struct DB_mem{
   int nrParameters;
   DB_Parameter params[];
 } DB_mem;
@@ -33,24 +33,37 @@ Parameter::Parameter(const std::string& name)
 {
   DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 
-  int memSize = DoubleBuffer::getInstance()->size();
-  int maxNrParameters = (memSize - sizeof(DB_mem))/sizeof(DB_Parameter);
-  if (p->nrParameters == maxNrParameters)
-	  throw std::runtime_error("Exceeding memory space while creating Parameter: " + name);
+  createParameter(p, name);
+
+  DoubleBuffer::getInstance()->lockOther();
+  DB_mem* o=static_cast<DB_mem*>(DoubleBuffer::getInstance()->getOther());
+  createParameter(o, name);
+  DoubleBuffer::getInstance()->unlockOther();
+
+}
+
+void Parameter::createParameter(DB_mem* p, const std::string& name)
+{
+	  int memSize = DoubleBuffer::getInstance()->size();
+	  int maxNrParameters = (memSize - sizeof(DB_mem))/sizeof(DB_Parameter);
+	  if (p->nrParameters == maxNrParameters)
+		  throw std::runtime_error("Exceeding memory space while creating Parameter: " + name);
 
 
-  idx = findParameter(name);
-  if (idx<0) {
-    // Create parameter in double buffer.
-    idx = p->nrParameters;
-    p->nrParameters++;
-    DB_Parameter* par = (p->params)+(idx);
-    if (name.length() > MaxNameLength-1) {
-    	std::clog << "Warning: only using " << MaxNameLength-1 << " characters from: " << name << std::endl;
-    }
-    strncpy(par->name, name.c_str(), MaxNameLength-1);
-    par->value = 0.0;
-  }
+	  idx = findParameterInMem(p, name);
+	  if (idx<0) {
+	    // Create parameter in double buffer.
+	    idx = p->nrParameters;
+	    p->nrParameters++;
+	    DB_Parameter* par = (p->params)+(idx);
+	    if (name.length() > MaxNameLength-1) {
+	    	std::clog << "Warning: only using " << MaxNameLength-1 << " characters from: " << name << std::endl;
+	    }
+	    strncpy(par->name, name.c_str(), MaxNameLength-1);
+	    par->value = 0.0;
+
+	    std::clog <<"Created " << name << " in " << p << "at index: " << idx << std::endl;
+	  }
 }
 
 Parameter::Parameter(int i)
@@ -114,6 +127,7 @@ void Parameter::setDeep(double v) {
 	  db->unlockOther();
 }
 
+/*
 void Parameter::setByIdx(int i, double v) {
   DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 
@@ -123,6 +137,7 @@ void Parameter::setByIdx(int i, double v) {
 
   par->value = v;
 }
+*/
 
 int Parameter::getNrParameters() {
   DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
@@ -132,6 +147,11 @@ int Parameter::getNrParameters() {
 int Parameter::findParameter(const std::string& name)
 {
   DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
+  return findParameterInMem(p, name);
+}
+
+int Parameter::findParameterInMem(DB_mem* p, const std::string& name)
+{
   for (int i=0; i<p->nrParameters; i++) {
     if (strncmp(name.c_str(), p->params[i].name,MaxNameLength-1)==0) {
       return i;
