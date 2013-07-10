@@ -16,7 +16,7 @@
 #include "HAL.h"
 #include "SimulatedHAL.h"
 #include "WiringPiHAL.h"
-
+#include "CmdUpdateFrequency.h"
 
 constexpr int MEMORYSIZE=16*1024;  // 16 Kilobytes.
 constexpr int SERVOFREQUENCY=2;    // 2 Hz
@@ -57,9 +57,10 @@ int main(int /*argc*/, char** /*argv[]*/) {
 
 		pt = PeriodicTimer::getInstance(1000000 / SERVOFREQUENCY );
 		TimeStats_Servo::initSample();
+		Cmd_UpdateFrequency::execute(0);
 		traces = Traces_Servo::getInstance();
 		traces->clearAllTraces();
-		db->copyTo();
+		//db->copyTo();
 		db->unlock();
 
 		pt->addPeriodicFunction(lockDB, db);
@@ -87,6 +88,8 @@ int main(int /*argc*/, char** /*argv[]*/) {
 
 		pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsCheckStop);
 		pt->addPeriodicFunction(PeriodicTimer::checkStop, 0);
+
+		pt->addPeriodicFunction(Cmd_UpdateFrequency::execute,0);
 
 		pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsEnd);
 		pt->addPeriodicFunction(unlockDB, db);

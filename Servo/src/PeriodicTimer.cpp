@@ -124,6 +124,10 @@ unsigned int PeriodicTimer::getNrOverruns() {
 	return wakeups_missed;
 }
 
+double PeriodicTimer::getFrequency() {
+	return 1000000.0/period;
+}
+
 void PeriodicTimer::updateStats() {
 	static struct itimerspec m;
 	int ret = timerfd_gettime(timer_fd, &m);
@@ -133,6 +137,28 @@ void PeriodicTimer::updateStats() {
 	margin = m.it_value.tv_nsec / 1000;
 	minMargin = margin < minMargin ? margin : minMargin;
 	maxMargin = margin > maxMargin ? margin : maxMargin;
+}
+
+void PeriodicTimer::updateFrequency(double frequency) {
+	unsigned int ns;
+	unsigned int sec;
+	struct itimerspec itval;
+
+	int p = 1000000/frequency;
+	int ret;
+
+	sec = p / 1000000;
+	ns = (p - (sec * 1000000)) * 1000;
+	itval.it_interval.tv_sec = sec;
+	itval.it_interval.tv_nsec = ns;
+	itval.it_value.tv_sec = sec;
+	itval.it_value.tv_nsec = ns;
+	ret = timerfd_settime(timer_fd, 0, &itval, NULL);
+	if (ret == -1) {
+		throw std::system_error(errno, std::system_category(),
+				"unable to update timer");
+	}
+	resetStats();
 }
 
 unsigned int PeriodicTimer::getTimeElapsed() {

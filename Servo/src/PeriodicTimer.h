@@ -29,6 +29,8 @@ public:
 
   void start();
   static void checkStop(void* context);
+  void updateFrequency(double frequency);
+  double getFrequency();
 
   unsigned int getNrOverruns();
   unsigned int getMargin();
