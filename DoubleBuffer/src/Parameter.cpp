@@ -61,8 +61,6 @@ void Parameter::createParameter(DB_mem* p, const std::string& name)
 	    }
 	    strncpy(par->name, name.c_str(), MaxNameLength-1);
 	    par->value = 0.0;
-
-	    std::clog <<"Created " << name << " in " << p << "at index: " << idx << std::endl;
 	  }
 }
 
