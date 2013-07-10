@@ -45,10 +45,10 @@ int main(int /*argc*/, char** /*argv[]*/) {
 
 		hb = DigitalOut::create(std::string("hearbeat"), 0,0);
 
-		Parameter* tsStart = new Parameter("TimeStats.start");
-		Parameter* tsEnd = new Parameter("TimeStats.end");
-		Parameter* tsTracing = new Parameter("TimeStats.tracing");
-		Parameter* tsCheckStop = new Parameter("TimeStats.checkStop");
+		Parameter* tsStart = new Parameter("TimeStats.start", 0.0);
+		Parameter* tsEnd = new Parameter("TimeStats.end", 0.0);
+		Parameter* tsTracing = new Parameter("TimeStats.tracing", 0.0);
+		Parameter* tsCheckStop = new Parameter("TimeStats.checkStop", 0.0);
 
 		// TODO: assign channel and pins for BitBus
 		SPI* spibus(SPI::getInstance());

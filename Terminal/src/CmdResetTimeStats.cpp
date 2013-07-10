@@ -27,8 +27,7 @@ void CmdResetTimeStats::displayHelp() {
 void CmdResetTimeStats::execute(std::list<std::string>& /*args*/) {
 	Parameter* reset;
 
-	reset = new Parameter(TimeStats::par_reset);
+	reset = new Parameter(TimeStats::par_reset,1.0);
 
-	reset->set(1.0);
 	std::cout << "OK" << std::endl;
 }

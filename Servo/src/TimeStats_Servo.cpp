@@ -24,10 +24,10 @@ TimeStats_Servo::~TimeStats_Servo() {}
 
 void TimeStats_Servo::initSample()
 {
-  minMargin = new Parameter(par_minMargin);
-  maxMargin = new Parameter(par_maxMargin);
-  margin = new Parameter(par_margin);
-  reset = new Parameter(par_reset);
+  minMargin = new Parameter(par_minMargin,0.0);
+  maxMargin = new Parameter(par_maxMargin,0.0);
+  margin = new Parameter(par_margin,0.0);
+  reset = new Parameter(par_reset,0.0);
 
   PeriodicTimer::getInstance()->resetStats();
 }

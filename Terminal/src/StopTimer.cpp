@@ -30,6 +30,5 @@ void StopTimer::execute(std::list<std::string>& args) {
 	if (!args.empty())
 		throw std::runtime_error("Usage " + getName());
 
-	Parameter* par = new Parameter("PeriodicTimer.stopRunning");
-	par->set(1.0);
+	Parameter* par = new Parameter("PeriodicTimer.stopRunning",1.0);
 }

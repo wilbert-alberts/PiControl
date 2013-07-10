@@ -49,7 +49,7 @@ SPI::~SPI() {
 void SPI::createRegister(int id, const std::string& n, int start, int length)
 {
 	bb->createRegister(id, n, start, length);
-	registers[id]=new Parameter(n);
+	registers[id]=new Parameter(n,0.0);
 
 	int nb = (start+length)/8 + ((start+length)%8==0 ? 0 : 1);
 	if (nb > nrBytes) {

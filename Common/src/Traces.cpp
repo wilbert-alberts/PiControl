@@ -55,7 +55,7 @@ Traces::Traces(int nrTraces) {
   }
 
 
-  par_sampleCounter = new Parameter(Traces::parid_sampleCounter);
+  par_sampleCounter = new Parameter(Traces::parid_sampleCounter, 0.0);
 }
 
 void Traces::clearAllTraces() {

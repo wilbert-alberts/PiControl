@@ -16,7 +16,7 @@ struct DB_mem;
 
 class Parameter {
 public:
-  Parameter(const std::string& name);
+  Parameter(const std::string& name, double value = 0.0);
   Parameter(int idx);
 
   virtual ~Parameter();
@@ -37,7 +37,7 @@ private:
   DoubleBuffer* db;
   int idx;
 
-  void createParameter(DB_mem* mem, const std::string& name);
+  void createParameter(DB_mem* mem, const std::string& name, double value);
   static int findParameterInMem(DB_mem* mem, const std::string& name);
 
 };

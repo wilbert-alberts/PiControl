@@ -20,23 +20,22 @@ Motor* Motor::getInstance() {
 }
 
 Motor::Motor() {
-	enabled = new Parameter("Motor.enabled");
-	enabled->setDeep(0.0);
+	enabled = new Parameter("Motor.enabled",0);
 
-	t = new Parameter("Motor.torque");
-	ki = new Parameter("Motor.ki");
-	kv = new Parameter("Motor.kv");
-	rm = new Parameter("Motor.rm");
-	velo = new Parameter("Motor.velo");
+	t = new Parameter("Motor.torque",0.0);
+	ki = new Parameter("Motor.ki",0.0);
+	kv = new Parameter("Motor.kv",0.0);
+	rm = new Parameter("Motor.rm",0.0);
+	velo = new Parameter("Motor.velo",0.0);
 
-	motorDir = new Parameter("Motor.direction");
-	batVoltage = new Parameter("Motor.batVoltage");
-	motorCurrent = new Parameter("Motor.current");
-	motorPos = new Parameter("Motor.pos");
-	pwmOut = new Parameter("Motor.pwmOut");
+	motorDir = new Parameter("Motor.direction",0.0);
+	batVoltage = new Parameter("Motor.batVoltage",0.0);
+	motorCurrent = new Parameter("Motor.current",0.0);
+	motorPos = new Parameter("Motor.pos",0.0);
+	pwmOut = new Parameter("Motor.pwmOut",0.0);
 
-	angle = new Parameter("Motor.Angle");
-	prevAngle = new Parameter("Motor.prevAngle");
+	angle = new Parameter("Motor.Angle",0.0);
+	prevAngle = new Parameter("Motor.prevAngle",0.0);
 
 }
 

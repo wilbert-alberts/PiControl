@@ -12,13 +12,21 @@
 #include "PeriodicTimer.h"
 
 Devices::Devices() :
-		spi(SPI::getInstance()), pt(PeriodicTimer::getInstance()), par_rawAngle(
-				new Parameter("Dev.rawAngle")), par_angle(
-				new Parameter("Dev.angle")), par_angleV(
-				new Parameter("Dev.angleV")), par_angleA(
-				new Parameter("Dev.angleA")), par_angleGain(
-				new Parameter("Dev.angleGain")), par_angleOffset(
-				new Parameter("Dev.angleOffset")) {
+		spi(SPI::getInstance()), pt(PeriodicTimer::getInstance()),
+
+		par_rawAngle(new Parameter("Dev.rawAngle",0.0)),
+		par_angle(new Parameter("Dev.angle",0.0)),
+		par_angleV(new Parameter("Dev.angleV",0.0)),
+		par_angleA(new Parameter("Dev.angleA",0.0)),
+		par_angleGain(new Parameter("Dev.angleGain",1.0)),
+		par_angleOffset(new Parameter("Dev.angleOffset",0.0)),
+
+		par_rawPos(new Parameter("Dev.rawAngle",0.0)),
+		par_pos(new Parameter("Dev.pos",0.0)),
+		par_posV(new Parameter("Dev.posV",0.0)),
+		par_posA(new Parameter("Dev.posA",0.0)),
+		par_posGain(new Parameter("Dev.posGain",1.0)),
+		par_posOffset(new Parameter("Dev.posOffset",0.0)) {
 }
 
 Devices::~Devices() {

@@ -36,10 +36,10 @@ void CmdDumpTiming::execute(std::list<std::string>& args) {
 	Parameter* margin;
 	Parameter* frequency;
 
-	minMargin = new Parameter(TimeStats::par_minMargin);
-	maxMargin = new Parameter(TimeStats::par_maxMargin);
-	margin = new Parameter(TimeStats::par_margin);
-	frequency= new Parameter(TimeStats::par_frequency);
+	minMargin = new Parameter(TimeStats::par_minMargin,0.0);
+	maxMargin = new Parameter(TimeStats::par_maxMargin,0.0);
+	margin = new Parameter(TimeStats::par_margin,0.0);
+	frequency= new Parameter(TimeStats::par_frequency,0.0);
 
 	std::cout << "frequency: " << frequency->get() << "Hz (period: " << 1.0/frequency->get()<< " seconds)" << std::endl;
 

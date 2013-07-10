@@ -23,9 +23,8 @@ Cmd_UpdateFrequency* Cmd_UpdateFrequency::getInstance()
 }
 
 Cmd_UpdateFrequency::Cmd_UpdateFrequency() {
-	par_frequency = new Parameter(TimeStats::par_frequency);
-	freq = PeriodicTimer::getInstance()->getFrequency();
-	par_frequency->setDeep(freq);
+	par_frequency = new Parameter(TimeStats::par_frequency,
+			PeriodicTimer::getInstance()->getFrequency());
 }
 
 Cmd_UpdateFrequency::~Cmd_UpdateFrequency() {

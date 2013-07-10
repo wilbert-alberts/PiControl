@@ -40,7 +40,7 @@ PeriodicTimer* PeriodicTimer::getInstance() {
 PeriodicTimer::PeriodicTimer(unsigned int p) :
 		timer_fd(0), period(p), wakeups_missed(0), margin(0), minMargin(0), maxMargin(
 				p), stopped(false) {
-	par_stopRunning = new Parameter("PeriodicTimer.stopRunning");
+	par_stopRunning = new Parameter("PeriodicTimer.stopRunning",0);
 }
 
 PeriodicTimer::~PeriodicTimer() {

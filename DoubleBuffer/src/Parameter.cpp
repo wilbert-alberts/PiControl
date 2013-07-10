@@ -28,21 +28,20 @@ typedef struct DB_mem{
 } DB_mem;
 
 
-Parameter::Parameter(const std::string& name)
+Parameter::Parameter(const std::string& name, double value)
 : db(DoubleBuffer::getInstance())
 {
   DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 
-  createParameter(p, name);
+  createParameter(p, name, value);
 
   DoubleBuffer::getInstance()->lockOther();
   DB_mem* o=static_cast<DB_mem*>(DoubleBuffer::getInstance()->getOther());
-  createParameter(o, name);
+  createParameter(o, name, value);
   DoubleBuffer::getInstance()->unlockOther();
-
 }
 
-void Parameter::createParameter(DB_mem* p, const std::string& name)
+void Parameter::createParameter(DB_mem* p, const std::string& name, double value)
 {
 	  int memSize = DoubleBuffer::getInstance()->size();
 	  int maxNrParameters = (memSize - sizeof(DB_mem))/sizeof(DB_Parameter);
@@ -60,7 +59,7 @@ void Parameter::createParameter(DB_mem* p, const std::string& name)
 	    	std::clog << "Warning: only using " << MaxNameLength-1 << " characters from: " << name << std::endl;
 	    }
 	    strncpy(par->name, name.c_str(), MaxNameLength-1);
-	    par->value = 0.0;
+	    par->value = value;
 	  }
 }
 

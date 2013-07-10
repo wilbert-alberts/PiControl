@@ -14,7 +14,7 @@ std::map<const std::string, DigitalIn*> DigitalIn::instances;
 
 
 DigitalIn::DigitalIn(const std::string& name, int p) :
-		pin(p), par(new Parameter(name)) {
+		pin(p), par(new Parameter(name,0.0)) {
 
 }
 

@@ -15,10 +15,9 @@
 std::map<const std::string, DigitalOut*> DigitalOut::instances;
 
 DigitalOut::DigitalOut(const std::string& name, int p, int v) :
-		pin(p), par(new Parameter(name)) {
+		pin(p), par(new Parameter(name, v)) {
 	HAL::getInstance()->pinMode(pin, HAL::OUT);
 	HAL::getInstance()->digitalWrite(pin, v);
-	par->set(v);
 }
 
 DigitalOut::~DigitalOut() {
