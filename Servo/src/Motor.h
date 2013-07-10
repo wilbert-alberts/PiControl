@@ -10,6 +10,7 @@
 
 class Parameter;
 class DigitalOut;
+class Devices;
 
 class Motor {
 public:
@@ -21,33 +22,21 @@ public:
 
 private:
 	Motor();
-	void updateInputs();
 	void calculateModel();
-	void setOutputs();
+
+	Devices* devs;
 
 	Parameter* enabled;
 	Parameter* t;
 	Parameter* ki;
 	Parameter* kv;
 	Parameter* rm;
-	Parameter* velo;
 
-	// Raw Output
-	Parameter*  pwmOut;
-	Parameter*  motorDir;
+	Parameter*  rotVelo;
+	Parameter*  dutycycle;
 
-	// Raw Input
 	Parameter*  batVoltage;
 	Parameter*  motorCurrent;
-	Parameter*  encPos;
-	Parameter*  height1;
-	Parameter*  height2;
-
-	// Deduced sensors
-	Parameter*  angle;
-	Parameter*  prevAngle;
-	Parameter*  motorPos;
-
 
 	static Motor* instance;
 };

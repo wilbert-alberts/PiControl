@@ -8,8 +8,10 @@
 #include "Motor.h"
 #include "Parameter.h"
 #include "SPI.h"
+#include "Devices.h"
 
 #include <iostream>
+#include <cmath>
 
 Motor* Motor::instance = 0;
 
@@ -26,17 +28,12 @@ Motor::Motor() {
 	ki = new Parameter("Motor.ki",0.0);
 	kv = new Parameter("Motor.kv",0.0);
 	rm = new Parameter("Motor.rm",0.0);
-	velo = new Parameter("Motor.velo",0.0);
-
-	motorDir = new Parameter("Motor.direction",0.0);
+	rotVelo = new Parameter("Motor.rotationalVelo",0.0);
+	dutycycle = new Parameter("Motor.dutycycle",0.0);
 	batVoltage = new Parameter("Motor.batVoltage",0.0);
 	motorCurrent = new Parameter("Motor.current",0.0);
-	motorPos = new Parameter("Motor.pos",0.0);
-	pwmOut = new Parameter("Motor.pwmOut",0.0);
 
-	angle = new Parameter("Motor.Angle",0.0);
-	prevAngle = new Parameter("Motor.prevAngle",0.0);
-
+	devs = Devices::getInstance();
 }
 
 Motor::~Motor() {
@@ -44,26 +41,29 @@ Motor::~Motor() {
 }
 
 void Motor::sample() {
-	updateInputs();
-	calculateModel();
-	std::cout << " Motor.enabled: " << enabled->get() << std::endl;
+	// Calculate rotational velocity
+	double rvel = devs->getDevice(Devices::posV);
+	double nrIncs = devs->getDevice(Devices::nrIncrements);
+
+	rvel = 2*M_PI*rvel/nrIncs; // Note rotations per second!
+	rotVelo->set(rvel);
+
+	double im =  t->get() / ki->get();             // Motor current.
+	motorCurrent->set(im);
+	double vme = im * rm->get() + rvel * kv->get();
+	double dc = vme / batVoltage->get();
+
+	// Normalize dc
+	if (dc > 1)  dc = 1.0;
+	if (dc < -1) dc = -1.0;
+
+	dutycycle->set(dc);
 	if (enabled->get() != 0.0) {
-		setOutputs();
+		devs->setDevice(Devices::dutycycle, dc);
 	}
-}
-
-void Motor::updateInputs() {
-	SPI* spi = SPI::getInstance();
-	batVoltage->set(spi->getRegister(SPI::UBAT));
-
-}
-
-void Motor::calculateModel() {
-
-}
-
-void Motor::setOutputs() {
-
+	else {
+		devs->setDevice(Devices::dutycycle, 0.0);
+	}
 }
 
 void Motor::sample(void* context) {
