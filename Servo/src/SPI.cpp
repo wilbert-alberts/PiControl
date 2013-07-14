@@ -27,7 +27,7 @@ SPI* SPI::getInstance()
 }
 
 SPI::SPI() {
-	// 90 bits. n+7/8 results in number of bytes.
+	enabled = new Parameter(std::string("SPI.enabled", 0.0));
 	bb = new BitBus();
 
 	createRegister(HEIGHT1, std::string("SPI.Height1"),    0, 16);
@@ -46,6 +46,7 @@ SPI::~SPI() {
 	delete[] byteArray;
 }
 
+
 void SPI::createRegister(int id, const std::string& n, int start, int length)
 {
 	bb->createRegister(id, n, start, length);
@@ -59,8 +60,30 @@ void SPI::createRegister(int id, const std::string& n, int start, int length)
 		byteArray = newBytes;
 		nrBytes = nb;
 	}
-
 }
+
+bool SPI::isEnabled()
+{
+	if (bEnabled && enabled->get()==0.0) {
+		// SPI got disabled
+		Mbed2Pi->setEnabled(false);
+		Pi2Mbed->setEnabled(false);
+		bEnabled = false;
+		return bEnabled;
+	}
+
+	if (!bEnabled && enabled->get() != 0.0) {
+		// SPI got enabled
+		Mbed2Pi->setEnabled(true);
+		Pi2Mbed->setEnabled(true);
+		bEnabled = true;
+		return bEnabled;
+	}
+
+	// In case of no change
+	return bEnabled;
+}
+
 void SPI::writeBus() {
 	// Protocol to read from the bus consists of:
 	// 1) Pulling Pi2Mbed to zero
@@ -81,7 +104,8 @@ void SPI::writeBus() {
 		waitOnSignal(Mbed2Pi, 1.0, 1000);
 
 		std::clog << "Initiating spi transfer" << std::endl;
-		HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
+		if (isEnabled())
+			HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
 	} catch (int to) {
 		std::cerr << "Timeout on SPI bus during write, reset" << std::endl;
 		Pi2Mbed->set(1.0);
@@ -126,7 +150,8 @@ void SPI::readBus() {
 		waitOnSignal(Mbed2Pi, 0.0, 1000);
 
 		std::clog << "Initiating spi transfer" << std::endl;
-		HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
+		if (isEnabled())
+			HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
 
 		std::clog << "Copying bytes to parameters" << std::endl;
 		copyToParameters();
@@ -141,18 +166,17 @@ void SPI::waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs) {
 	static struct timeval tv;
 	static struct timeval to;
 
-#ifdef REALMODE
 	gettimeofday(&tv, 0);
 	to.tv_sec = tv.tv_sec + ((tv.tv_usec + timeoutInUs) / 1000000);
 	to.tv_usec = (tv.tv_usec + timeoutInUs) % 1000000;
 	do {
-		if (in->get() == value)
+		// In case not enabled, return immediately
+		if (!isEnabled() || (in->get() == value))
 			return;
 
 		gettimeofday(&tv, 0);
 	} while ((to.tv_sec > tv.tv_sec) || (to.tv_usec > tv.tv_usec));
 	throw(1);
-#endif
 }
 
 void SPI::writeBus(void* context) {
@@ -172,9 +196,3 @@ void SPI::setRegister(int reg, double value)
 {
 	bb->setRegister(byteArray, reg, value);
 }
-
-/* TODO: REMOVE
-BitBus* SPI::getBB() {
-	return bb;
-}
-*/

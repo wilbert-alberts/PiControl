@@ -21,12 +21,15 @@ public:
 	void set(int value);
 	int get();
 
+	void setEnabled(bool v);
+
 	static DigitalOut* getByName(const std::string& name);
 	static void activateAllOuts(void* context);
 
 private:
 	DigitalOut(const std::string& name, int pin, int value);
 
+	bool enabled;
 	int pin;
 	Parameter* par;
 

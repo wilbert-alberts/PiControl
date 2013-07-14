@@ -14,7 +14,7 @@ std::map<const std::string, DigitalIn*> DigitalIn::instances;
 
 
 DigitalIn::DigitalIn(const std::string& name, int p) :
-		pin(p), par(new Parameter(name,0.0)) {
+		pin(p), par(new Parameter(name,0.0)), enabled(false) {
 
 }
 
@@ -24,16 +24,25 @@ DigitalIn::~DigitalIn() {
 DigitalIn* DigitalIn::create(const std::string& name, int pin) {
 	DigitalIn* r = new DigitalIn(name, pin);
 	DigitalIn::instances[name] = r;
-	HAL::getInstance()->pinMode(pin, HAL::IN);
 	return r;
 }
 
 int DigitalIn::get() {
-	int v;
-	v = HAL::getInstance()->digitalRead(pin);
+	int v=0;
+	if (enabled)
+		v = HAL::getInstance()->digitalRead(pin);
 	par->set(v);
 	return v;
 }
+
+void DigitalIn::setEnabled(bool v) {
+	if (v and not enabled) {
+		HAL::getInstance()->pinMode(pin, HAL::IN);
+	}
+	enabled = v;
+	get();
+}
+
 
 DigitalIn* DigitalIn::getByName(const std::string& name) {
 	if (instances.find(name) != instances.end()) {

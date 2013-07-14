@@ -29,7 +29,6 @@ public:
 
 	double getRegister(int reg);
 	void   setRegister(int reg, double value);
-	//BitBus* getBB();
 
 	static constexpr int HEIGHT1 = 1;
 	static constexpr int HEIGHT2 = 2;
@@ -46,7 +45,10 @@ private:
 	void createRegister(int id, const std::string& n, int start, int length);
 	void copyFromParameters();
 	void copyToParameters();
+	bool isEnabled();
 
+	bool            bEnabled;
+	Parameter*      enabled;
 	int             nrBytes;
 	unsigned char*  byteArray;
 	BitBus*     bb;

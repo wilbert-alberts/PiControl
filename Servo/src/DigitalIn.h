@@ -20,11 +20,15 @@ public:
 
 	int get();
 
+	void setEnabled(bool v);
+
 	static DigitalIn* getByName(const std::string& name);
 	static void captureAllIns(void* context);
 
 private:
 	DigitalIn(const std::string& name, int pin);
+
+	bool enabled;
 	int pin;
 	Parameter* par;
 

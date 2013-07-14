@@ -15,9 +15,7 @@
 std::map<const std::string, DigitalOut*> DigitalOut::instances;
 
 DigitalOut::DigitalOut(const std::string& name, int p, int v) :
-		pin(p), par(new Parameter(name, v)) {
-	HAL::getInstance()->pinMode(pin, HAL::OUT);
-	HAL::getInstance()->digitalWrite(pin, v);
+		enabled(false), pin(p), par(new Parameter(name, v)) {
 }
 
 DigitalOut::~DigitalOut() {
@@ -31,12 +29,21 @@ DigitalOut* DigitalOut::create(const std::string& name, int pin, int value) {
 }
 
 void DigitalOut::set(int v) {
-	HAL::getInstance()->digitalWrite(pin, v);
+	if (enabled)
+		HAL::getInstance()->digitalWrite(pin, v);
 	par->set(v != 0 ? 1.0 : 0.0);
 }
 
 int DigitalOut::get() {
 	return (par->get() > 0.0) ? 1 : 0;
+}
+
+void DigitalOut::setEnabled(bool v) {
+	if (v && not enabled) {
+		HAL::getInstance()->pinMode(pin, HAL::OUT);
+		HAL::getInstance()->digitalWrite(pin, get());
+	}
+	enabled = v;
 }
 
 DigitalOut* DigitalOut::getByName(const std::string& name) {
@@ -51,7 +58,8 @@ void DigitalOut::activateAllOuts(void* /*context*/) {
 			instances.begin(); iter != instances.end(); iter++) {
 		DigitalOut* digo = iter->second;
 
-		HAL::getInstance()->digitalWrite(digo->pin, digo->get());
+		if (digo->enabled)
+			HAL::getInstance()->digitalWrite(digo->pin, digo->get());
 
 	}
 }
