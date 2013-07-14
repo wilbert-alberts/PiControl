@@ -137,7 +137,7 @@
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug.275386957" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>
 							<builder buildPath="${workspace_loc:/Servo}/Debug" id="cdt.managedbuild.target.gnu.builder.exe.debug.60733924" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1034072362" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
-							<tool command="arm-linux-gnueabihf-g++-4.7" id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1290063738" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
+							<tool command="armv6-rpi-linux-gnueabi-g++" id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1290063738" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.2127382789" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1205709909" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1327075353" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
@@ -147,12 +147,12 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.warnings.extrawarn.648760655" name="Extra warnings (-Wextra)" superClass="gnu.cpp.compiler.option.warnings.extrawarn" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.other.other.505613926" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.597626156" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.597626156" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="REALMODE"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.7664351" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
-							<tool command="arm-linux-gnueabihf-gcc-4.7" id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.371147771" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
+							<tool command="armv6-rpi-linux-gnueabi-gcc" id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.371147771" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.1827951093" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.exe.debug.option.debugging.level.1724995525" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.747965164" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
@@ -161,7 +161,7 @@
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1583208853" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.817199306" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
-							<tool command="arm-linux-gnueabihf-g++-4.7" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1227470486" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
+							<tool command="armv6-rpi-linux-gnueabi-g++" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1227470486" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.2033527279" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="Common"/>
 									<listOptionValue builtIn="false" value="DoubleBuffer"/>
@@ -179,7 +179,7 @@
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
 							</tool>
-							<tool command="arm-linux-gnueabihf-as" id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1002358053" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug">
+							<tool command="armv6-rpi-linux-gnueabi-as" id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1002358053" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.839934466" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 						</toolChain>
