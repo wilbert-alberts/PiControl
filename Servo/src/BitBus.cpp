@@ -45,6 +45,9 @@ void BitBus::setRegister(unsigned char* bytes, int id, int value) {
 
 	const Register& r = registers[id];
 
+	//std::clog << "BitBus::setRegister " << id << ": " << value << std::endl;
+
+
 	if (value > (1<<r.length)) {
 		std::clog << "Warning: value " << value << " does not fit in register " << id << std::endl;
 		std::clog << "Skipping assignment." << std::endl;
@@ -66,11 +69,13 @@ int BitBus::getRegister(unsigned char* bytes, int id) {
 	int result=0;
 	char* sresult = (char*)(&result);
 
-	for (int i=0; i<r.length/8+1; i++) {
+
+	for (int i=0; i< (r.length+7)/8; i++) {
 		sresult[i] = bytes[i+ r.startBit/8];
 	}
 	result = result >> r.startBit%8;
 
+	//std::clog << "BitBus::getRegister " << id << ": " << result << std::endl;
 	return result;
 }
 
