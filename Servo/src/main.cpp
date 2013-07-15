@@ -17,6 +17,7 @@
 #include "SimulatedHAL.h"
 #include "WiringPiHAL.h"
 #include "CmdUpdateFrequency.h"
+#include "Devices.h"
 
 constexpr int MEMORYSIZE=16*1024;  // 16 Kilobytes.
 constexpr int SERVOFREQUENCY=2;    // 2 Hz
@@ -76,6 +77,9 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		// Run servo
 		pt->addPeriodicFunction(flipper,0);
 		pt->addPeriodicFunction(Motor::sample, motor);
+
+		// Transform dutycycle into correct signals.
+		pt->addPeriodicFunction(Devices::update, 0);
 
 		// Write Bitbus
 		pt->addPeriodicFunction(SPI::writeBus, spibus);

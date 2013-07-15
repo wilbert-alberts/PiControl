@@ -19,7 +19,7 @@ void WiringPiHAL::registerHAL() {
 
 void WiringPiHAL::setup() {
 	wiringPiSetup();
-	wiringPiSPISetup(0, 1000000); // Note: channel doesn't matter
+	wiringPiSPISetup(0, 500000); // Note: channel doesn't matter
 }
 
 void WiringPiHAL::pinMode(int pin, int mode) {
@@ -42,7 +42,10 @@ void WiringPiHAL::digitalWrite(int pin, int value) {
 	::digitalWrite(pin, value);
 }
 void WiringPiHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len) {
-	::wiringPiSPIDataRW(channel, data, len);
+	//::wiringPiSPIDataRW(channel, data, len);
+	for (int i=0; i<len; i++) {
+		::wiringPiSPIDataRW(channel, data+i, 1);
+	}
 }
 
 #endif
