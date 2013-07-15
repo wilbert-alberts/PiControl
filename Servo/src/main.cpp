@@ -46,6 +46,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		hb = DigitalOut::create(std::string("hearbeat"), 0,0);
 
 		Parameter* tsStart = new Parameter("TimeStats.start", 0.0);
+		Parameter* tsDI = new Parameter("TimeStats.digitalIn", 0.0);
 		Parameter* tsEnd = new Parameter("TimeStats.end", 0.0);
 		Parameter* tsTracing = new Parameter("TimeStats.tracing", 0.0);
 		Parameter* tsCheckStop = new Parameter("TimeStats.checkStop", 0.0);
@@ -70,14 +71,14 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(DigitalIn::captureAllIns, 0);
 
 		// Read Bitbus
-		//pt->addPeriodicFunction(SPI::readBus, spibus);
+		pt->addPeriodicFunction(SPI::readBus, spibus);
 
 		// Run servo
 		pt->addPeriodicFunction(flipper,0);
 		pt->addPeriodicFunction(Motor::sample, motor);
 
 		// Write Bitbus
-		//pt->addPeriodicFunction(SPI::writeBus, spibus);
+		pt->addPeriodicFunction(SPI::writeBus, spibus);
 
 		// Activate digital outs.
 		pt->addPeriodicFunction(DigitalOut::activateAllOuts, 0);
@@ -115,6 +116,6 @@ void flipper(void* /*context*/)
 	static int i = 1;
 	hb->set(i);
 	i=1-i;
-	std::cout << i << std::endl;
+	//std::cout << i << std::endl;
 }
 
