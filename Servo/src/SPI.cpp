@@ -19,6 +19,8 @@
 
 SPI* SPI::instance = 0;
 
+unsigned char wilbert[] = "wilbertalberts";
+
 SPI* SPI::getInstance()
 {
 	if (instance==0)
@@ -27,7 +29,7 @@ SPI* SPI::getInstance()
 }
 
 SPI::SPI() {
-	enabled = new Parameter(std::string("SPI.enabled", 0.0));
+	enabled = new Parameter(std::string("SPI.enabled"), 0.0);
 	bb = new BitBus();
 
 	createRegister(HEIGHT1, std::string("SPI.Height1"),    0, 16);
@@ -36,7 +38,7 @@ SPI::SPI() {
 	createRegister(ENCPOS, std::string("SPI.EncPos"),    48, 16);
 
 	createRegister(PWM, std::string("SPI.PWM"),      64, 16);
-	createRegister(MOTORDIR, std::string("SPI.MotorDir"), 72,  8);
+	createRegister(MOTORDIR, std::string("SPI.MotorDir"), 80,  8);
 
 	Pi2Mbed = DigitalOut::create(std::string("SPI.pi2mbed"), 4, 1);
 	Mbed2Pi = DigitalIn::create("SPI.mbed2pi", 5);
@@ -90,20 +92,20 @@ void SPI::writeBus() {
 	// 2) Wait until Mbed2Pi is zero
 	// 3) Transmit over spi
 
-	std::clog << "SPI::writeBus"<< std::endl;
+	//std::clog << "SPI::writeBus"<< std::endl;
 	copyFromParameters();
 
 	try {
-		std::clog << "Verifying state of Mbed2Pi line" << std::endl;
+		//std::clog << "Verifying state of Mbed2Pi line" << std::endl;
 		waitOnSignal(Mbed2Pi, 0.0, 1000);
 
-		std::clog << "Set P2Mbed to 1" << std::endl;
+		//std::clog << "Set P2Mbed to 1" << std::endl;
 		Pi2Mbed->set(1);
 
-		std::clog << "Wait for mbed to acknowlegde" << std::endl;
+		//std::clog << "Wait for mbed to acknowlegde" << std::endl;
 		waitOnSignal(Mbed2Pi, 1.0, 1000);
 
-		std::clog << "Initiating spi transfer" << std::endl;
+		//std::clog << "Initiating spi transfer" << std::endl;
 		if (isEnabled())
 			HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
 	} catch (int to) {
@@ -130,7 +132,6 @@ void SPI::copyToParameters()
 
 		p->set(bb->getRegister(byteArray, id));
 	}
-
 }
 void SPI::readBus() {
 	// Protocol to read from the bus consists of:
@@ -138,22 +139,22 @@ void SPI::readBus() {
 	// 2) Wait until Mbed2Pi is zero
 	// 3) Transmit over spi
 
-	std::clog << "SPI::readBus"<< std::endl;
+	//std::clog << "SPI::readBus"<< std::endl;
 	try {
-		std::clog << "Verifying the Mbed2Pi line"<< std::endl;
+		//std::clog << "Verifying the Mbed2Pi line"<< std::endl;
 		waitOnSignal(Mbed2Pi, 1.0, 1000);
 
-		std::clog << "Setting Pi2Mbed to 0" << std::endl;
+		//std::clog << "Setting Pi2Mbed to 0" << std::endl;
 		Pi2Mbed->set(0);
 
-		std::clog << "Waiting for mbed to acknowledge" << std::endl;
+		//std::clog << "Waiting for mbed to acknowledge" << std::endl;
 		waitOnSignal(Mbed2Pi, 0.0, 1000);
 
-		std::clog << "Initiating spi transfer" << std::endl;
+		//std::clog << "Initiating spi transfer" << std::endl;
 		if (isEnabled())
-			HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
+			HAL::getInstance()->wiringPiSPIDataRW(0, wilbert, nrBytes);
 
-		std::clog << "Copying bytes to parameters" << std::endl;
+		//std::clog << "Copying bytes to parameters" << std::endl;
 		copyToParameters();
 
 	} catch (int to) {
