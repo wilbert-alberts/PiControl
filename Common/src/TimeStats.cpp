@@ -9,6 +9,7 @@
 
 #include <string>
 
+const std::string TimeStats::par_sampleCounter("TimeStats.sampleCounter");
 const std::string TimeStats::par_minMargin("TimeStats.minMargin");
 const std::string TimeStats::par_maxMargin("TimeStats.maxMargin");
 const std::string TimeStats::par_margin("TimeStats.margin");

@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 
+Parameter* TimeStats_Servo::sampleCounter = 0;
 Parameter* TimeStats_Servo::minMargin = 0;
 Parameter* TimeStats_Servo::maxMargin = 0;
 Parameter* TimeStats_Servo::margin = 0;
@@ -30,6 +31,7 @@ void TimeStats_Servo::initSample()
   margin = new Parameter(par_margin,0.0);
   reset = new Parameter(par_reset,0.0);
   overruns = new Parameter(par_overruns,0.0);
+  sampleCounter = new Parameter(par_sampleCounter,0.0);
 
   PeriodicTimer::getInstance()->resetStats();
 }
@@ -47,6 +49,7 @@ void TimeStats_Servo::sampleCommand(void* /*context*/)
 {
   PeriodicTimer* pt = PeriodicTimer::getInstance();
 
+  sampleCounter->set(sampleCounter->get()+1);
   margin->set(pt->getMargin());
   minMargin->set(pt->getMinMargin());
   maxMargin->set(pt->getMaxMargin());
