@@ -74,6 +74,9 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		// Read Bitbus
 		pt->addPeriodicFunction(SPI::readBus, spibus);
 
+		// Read Devices
+		pt->addPeriodicFunction(Devices::sample, 0);
+
 		// Run servo
 		pt->addPeriodicFunction(flipper,0);
 		pt->addPeriodicFunction(Motor::sample, motor);
