@@ -132,6 +132,7 @@ void SPI::copyToParameters()
 
 		p->set(bb->getRegister(byteArray, id));
 	}
+
 }
 void SPI::readBus() {
 	// Protocol to read from the bus consists of:
@@ -152,9 +153,14 @@ void SPI::readBus() {
 
 		//std::clog << "Initiating spi transfer" << std::endl;
 		if (isEnabled())
-			HAL::getInstance()->wiringPiSPIDataRW(0, wilbert, nrBytes);
+			HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
 
 		//std::clog << "Copying bytes to parameters" << std::endl;
+		//for (int i=0; i<nrBytes; i++) byteArray[i] = 0;
+		//std::clog << "low byte: " <<  (int)byteArray[6] << std::endl;
+		//std::clog << "high byte: " << (int)byteArray[7] << std::endl;
+		//byteArray[7] =2;
+
 		copyToParameters();
 
 	} catch (int to) {
