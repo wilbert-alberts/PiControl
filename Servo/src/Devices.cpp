@@ -109,6 +109,12 @@ void Devices::sample() {
 	sampleBattery();
 }
 
+void Devices::sample(void* /*context*/) {
+	Devices* d = Devices::getInstance();
+
+	d->sample();
+}
+
 void Devices::samplePosition(double frequency) {
 	// Start with shifting previous values
 	pos_[2] = pos_[1];
@@ -120,6 +126,8 @@ void Devices::samplePosition(double frequency) {
 	// Mask relevant bits
 	rawpos = rawpos & 0x0fff; // 12 bits
 	// determine delta w.r.t. previous sample;
+	par_rawPos->set(rawpos);
+
 	int delta = rawpos - prevRawPos;
 	// store new value for prevRawPos
 	prevRawPos = rawpos;
@@ -144,6 +152,11 @@ void Devices::samplePosition(double frequency) {
 	pos_v[0] = (pos_[0] - pos_[1]) * frequency;
 	pos_v[1] = (pos_[1] - pos_[2]) * frequency;
 	pos_a[0] = (pos_v[0] - pos_v[1]) * frequency;
+
+	// store calculated values into parameters
+	par_pos->set(pos_[0]);
+	par_posV->set(pos_v[0]);
+	par_posA->set(pos_a[0]);
 }
 
 void Devices::sampleBattery()
