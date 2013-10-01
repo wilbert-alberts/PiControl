@@ -46,28 +46,65 @@ int WiringPiHAL::digitalRead(int pin) {
 void WiringPiHAL::digitalWrite(int pin, int value) {
 	::digitalWrite(pin, value);
 }
+
 void WiringPiHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len) {
-	int result;
-	//::wiringPiSPIDataRW(channel, data, len);
 
-	//static char myBuffer[len+8];
-	static unsigned char myBuffer[80];
+	static unsigned char framedData[80];
 
-	frameBuffer(myBuffer, len+8);
+	frameBuffer(framedData, len);
+	fillBuffer(framedData, data, len);
 
-	fillBuffer(myBuffer, data, len);
+	// Run protocol to get rid of remaining data in SPI FIFO
+	typedef enum {
+		INIT,
+		HALFWAY,
+		EXIT
+	} State_enum;
 
-	//dumpBuffer("transmit", myBuffer, len+8);
+	State_enum state = INIT;
+	unsigned char buffer;
+	do {
+		switch (state) {
+		case INIT:
+			buffer = 0xAA;
+			::wiringPiSPIDataRW(channel, &buffer, 1);
+			switch (buffer) {
+			case 0xAA:
+				state = HALFWAY;
+				break;
+			default:
+				state = INIT;
+				break;
+			}
+			break;
+		case HALFWAY:
+			buffer = 0xBB;
+			::wiringPiSPIDataRW(channel, &buffer, 1);
+			switch (buffer) {
+			case 0xAA:
+				state = HALFWAY;
+				break;
+			case 0xBB:
+				state = EXIT;
+				break;
+			default:
+				state = INIT;
+				break;
+			}
+			break;
+		default:
+			// Should not be reached
+			std::clog << "This code should not be reached: " << std::endl;
+			break;
+		}
+	} while (state != EXIT);
 
-	for (int i=0; i<len+8; i++) {
-		result = ::wiringPiSPIDataRW(channel, myBuffer+i, 1);
-		if (result<0)
-			std::clog << "SPI communication error: " << result << std::endl;
+	// MBED en PI in sync, no communicate buffer.
+	for (int i=0; i<len; i++) {
+		::wiringPiSPIDataRW(channel, data+i, 1);
 	}
 
-	//dumpBuffer("received", myBuffer, len+8);
-
-	captureBuffer(myBuffer, data, len);
+	captureBuffer(framedData, data, len);
 
 }
 
@@ -78,17 +115,17 @@ void WiringPiHAL::frameBuffer(unsigned char *data, int len)
 	data[2] = 0xAA;
 	data[3] = 0x55;
 
-	data[len-4] = 0x55;
-	data[len-3] = 0xaa;
-	data[len-2] = 0x55;
-	data[len-1] = 0xaa;
+	data[len+4] = 0x55;
+	data[len+5] = 0xaa;
+	data[len+6] = 0x55;
+	data[len+7] = 0xaa;
 }
 
 void WiringPiHAL::fillBuffer(unsigned char* myBuffer, unsigned char* source, int len)
 {
 	for (int i=0; i<len; i++)
-		myBuffer[4+i] = 2*i+1;
-		//myBuffer[4+i] = source[i];
+		//myBuffer[4+i] = 2*i+1;
+		myBuffer[4+i] = source[i];
 }
 
 void WiringPiHAL::captureBuffer(unsigned char* myBuffer, unsigned char* dest, int len)

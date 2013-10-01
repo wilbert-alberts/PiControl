@@ -25,6 +25,7 @@ public:
   static void takeTimeStamp(void* context); // context should be Parameter*
 
 private:
+  static Parameter* sampleCounter;
   static Parameter* minMargin;
   static Parameter* maxMargin;
   static Parameter* reset;
