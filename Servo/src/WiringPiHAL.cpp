@@ -7,8 +7,6 @@
 
 #include "WiringPiHAL.h"
 
-#define REALMODE
-
 #ifdef REALMODE
 
 #include <iostream>

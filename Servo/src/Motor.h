@@ -17,6 +17,7 @@ public:
 	static Motor* getInstance();
 	virtual ~Motor();
 
+	void setTorque(double torque);
 	static void sample(void* context);
 	void sample();
 

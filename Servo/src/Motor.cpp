@@ -40,6 +40,10 @@ Motor::~Motor() {
 	// TODO Auto-generated destructor stub
 }
 
+void Motor::setTorque(double tq) {
+	t->set(tq);
+}
+
 void Motor::sample() {
 	// Calculate rotational velocity
 	double rvel = devs->getDevice(Devices::posV);

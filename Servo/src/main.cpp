@@ -12,6 +12,7 @@
 #include "DigitalIn.h"
 #include "SPI.h"
 #include "BitBus.h"
+#include "Controller.h"
 #include "Motor.h"
 #include "HAL.h"
 #include "SimulatedHAL.h"
@@ -78,7 +79,9 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(Devices::sample, 0);
 
 		// Run servo
-		pt->addPeriodicFunction(flipper,0);
+		pt->addPeriodicFunction(Controller::sample,0);
+
+		// Run motor model
 		pt->addPeriodicFunction(Motor::sample, motor);
 
 		// Transform dutycycle into correct signals.

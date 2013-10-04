@@ -8,7 +8,6 @@
 #ifndef WIRINGPIHAL_H_
 #define WIRINGPIHAL_H_
 
-#define REALMODE
 #ifdef REALMODE
 
 #include "HAL.h"
