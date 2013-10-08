@@ -11,9 +11,9 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <cassert>
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
-
 
 
 void WiringPiHAL::registerHAL() {
@@ -45,12 +45,35 @@ void WiringPiHAL::digitalWrite(int pin, int value) {
 	::digitalWrite(pin, value);
 }
 
-void WiringPiHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len) {
+void WiringPiHAL::transmitBuffer(int channel, unsigned char* framedData, int len)
+{
+	// MBED en PI in sync, now communicate buffer.
+	for (int i = 0; i < len + 8; i++) {
+		::wiringPiSPIDataRW(channel, framedData + i, 1);
+	}
+}
 
+void WiringPiHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len)
+{
 	static unsigned char framedData[80];
+
+	assert(len+8<80);
 
 	frameBuffer(framedData, len);
 	fillBuffer(framedData, data, len);
+
+	getInSync(channel);
+
+	// MBED en PI in sync, now communicate buffer.
+	transmitBuffer(channel, framedData, len);
+	//dumpBuffer("After comm:" , framedData, len);
+
+	captureBuffer(framedData, data, len);
+}
+
+void WiringPiHAL::getInSync(int channel)
+{
+	int syncCounter = 50;
 
 	// Run protocol to get rid of remaining data in SPI FIFO
 	typedef enum {
@@ -95,15 +118,11 @@ void WiringPiHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len) {
 			std::clog << "This code should not be reached: " << std::endl;
 			break;
 		}
-	} while (state != EXIT);
+		syncCounter--;
+	} while ((syncCounter>0) && (state != EXIT));
 
-	// MBED en PI in sync, no communicate buffer.
-	for (int i=0; i<len; i++) {
-		::wiringPiSPIDataRW(channel, data+i, 1);
-	}
-
-	captureBuffer(framedData, data, len);
-
+	if ((syncCounter==0) && (state != EXIT))
+		std::cerr << "Unable to get in sync" << std::endl;
 }
 
 void WiringPiHAL::frameBuffer(unsigned char *data, int len)
@@ -122,7 +141,6 @@ void WiringPiHAL::frameBuffer(unsigned char *data, int len)
 void WiringPiHAL::fillBuffer(unsigned char* myBuffer, unsigned char* source, int len)
 {
 	for (int i=0; i<len; i++)
-		//myBuffer[4+i] = 2*i+1;
 		myBuffer[4+i] = source[i];
 }
 
@@ -136,7 +154,7 @@ void WiringPiHAL::captureBuffer(unsigned char* myBuffer, unsigned char* dest, in
 			(myBuffer[8+len-3] != 0xaa) ||
 			(myBuffer[8+len-2] != 0x55) ||
 			(myBuffer[8+len-1] != 0xaa)) {
-		std::clog << "SPI communication error: incomplete/corrupt frame" << std::endl;
+		std::cerr << "SPI communication error: incomplete/corrupt frame" << std::endl;
 		dumpBuffer("captured: ", myBuffer, len+8);
 	}
 
@@ -161,7 +179,7 @@ void WiringPiHAL::captureBuffer(unsigned char* myBuffer, unsigned char* dest, in
 void WiringPiHAL::dumpBuffer(const char* msg, unsigned char* myBuffer, int len)
 {
 	printf("%s: ", msg);
-	for (int i=0; i<len; i++) {
+	for (int i=0; i<len+8; i++) {
 		printf(" %02X", myBuffer[i]);
 	}
 	printf("\n");

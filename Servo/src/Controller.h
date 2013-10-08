@@ -25,9 +25,26 @@ private:
 	void calculateModel();
 	static Controller* instance;
 	Parameter* enabled;
+	Parameter* pos_sp;
+	Parameter* pos_kp;
+	Parameter* pos_kd;
+	Parameter* pos_ki;
+	Parameter* ang_sp;
+	Parameter* ang_kp;
+	Parameter* ang_kd;
+	Parameter* ang_ki;
+	Parameter* posErrorParam;
+	Parameter* angErrorParam;
+
 	Motor* motor;
 	bool updateActualPosition;
 	Devices* devs;
+
+	double prevPosError;
+	double prevAngError;
+	double relPosOffset;
+	double sumError;
+
 };
 
 #endif /* CONTROLLER_H_ */

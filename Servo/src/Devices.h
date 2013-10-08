@@ -51,7 +51,7 @@ public:
 	} ;
 
 
-	double getDevice(DeviceID id);
+	double getDeviceValue(DeviceID id);
 	void setDevice(DeviceID id, double val);
 
 

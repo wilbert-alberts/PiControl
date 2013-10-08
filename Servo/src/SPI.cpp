@@ -92,20 +92,20 @@ void SPI::writeBus() {
 	// 2) Wait until Mbed2Pi is zero
 	// 3) Transmit over spi
 
-	std::clog << "SPI::writeBus"<< std::endl;
+	//std::clog << "SPI::writeBus"<< std::endl;
 	copyFromParameters();
 
 	try {
-		std::clog << "Verifying state of Mbed2Pi line" << std::endl;
+		//std::clog << "Verifying state of Mbed2Pi line" << std::endl;
 		waitOnSignal(Mbed2Pi, 0.0, 100000);
 
-		std::clog << "Set P2Mbed to 1" << std::endl;
+		//std::clog << "Set P2Mbed to 1" << std::endl;
 		Pi2Mbed->set(1);
 
-		std::clog << "Wait for mbed to acknowlegde" << std::endl;
+		//std::clog << "Wait for mbed to acknowlegde" << std::endl;
 		waitOnSignal(Mbed2Pi, 1.0, 100000);
 
-		std::clog << "Initiating spi transfer" << std::endl;
+		//std::clog << "Initiating spi transfer" << std::endl;
 		if (isEnabled())
 			HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
 	} catch (int to) {
@@ -120,6 +120,7 @@ void SPI::copyFromParameters()
 		Parameter* p = iter->second;
 		int id = iter->first;
 
+		std::clog <<"setting register " << p->getName() << " to value: " << p->get() << std::endl;
 		bb->setRegister(byteArray, id, p->get());
 	}
 }
@@ -144,18 +145,18 @@ void SPI::readBus() {
 	// 2) Wait until Mbed2Pi is zero
 	// 3) Transmit over spi
 
-	std::clog << "SPI::readBus"<< std::endl;
+	//std::clog << "SPI::readBus"<< std::endl;
 	try {
-		std::clog << "Verifying the Mbed2Pi line"<< std::endl;
+		//std::clog << "Verifying the Mbed2Pi line"<< std::endl;
 		waitOnSignal(Mbed2Pi, 1.0, 100000);
 
-		std::clog << "Setting Pi2Mbed to 0" << std::endl;
+		//std::clog << "Setting Pi2Mbed to 0" << std::endl;
 		Pi2Mbed->set(0);
 
-		std::clog << "Waiting for mbed to acknowledge" << std::endl;
+		//std::clog << "Waiting for mbed to acknowledge" << std::endl;
 		waitOnSignal(Mbed2Pi, 0.0, 100000);
 
-		std::clog << "Initiating spi transfer" << std::endl;
+		//std::clog << "Initiating spi transfer" << std::endl;
 		if (isEnabled())
 			HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
 
@@ -200,10 +201,16 @@ void SPI::readBus(void* context) {
 
 double SPI::getRegister(int reg)
 {
+	//TODO: check whether 'get' functionality should be based
+	//      on registers or parameters
 	return bb->getRegister(byteArray, reg);
 }
 
 void SPI::setRegister(int reg, double value)
 {
 	bb->setRegister(byteArray, reg, value);
+
+	Parameter* p = registers[reg];
+	p->set(value);
+
 }

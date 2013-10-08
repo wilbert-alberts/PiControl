@@ -27,6 +27,8 @@ private:
 	void fillBuffer(unsigned char* myBuffer, unsigned char* source, int len);
 	void dumpBuffer(const char* msg, unsigned char* myBuffer, int len);
 	void captureBuffer(unsigned char* myBuffer, unsigned char* dest, int len);
+	void transmitBuffer(int channel, unsigned char* framedData, int len);
+	void getInSync(int channel);
 };
 
 #endif

@@ -46,8 +46,10 @@ void Motor::setTorque(double tq) {
 
 void Motor::sample() {
 	// Calculate rotational velocity
-	double rvel = devs->getDevice(Devices::posV);
-	double nrIncs = devs->getDevice(Devices::nrIncrements);
+	double rvel = devs->getDeviceValue(Devices::posV);
+	double nrIncs = devs->getDeviceValue(Devices::nrIncrements);
+
+	batVoltage->set(devs->getDeviceValue(Devices::voltage));
 
 	rvel = 2*M_PI*rvel/nrIncs; // Note rotations per second!
 	rotVelo->set(rvel);
@@ -66,7 +68,7 @@ void Motor::sample() {
 		devs->setDevice(Devices::dutycycle, dc);
 	}
 	else {
-		devs->setDevice(Devices::dutycycle, 0.0);
+		//devs->setDevice(Devices::dutycycle, 0.0);
 	}
 }
 

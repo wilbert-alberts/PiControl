@@ -12,6 +12,8 @@
 #include "PeriodicTimer.h"
 
 #include <stdexcept>
+#include <iostream>
+#include <cmath>
 
 Devices* Devices::instance=0;
 
@@ -62,7 +64,7 @@ Parameter* Devices::createParameter(const std::string& name, double v, Devices::
 	return result;
 }
 
-double Devices::getDevice(DeviceID id) {
+double Devices::getDeviceValue(DeviceID id) {
 	if (devices.find(id) == devices.end())
 		throw std::invalid_argument("Devices::getDevice: illegal value for deviceID: " + id);
 
@@ -176,8 +178,13 @@ void Devices::update() {
 
 void Devices::updateDC() {
 	double dc = par_dutycycle->get();
+	// Limit dc to -1.0 -  1.0
+	dc = dc> 1.0?  1.0 : dc;
+	dc = dc<-1.0? -1.0 : dc;
+
+	// Determine value for direction register
 	int dir = dc<0.0 ? 0 : 1;
-	int rawDC = 65535*abs(dc);
+	int rawDC = (int)(65535.0*fabs(dc));
 
 	spi->setRegister(SPI::PWM, static_cast<double>(rawDC));
 	spi->setRegister(SPI::MOTORDIR, static_cast<double>(dir));
