@@ -3,8 +3,10 @@
 source ./environment.sh
 
 $TERMINAL Motor.ki 3.14
+$TERMINAL Motor.kv 3.14
 $TERMINAL Motor.rm 2.71
-$TERMINAL dumpParameters
+
 $TERMINAL SPI.enabled 1
 $TERMINAL Motor.enabled 1
 
+$TERMINAL dumpParameters

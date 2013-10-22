@@ -1,0 +1,19 @@
+#!/bin/bash
+
+source ./environment.sh
+
+$TERMINAL Controller.pos_sp 0.0
+$TERMINAL Controller.ang_kp 0.0
+$TERMINAL Controller.pos_ki 0.0
+$TERMINAL Controller.pos_kd 0.0
+
+$TERMINAL Controller.ang_sp 0.0
+$TERMINAL Controller.ang_kp 0.0
+$TERMINAL Controller.ang_ki 0.0
+$TERMINAL Controller.ang_kd 0.0
+
+$TERMINAL SPI.enabled 1
+$TERMINAL Motor.enabled 1
+$TERMINAL Controller.enabled 1
+
+$TERMINAL dumpParameters
