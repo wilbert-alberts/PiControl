@@ -1,7 +1,8 @@
 #!/bin/bash
 
-sh environment.sh
+source ./environment.sh
 
+gpio load spi
 rm -Rf /var/run/shm/mem*
 rm -Rf /var/run/shm/sem*
 gdb $SERVO
