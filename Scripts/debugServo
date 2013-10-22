@@ -1,0 +1,10 @@
+#!/bin/bash
+
+sh environment.sh
+
+rm -Rf /var/run/shm/mem*
+rm -Rf /var/run/shm/sem*
+gdb $SERVO
+
+
+
