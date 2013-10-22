@@ -2,6 +2,10 @@
 
 sh environment.sh
 
+echo boo
+echo $SERVO
+echo ba
+
 rm -Rf /var/run/shm/mem*
 rm -Rf /var/run/shm/sem*
 $SERVO
