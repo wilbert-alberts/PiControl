@@ -4,7 +4,7 @@
  *  Created on: Jun 19, 2013
  *      Author: wilbert
  */
- 
+
 #include "TraceEntry.h"
 #include "DoubleBuffer.h"
 #include "Parameter.h"
@@ -41,7 +41,7 @@ void TraceEntry::sample(DoubleBuffer* /*db*/, int sampleCounter)
   wvalue[lastSampleIdx] = v;
   lastSampleIdx = (lastSampleIdx+1) % (buffersize);
   nrSamples++;
-  std::cout << "Tracing par: " << parIdx << " - " << v << std::endl;
+  //std::cout << "Tracing par: " << parIdx << " - " << v << std::endl;
 }
 
 void TraceEntry::attachForRead()

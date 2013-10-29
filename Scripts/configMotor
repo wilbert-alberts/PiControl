@@ -2,6 +2,13 @@
 
 source ./environment.sh
 
+$TERMINAL PeriodicTimer.frequency 100
+
+$TERMINAL Dev.posGain 0.00002262443
+
+$TERMINAL Dev.angleGain 0.0003870809
+$TERMINAL Dev.angleOffset -1.2328527249
+
 $TERMINAL Motor.ki 0.033
 $TERMINAL Motor.kv 0.033
 $TERMINAL Motor.rm 4.72

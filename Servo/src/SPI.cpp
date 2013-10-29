@@ -120,7 +120,7 @@ void SPI::copyFromParameters()
 		Parameter* p = iter->second;
 		int id = iter->first;
 
-		std::clog <<"setting register " << p->getName() << " to value: " << p->get() << std::endl;
+		//std::clog <<"setting register " << p->getName() << " to value: " << p->get() << std::endl;
 		bb->setRegister(byteArray, id, p->get());
 	}
 }

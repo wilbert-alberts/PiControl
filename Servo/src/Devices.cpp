@@ -99,7 +99,6 @@ void Devices::sampleAngle(double frequency) {
 	angle_a[0] = (angle_v[0] - angle_v[1]) * frequency;
 	// store calculated values into parameters
 	par_angle->set(angle_[0]);
-	par_angleV->set(angle_v[0]);
 	par_angleA->set(angle_a[0]);
 }
 
@@ -183,7 +182,7 @@ void Devices::updateDC() {
 	dc = dc<-1.0? -1.0 : dc;
 
 	// Determine value for direction register
-	int dir = dc<0.0 ? 0 : 1;
+	int dir = dc<0.0 ? 1 : 0;
 	int rawDC = (int)(65535.0*fabs(dc));
 
 	spi->setRegister(SPI::PWM, static_cast<double>(rawDC));

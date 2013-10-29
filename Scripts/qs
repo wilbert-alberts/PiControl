@@ -1,0 +1,9 @@
+#!/bin/bash
+
+source ./environment.sh
+
+$TERMINAL Controller.enabled 0
+$TERMINAL Motor.torque 0
+$TERMINAL Motor.enabled 0
+
+

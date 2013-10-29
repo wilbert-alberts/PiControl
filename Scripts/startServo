@@ -2,13 +2,10 @@
 
 source ./environment.sh
 
-echo boo
-echo $SERVO
-echo ba
-
 gpio load spi
 rm -Rf /var/run/shm/mem*
 rm -Rf /var/run/shm/sem*
+#pkill Servo
 $SERVO
 
 
