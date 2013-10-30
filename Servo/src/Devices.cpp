@@ -48,7 +48,8 @@ Devices::Devices() :
 		par_voltageGain(createParameter("Dev.voltageGain",1.0, voltageGain)),
 		par_voltageOffset(createParameter("Dev.voltageOffset",0.0, voltageOffset)),
 
-		par_dutycycle(createParameter("Dev.dutycycle",0.0, dutycycle))
+		par_dutycycle(createParameter("Dev.dutycycle",0.0, dutycycle)),
+		par_motordir(createParameter("Dev.motordir",1.0, motordir))
 {
 }
 
@@ -176,7 +177,7 @@ void Devices::update() {
 }
 
 void Devices::updateDC() {
-	double dc = par_dutycycle->get();
+	double dc = par_dutycycle->get()*(par_motordir->get() < 0? -1: 1);
 	// Limit dc to -1.0 -  1.0
 	dc = dc> 1.0?  1.0 : dc;
 	dc = dc<-1.0? -1.0 : dc;
