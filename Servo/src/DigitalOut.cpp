@@ -29,8 +29,11 @@ DigitalOut* DigitalOut::create(const std::string& name, int pin, int value) {
 }
 
 void DigitalOut::set(int v) {
-	if (enabled)
+
+	if (enabled) {
+		//std::clog << "Setting " << v << " on " << par->getName() << std::endl;
 		HAL::getInstance()->digitalWrite(pin, v);
+	}
 	par->set(v != 0 ? 1.0 : 0.0);
 }
 

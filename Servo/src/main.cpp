@@ -19,11 +19,11 @@
 #include "WiringPiHAL.h"
 #include "CmdUpdateFrequency.h"
 #include "Devices.h"
+#include "HWDebug.h"
+
 
 constexpr int MEMORYSIZE=16*1024;  // 16 Kilobytes.
 constexpr int SERVOFREQUENCY=2;    // 2 Hz
-
-static DigitalOut* hb;
 
 void lockDB(void* context);
 void unlockDB(void* context);
@@ -45,8 +45,6 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		db->create(MEMORYSIZE);
 		db->lock();
 
-		hb = DigitalOut::create(std::string("hearbeat"), 0,0);
-
 		Parameter* tsStart = new Parameter("TimeStats.start", 0.0);
 		Parameter* tsDI = new Parameter("TimeStats.digitalIn", 0.0);
 		Parameter* tsEnd = new Parameter("TimeStats.end", 0.0);
@@ -67,6 +65,8 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		db->unlock();
 
 		pt->addPeriodicFunction(lockDB, db);
+		pt->addPeriodicFunction(flipper,0);
+
 		pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsStart);
 		// add sample functions
 		// Start with capturing digital Ins
@@ -123,9 +123,6 @@ void unlockDB(void* context) {
 
 void flipper(void* /*context*/)
 {
-	static int i = 1;
-	hb->set(i);
-	i=1-i;
-	//std::cout << i << std::endl;
+	HWDebug::raiseEvent("heartbeat");
 }
 

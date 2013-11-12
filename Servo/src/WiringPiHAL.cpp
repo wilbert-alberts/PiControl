@@ -22,7 +22,7 @@ void WiringPiHAL::registerHAL() {
 
 void WiringPiHAL::setup() {
 	wiringPiSetup();
-	wiringPiSPISetup(0, 500000); // Note: channel doesn't matter
+	wiringPiSPISetup(0, 4000000);
 }
 
 void WiringPiHAL::pinMode(int pin, int mode) {
@@ -62,7 +62,7 @@ void WiringPiHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len)
 	frameBuffer(framedData, len);
 	fillBuffer(framedData, data, len);
 
-	getInSync(channel);
+	//getInSync(channel);
 
 	// MBED en PI in sync, now communicate buffer.
 	transmitBuffer(channel, framedData, len);
@@ -157,10 +157,10 @@ void WiringPiHAL::captureBuffer(unsigned char* myBuffer, unsigned char* dest, in
 		std::cerr << "SPI communication error: incomplete/corrupt frame" << std::endl;
 		dumpBuffer("captured: ", myBuffer, len+8);
 	}
-
-	for (int i=0; i<len; i++)
-		dest[i] = myBuffer[4+i];
-
+	else {
+		for (int i=0; i<len; i++)
+			dest[i] = myBuffer[4+i];
+	}
 /*	In case of unreliable spi communication
 	for (int i=0; i<4; i++) {
 		if ((myBuffer[i] == 0xAA) &&
@@ -186,3 +186,6 @@ void WiringPiHAL::dumpBuffer(const char* msg, unsigned char* myBuffer, int len)
 }
 
 #endif
+
+
+
