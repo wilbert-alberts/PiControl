@@ -23,6 +23,9 @@ public:
 private:
 	Controller();
 	void calculateModel();
+	bool mmdcSafe();
+	void disableController();
+
 	static Controller* instance;
 	Parameter* enabled;
 	Parameter* pos_sp;
@@ -35,6 +38,8 @@ private:
 	Parameter* ang_ki;
 	Parameter* posErrorParam;
 	Parameter* angErrorParam;
+	Parameter* mmdcMinAng;
+	Parameter* mmdcMaxAng;
 
 	Motor* motor;
 	bool updateActualPosition;

@@ -31,6 +31,9 @@ Controller::Controller() {
 	angErrorParam = new Parameter("Controller.angError", 0);
 	posErrorParam = new Parameter("Controller.posError", 0);
 
+	mmdcMinAng = new Parameter("Controller.minAng", -100);
+	mmdcMaxAng = new Parameter("Controller.maxAng",  100);
+
 	motor = Motor::getInstance();
 	devs = Devices::getInstance();
 	updateActualPosition = true;
@@ -41,6 +44,36 @@ Controller::~Controller() {
 }
 
 void Controller::sample() {
+	if (mmdcSafe())
+	{
+		calculateModel();
+	}
+	else
+	{
+		disableController();
+	}
+}
+
+bool Controller::mmdcSafe()
+{
+	if (enabled->get()==0.0)
+		return true;
+
+	double ang = devs->getDeviceValue(Devices::angle);
+
+	return ((ang >= mmdcMinAng->get()) &&
+	        (ang <= mmdcMaxAng->get()));
+}
+
+void Controller::disableController()
+{
+	motor->setTorque(0.0);
+	enabled->set(0.0);
+	updateActualPosition = true;
+}
+
+void Controller::calculateModel()
+{
 	double tq;
 	double pos;
 	double posError;
@@ -90,6 +123,7 @@ void Controller::sample() {
 
 	posErrorParam->set(posError);
 	angErrorParam->set(angError);
+
 }
 
 void Controller::sample(void* context) {

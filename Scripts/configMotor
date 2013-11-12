@@ -2,7 +2,7 @@
 
 source ./environment.sh
 
-$TERMINAL PeriodicTimer.frequency 100
+$TERMINAL PeriodicTimer.frequency 400
 
 $TERMINAL Dev.posGain 0.00002262443
 

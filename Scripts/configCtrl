@@ -2,6 +2,9 @@
 
 source ./environment.sh
 
+$TERMINAL Controller.minAng -7.5
+$TERMINAL Controller.maxAng 7.5
+
 $TERMINAL Controller.pos_sp 0.0
 $TERMINAL Controller.pos_kp 6000
 $TERMINAL Controller.pos_kd 10000
@@ -10,7 +13,7 @@ $TERMINAL Controller.pos_kd 0
 $TERMINAL Controller.pos_ki 0.0
 
 $TERMINAL Controller.ang_sp 0.0
-$TERMINAL Controller.ang_kp 50
+$TERMINAL Controller.ang_kp 100
 $TERMINAL Controller.ang_ki 0.0
 $TERMINAL Controller.ang_kd 0
 
