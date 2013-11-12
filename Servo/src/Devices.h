@@ -47,7 +47,7 @@ public:
 
 		voltage, voltageGain, voltageOffset,
 
-		dutycycle
+		dutycycle, motordir
 	} ;
 
 
@@ -103,6 +103,7 @@ private:
 	Parameter* par_voltageOffset;
 
 	Parameter* par_dutycycle;
+	Parameter* par_motordir;
 };
 
 #endif /* DEVICES_H_ */
