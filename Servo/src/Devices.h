@@ -16,7 +16,7 @@ class SPI;
 class PeriodicTimer;
 
 enum DeviceID {
-	rawAngle, angle, angleV, angleA, angleGain, angleOffset,
+	h1Ang, h2Ang, rawAngle, angle, angleV, angleA, angleGain, angleOffset,
 
 	rawPos, pos, posV, posA, posGain, posOffset,
 
@@ -39,7 +39,7 @@ public:
 	static void update(void* context);
 
 	enum DeviceID {
-		rawAngle, angle, angleV, angleA, angleGain, angleOffset,
+		h1Ang, h2Ang, rawAngle, angle, angleV, angleA, angleGain, angleOffset,
 
 		rawPos, pos, posV, posA, posGain, posOffset,
 
@@ -75,6 +75,8 @@ private:
 	double angle_v[2];
 	double angle_a[1];
 
+	Parameter* par_h1Ang;
+	Parameter* par_h2Ang;
 	Parameter* par_rawAngle;
 	Parameter* par_angle;
 	Parameter* par_angleV;
