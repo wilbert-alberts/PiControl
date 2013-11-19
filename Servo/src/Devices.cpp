@@ -28,7 +28,7 @@ Devices::Devices() :
 		spi(SPI::getInstance()), pt(PeriodicTimer::getInstance()),
 
 		par_h1Ang(createParameter("Dev.h1Ang",0.0, h1Ang)),
-		par_h2Ang(createParameter("Dev.h1Ang",0.0, h2Ang)),
+		par_h2Ang(createParameter("Dev.h2Ang",0.0, h2Ang)),
 		par_rawAngle(createParameter("Dev.rawAngle",0.0, rawAngle)),
 		par_angle(createParameter("Dev.angle",0.0, angle)),
 		par_angleV(createParameter("Dev.angleV",0.0, angleV)),
