@@ -51,7 +51,9 @@ Devices::Devices() :
 		par_voltageOffset(createParameter("Dev.voltageOffset",0.0, voltageOffset)),
 
 		par_dutycycle(createParameter("Dev.dutycycle",0.0, dutycycle)),
-		par_motordir(createParameter("Dev.motordir",1.0, motordir))
+		par_motordir(createParameter("Dev.motordir",1.0, motordir)),
+		par_oversampling(createParameter("Dev.oversampling",25.0, oversampling))
+
 {
 }
 
@@ -178,6 +180,7 @@ void Devices::update(void* /*context*/) {
 
 void Devices::update() {
 	updateDC();
+	spi->setRegister(SPI::OVERSAMPLING, par_oversampling->get());
 }
 
 void Devices::updateDC() {

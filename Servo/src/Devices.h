@@ -15,6 +15,7 @@ class Parameter;
 class SPI;
 class PeriodicTimer;
 
+/*
 enum DeviceID {
 	h1Ang, h2Ang, rawAngle, angle, angleV, angleA, angleGain, angleOffset,
 
@@ -24,9 +25,9 @@ enum DeviceID {
 
 	voltage, voltageGain, voltageOffset,
 
-	dutyCycle
+	dutyCycle, motordir, oversampling
 } ;
-
+*/
 
 class Devices {
 public:
@@ -47,7 +48,7 @@ public:
 
 		voltage, voltageGain, voltageOffset,
 
-		dutycycle, motordir
+		dutycycle, motordir, oversampling
 	} ;
 
 
@@ -106,6 +107,7 @@ private:
 
 	Parameter* par_dutycycle;
 	Parameter* par_motordir;
+	Parameter* par_oversampling;
 };
 
 #endif /* DEVICES_H_ */

@@ -36,6 +36,8 @@ public:
 	static constexpr int ENCPOS = 4;
 	static constexpr int PWM = 11;
 	static constexpr int MOTORDIR = 12;
+	static constexpr int OVERSAMPLING = 13;
+
 
 private:
 	static SPI* instance;

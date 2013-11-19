@@ -19,8 +19,6 @@
 
 SPI* SPI::instance = 0;
 
-unsigned char wilbert[] = "wilbertalberts";
-
 SPI* SPI::getInstance()
 {
 	if (instance==0)
@@ -39,6 +37,8 @@ SPI::SPI() {
 
 	createRegister(PWM, std::string("SPI.PWM"),      64, 16);
 	createRegister(MOTORDIR, std::string("SPI.MotorDir"), 80,  8);
+
+	createRegister(OVERSAMPLING, std::string("SPI.oversampling"), 88,  8);
 
 	Pi2Mbed = DigitalOut::create(std::string("SPI.pi2mbed"), 4, 1);
 	Mbed2Pi = DigitalIn::create("SPI.mbed2pi", 5);
@@ -62,6 +62,7 @@ void SPI::createRegister(int id, const std::string& n, int start, int length)
 		byteArray = newBytes;
 		nrBytes = nb;
 	}
+	std::clog << "Adding " << n << " nrBytes: " << nrBytes << std::endl;
 }
 
 bool SPI::isEnabled()
