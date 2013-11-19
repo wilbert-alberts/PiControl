@@ -73,7 +73,7 @@ void Traces_Term::dumpTraces() {
     if (getNrTraces() > 0) {
       startCounter = getTraceEntry(0)->getStart();
       endCounter = getTraceEntry(0)->getEnd();
-      ss << "Samplecounter\t";
+      ss << "# Samplecounter\t";
       for (int i = 0; i < getNrTraces(); i++) {
         TraceEntry* te = getTraceEntry(i);
         ss << Parameter::getNameByIdx(te->getParameterIndex());
