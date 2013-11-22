@@ -126,7 +126,7 @@ void Controller::calculateModel()
 
 }
 
-void Controller::sample(void* context) {
+void Controller::sample(void* /* context */) {
 	Controller* me = Controller::getInstance(); // static_cast<Controller*>(context);
 	me->sample();
 }

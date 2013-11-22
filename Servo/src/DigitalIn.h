@@ -28,9 +28,9 @@ public:
 private:
 	DigitalIn(const std::string& name, int pin);
 
-	bool enabled;
 	int pin;
 	Parameter* par;
+	bool enabled;
 
 	static std::map<const std::string, DigitalIn*> instances;
 };

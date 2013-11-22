@@ -19,19 +19,19 @@ void SimulatedHAL::setup()
 {
 
 }
-void SimulatedHAL::pinMode(int pin, int mode)
+void SimulatedHAL::pinMode(int /* pin */ , int /* mode*/ )
 {
 
 }
-int  SimulatedHAL::digitalRead(int pin)
+int  SimulatedHAL::digitalRead(int /* pin */)
+{
+	return 0;
+}
+void SimulatedHAL::digitalWrite(int /* pin */ , int /* value */)
 {
 
 }
-void SimulatedHAL::digitalWrite(int pin, int value)
-{
-
-}
-void SimulatedHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len)
+void SimulatedHAL::wiringPiSPIDataRW(int /* channel */, unsigned char * /*data*/ , int /* len */)
 {
 
 }

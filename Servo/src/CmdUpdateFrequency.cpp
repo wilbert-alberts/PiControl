@@ -40,7 +40,7 @@ void Cmd_UpdateFrequency::execute()
 	}
 }
 
-void Cmd_UpdateFrequency::execute(void*context)
+void Cmd_UpdateFrequency::execute(void* /* context */ )
 {
 	Cmd_UpdateFrequency* c = Cmd_UpdateFrequency::getInstance();
 	c->execute();

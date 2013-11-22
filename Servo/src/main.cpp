@@ -46,28 +46,26 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		db->lock();
 
 		Parameter* tsStart = new Parameter("TimeStats.start", 0.0);
-		Parameter* tsDI = new Parameter("TimeStats.digitalIn", 0.0);
 		Parameter* tsEnd = new Parameter("TimeStats.end", 0.0);
 		Parameter* tsTracing = new Parameter("TimeStats.tracing", 0.0);
 		Parameter* tsCheckStop = new Parameter("TimeStats.checkStop", 0.0);
 
-		// TODO: assign channel and pins for BitBus
 		SPI* spibus(SPI::getInstance());
-
 		Motor* motor(Motor::getInstance());
-
 		pt = PeriodicTimer::getInstance(SERVOFREQUENCY );
+
 		TimeStats_Servo::initSample();
 		Cmd_UpdateFrequency::execute(0);
 		traces = Traces_Servo::getInstance();
 		traces->clearAllTraces();
-		//db->copyTo();
+
 		db->unlock();
 
 		pt->addPeriodicFunction(lockDB, db);
 		pt->addPeriodicFunction(flipper,0);
 
 		pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsStart);
+
 		// add sample functions
 		// Start with capturing digital Ins
 		pt->addPeriodicFunction(DigitalIn::captureAllIns, 0);
