@@ -38,6 +38,10 @@ void CommandProcessor::processCommand(int argc, char* argv[])
 
 	// In case command is invoked via Terminal, extrace
 	// real command by looking to next argument.
+	if ((cmd == "Terminal") && (argc ==1)) {
+		throw std::runtime_error("Terminal requires at least one argument");
+	}
+
 	if (cmd == "Terminal") {
 		argv++;
 		argc--;
