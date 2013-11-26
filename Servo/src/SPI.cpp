@@ -32,13 +32,16 @@ SPI::SPI() {
 
 	createRegister(HEIGHT1, std::string("SPI.Height1"),    0, 16);
 	createRegister(HEIGHT2, std::string("SPI.Height2"),   16, 16);
-	createRegister(UBAT, std::string("SPI.UBat"),      32, 16);
-	createRegister(ENCPOS, std::string("SPI.EncPos"),    48, 16);
 
-	createRegister(PWM, std::string("SPI.PWM"),      64, 16);
-	createRegister(MOTORDIR, std::string("SPI.MotorDir"), 80,  8);
+	createRegister(GYRO, std::string("SPI.Gyro"),   32, 16);
 
-	createRegister(OVERSAMPLING, std::string("SPI.oversampling"), 88,  8);
+	createRegister(UBAT, std::string("SPI.UBat"),      48, 16);
+	createRegister(ENCPOS, std::string("SPI.EncPos"),    64, 16);
+
+	createRegister(PWM, std::string("SPI.PWM"),      80, 16);
+	createRegister(MOTORDIR, std::string("SPI.MotorDir"), 96,  8);
+
+	createRegister(OVERSAMPLING, std::string("SPI.oversampling"), 104,  8);
 
 	Pi2Mbed = DigitalOut::create(std::string("SPI.pi2mbed"), 4, 1);
 	Mbed2Pi = DigitalIn::create("SPI.mbed2pi", 5);
