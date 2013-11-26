@@ -57,7 +57,6 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		TimeStats_Servo::initSample();
 		Cmd_UpdateFrequency::execute(0);
 		traces = Traces_Servo::getInstance();
-		traces->clearAllTraces();
 
 		db->unlock();
 

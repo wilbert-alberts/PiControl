@@ -8,7 +8,7 @@
 #ifndef TRACES_SERVO_H_
 #define TRACES_SERVO_H_
 
-#include "Traces.h"
+#include "Parameter.h"
 
 #include <fcntl.h>
 #include <semaphore.h>
@@ -17,15 +17,18 @@
 #include <map>
 #include <string>
 
-class Traces_Servo: public Traces {
+class Traces_Servo{
 public:
 
   static void sampleAllTraces(void* db);
   static Traces_Servo* getInstance();
 
 private:
-  Traces_Servo(int maxNrTraces);
-  int sampleCounter;
+  Traces_Servo();
+
+  static Traces_Servo* instance;
+  int        sampleCounter;
+  Parameter* par_sampleCounter;
 };
 
 #endif /* TRACE_H_ */

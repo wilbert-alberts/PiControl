@@ -21,36 +21,37 @@
 #include <sys/types.h>
 
 #include "Traces_Servo.h"
-#include "TraceEntry.h"
+#include "Traces.h"
 #include "DoubleBuffer.h"
 #include "Parameter.h"
 
 
+Traces_Servo* Traces_Servo::instance = 0;
+
 Traces_Servo* Traces_Servo::getInstance()
 {
-  if (traces == 0) {
-    traces = new Traces_Servo(MAXNRTRACES);
+  if (instance == 0) {
+    instance = new Traces_Servo();
   }
 
-  return dynamic_cast<Traces_Servo*>(traces);
+  return instance;
 }
 
-Traces_Servo::Traces_Servo(int nrTraces)
-: Traces(nrTraces), sampleCounter(0)
+Traces_Servo::Traces_Servo()
+: sampleCounter(0)
+, par_sampleCounter(new Parameter("Traces.sampleCounter"))
 {
+	Traces* t = Traces::getInstance();
+	t->reset();
 }
 
 void Traces_Servo::sampleAllTraces(void* /*context*/)
 {
-  DoubleBuffer* db = DoubleBuffer::getInstance();
   Traces_Servo* instance = Traces_Servo::getInstance();
+  Traces*  traces = Traces::getInstance();
 
-  instance->lockTraceDB();
-  for (int i=0; i<instance->getNrTraces(); i++) {
-    TraceEntry* e = instance->getTraceEntry(i);
-    e->sample(db, instance->sampleCounter);
-  }
-  instance->unlockTraceDB();
-  instance->par_sampleCounter->set((double)instance->sampleCounter);
+  traces->sample(instance->sampleCounter);
   instance->sampleCounter++;
+
+  instance->par_sampleCounter->set((double)instance->sampleCounter);
 }

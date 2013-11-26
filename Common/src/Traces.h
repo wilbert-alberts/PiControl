@@ -1,59 +1,86 @@
 /*
- * Trace.h
+ * TracesV2.h
  *
- *  Created on: Jun 19, 2013
+ *  Created on: Nov 23, 2013
  *      Author: wilbert
  */
 
-#ifndef TRACES_H_
-#define TRACES_H_
 
-#include <fcntl.h>
-#include <sys/stat.h>
+#include <cstring>
 #include <semaphore.h>
 
-#include <string>
-#include <map>
+#include "Parameter.h"
 
-class DoubleBuffer;
-class Parameter;
-class TraceEntry;
+#ifndef TRACESV2_H_
+#define TRACESV2_H_
 
-#define MAXNRTRACES (100)
 
-struct TraceDB;
+
+#define BUFFERSIZE 4096
+#define NRTRACES   100
+
+
+
+class CyclicBuffer {
+public:
+	CyclicBuffer();
+	virtual ~CyclicBuffer();
+	void reset();
+	void pushValue(double val);
+	void getValues(double* dest);
+
+private:
+	double values[BUFFERSIZE];
+	int    nrSamples;
+	int    idx;
+};
+
+
+class Trace {
+public:
+	Trace();
+	virtual ~Trace();
+
+	void reset();
+
+	bool isSet();
+	void setParameterID(int id);
+	int  getParameterID();
+	void sample();
+	void getValues(double *dest);
+
+private:
+	CyclicBuffer buffer;
+	int          parID;
+};
 
 class Traces {
 public:
-  virtual ~Traces();
-  TraceEntry* getTraceEntry(int i);
-  int         getNrTraces();
+	static Traces* getInstance();
+	virtual ~Traces();
 
-  static const std::string parid_sampleCounter;
+	void reset();
 
-  void lockTraceDB();
-  void unlockTraceDB();
-  bool isTraceDBLocked();
+	void addTrace(Parameter* p);
+	void delTrace(Parameter* p);
+	void delAllTraces();
 
-  void clearAllTraces();
+	void sample(int samplecounter);
+	void dumpTraces();
 
-  void addTrace(int parIdx, int buffersize);
-  void removeTrace(int parIdx);
+private:
+	Traces();
 
-protected:
-  static Traces* traces;
+	static Traces* instance;
 
-  sem_t*   semDB;     // Manage access to traceDB.
-  TraceDB* traceDB;   // To be put in shared memory.
-  int      maxNrTraces;
+	void lock();
+	bool tryLock();
+	void unlock();
 
-  Parameter* par_sampleCounter;
-
-  void* createSharedMemory(const std::string& id, int size);
-  void  createDBSem();
-
-  Traces(int maxNrTraces);
-
+	sem_t semLock;
+	Trace traces[NRTRACES];
+	int   sampleCounter;
 };
 
-#endif /* TRACE_H_ */
+
+#endif /* TRACESV2_H_ */

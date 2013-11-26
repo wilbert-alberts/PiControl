@@ -7,7 +7,7 @@
 
 #include "CmdDumpTraces.h"
 
-#include "Traces_Term.h"
+#include "Traces.h"
 
 #include <iostream>
 #include <list>
@@ -31,7 +31,7 @@ void CmdDumpTraces::execute(std::list<std::string>& args) {
 		return;
 	}
 
-	Traces_Term* traces  = Traces_Term::getInstance();
+	Traces* traces  = Traces::getInstance();
 
 	traces->dumpTraces();
 }

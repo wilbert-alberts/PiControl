@@ -7,12 +7,13 @@
 
 #include "CmdAddTrace.h"
 
-#include "Traces_Term.h"
+#include "Traces.h"
 
 #include <iostream>
 #include <sstream>
 #include <list>
 #include <string>
+#include <stdexcept>
 
 CmdAddTrace::CmdAddTrace() :
 		Command("addTrace") {
@@ -28,7 +29,6 @@ void CmdAddTrace::displayHelp() {
 }
 
 void CmdAddTrace::execute(std::list<std::string>& args) {
-	int length;
 
 	if (args.empty()) {
 		displayHelp();
@@ -39,19 +39,16 @@ void CmdAddTrace::execute(std::list<std::string>& args) {
 	args.pop_front();
 
 	if (!args.empty()) {
-		std::stringstream ss(args.front());
-		ss >> length;
-
-	} else {
-		length = Traces_Term::DefaultTraceLength;
-	}
-
-	if (!args.empty()) {
 		displayHelp();
 		return;
 	}
 
-	Traces_Term* traces = Traces_Term::getInstance();
+	Traces* traces = Traces::getInstance();
 
-	traces->createTrace(name, length);
+	int idx = Parameter::findParameter(name);
+
+	if (idx<1)
+		throw std::runtime_error("Unknown parameter: " + name );
+
+	traces->addTrace(new Parameter(idx));
 }
