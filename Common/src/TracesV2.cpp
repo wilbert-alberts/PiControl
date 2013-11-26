@@ -7,6 +7,7 @@
 
 #include "TracesV2.h"
 
+#include <iostream>
 #include <errno.h>
 
 
@@ -118,12 +119,12 @@ void Traces::delTraces()
 	}
 }
 
-void Traces::sample()
+void Traces::sample(int samplecounter)
 {
 	for (int i=0; i<NRTRACES; i++) {
 		traces[i].sample();
 	}
-	sampleCounter->set(sampleCounter->get()+1.0);
+	sampleCounter->set(samplecounter);
 }
 
 void Traces::dumpTraces() {

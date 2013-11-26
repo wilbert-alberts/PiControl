@@ -47,7 +47,7 @@ public:
 
 private:
 	CyclicBuffer buffer;
-	Parameter*   parameter;
+	int          parameterIndex;
 };
 
 class Traces {
@@ -59,7 +59,7 @@ public:
 	void delTrace(Parameter* p);
 	void delTraces();
 
-	void sample();
+	void sample(int samplecounter);
 	void dumpTraces();
 
 private:
