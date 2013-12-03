@@ -44,6 +44,8 @@ public:
 
 		rawPos, pos, posV, posA, posGain, posOffset,
 
+		rawGyro, gyro, gyroGain, gyroOffset,
+
 		nrIncrements,
 
 		voltage, voltageGain, voltageOffset,
@@ -61,6 +63,7 @@ private:
 	Parameter* createParameter(const std::string& n, double v, DeviceID id);
 	void sampleAngle(double frequency);
 	void samplePosition(double frequency);
+	void sampleGyro(double frequency);
 	void sampleBattery();
 
 	void updateDC();
@@ -98,6 +101,11 @@ private:
 	Parameter* par_posA;
 	Parameter* par_posGain;
 	Parameter* par_posOffset;
+
+	Parameter* par_rawGyro;
+	Parameter* par_gyro;
+	Parameter* par_gyroGain;
+	Parameter* par_gyroOffset;
 
 	Parameter* par_nrIncrements;
 
