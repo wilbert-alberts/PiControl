@@ -33,9 +33,9 @@ SPI::SPI() {
 	createRegister(HEIGHT1, std::string("SPI.Height1"),    0, 16);
 	createRegister(HEIGHT2, std::string("SPI.Height2"),   16, 16);
 
-	createRegister(GYRO, std::string("SPI.Gyro"),   32, 16);
+	createRegister(UBAT, std::string("SPI.UBat"),   32, 16);
 
-	createRegister(UBAT, std::string("SPI.UBat"),      48, 16);
+	createRegister(GYRO, std::string("SPI.Gyro"),      48, 16);
 	createRegister(ENCPOS, std::string("SPI.EncPos"),    64, 16);
 
 	createRegister(PWM, std::string("SPI.PWM"),      80, 16);

@@ -127,6 +127,8 @@ void Devices::sample() {
 void Devices::sampleGyro(double /*frequency*/)
 {
 	double rawGyro = spi->getRegister(SPI::GYRO);
+	if (rawGyro > 32767)
+		rawGyro -= 65536;
 	double gyro = rawGyro * par_gyroGain->get() + par_gyroOffset->get();
 	par_rawGyro->set(rawGyro);
 	par_gyro->set(gyro);

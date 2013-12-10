@@ -153,7 +153,7 @@ void WiringPiHAL::captureBuffer(unsigned char* myBuffer, unsigned char* dest, in
 			(myBuffer[8+len-4] != 0x55) ||
 			(myBuffer[8+len-3] != 0xaa) ||
 			(myBuffer[8+len-2] != 0x55) ||
-			(myBuffer[8+len-1] != 0xaa)) {
+			(myBuffer[8+len-1] != 0x23)) {
 		std::cerr << "SPI communication error: incomplete/corrupt frame" << std::endl;
 		dumpBuffer("captured: ", myBuffer, len+8);
 	}
