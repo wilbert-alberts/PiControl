@@ -244,7 +244,7 @@ void Traces::lock()
 bool Traces::tryLock()
 {
 	int r = sem_trywait(&semLock);
-	if ((r!=0) && (r != EAGAIN))
+	if ((r!=0) && (errno != EAGAIN))
 		throw std::system_error(errno, std::system_category(),"unable trying to lock");
 	return r == 0;
 }
