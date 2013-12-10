@@ -65,6 +65,7 @@ void WiringPiHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len)
 	//getInSync(channel);
 
 	// MBED en PI in sync, now communicate buffer.
+	//dumpBuffer("Before comm:" , framedData, len);
 	transmitBuffer(channel, framedData, len);
 	//dumpBuffer("After comm:" , framedData, len);
 
@@ -131,6 +132,9 @@ void WiringPiHAL::frameBuffer(unsigned char *data, int len)
 	data[1] = 0x55;
 	data[2] = 0xAA;
 	data[3] = 0x55;
+
+	for (int i=4; i<len-4; i++)
+		data[i]=0x11;
 
 	data[len+4] = 0x55;
 	data[len+5] = 0xaa;

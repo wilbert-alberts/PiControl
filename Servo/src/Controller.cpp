@@ -81,6 +81,8 @@ void Controller::calculateModel()
 	double angError;
 	double angVError;
 
+	double angV;
+
 	pos = devs->getDeviceValue(Devices::pos);
 	if (updateActualPosition) {
 		// Get actual position from Devices
@@ -100,14 +102,21 @@ void Controller::calculateModel()
 
 	sumError += posError;
 
+	angV = devs->getDeviceValue(Devices::gyro);
+
 	if ((posError > 0 && prevPosError < 0)
 			|| (posError < 0 && prevPosError > 0))
 		sumError = 0;
 
 	// Calculate controller
+	/*
 	tq = ((pos_kp->get() * posError + pos_kd->get() * posVError)
 			+ (ang_kp->get() * angError + ang_kd->get() * angVError)
 			+ (pos_kd->get() * posVError + pos_ki->get() * sumError));
+    */
+	tq = ((pos_kp->get() * posError + pos_kd->get() * posVError + pos_ki->get() * sumError) +
+		   (ang_kp->get() * angError + ang_kd->get() * angV));
+
 
 	// Set torque.
 	if (enabled->get() != 0.0) {

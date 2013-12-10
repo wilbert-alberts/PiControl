@@ -13,9 +13,9 @@ $TERMINAL Controller.pos_kd 0
 $TERMINAL Controller.pos_ki 0.0
 
 $TERMINAL Controller.ang_sp 0.0
-$TERMINAL Controller.ang_kp 100
+$TERMINAL Controller.ang_kp 50
+$TERMINAL Controller.ang_kd -0.04
 $TERMINAL Controller.ang_ki 0.0
-$TERMINAL Controller.ang_kd 0
 
 $TERMINAL SPI.enabled 1
 $TERMINAL Motor.enabled 1
