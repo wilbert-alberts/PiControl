@@ -5,7 +5,7 @@ import subprocess
 import string
 
 
-output = subprocess.check_output (["ssh", "root@192.168.1.40", "/home/pi/PiControl/Terminal/ARM-Debug/Terminal dumpTraces"])
+output = subprocess.check_output (["ssh", "root@192.168.1.2", "/home/pi/PiControl/Terminal/ARM-Debug/Terminal dumpTraces"])
 
 lines = string.split(output,'\n')
 
