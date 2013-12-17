@@ -12,6 +12,8 @@ class Parameter;
 class DigitalOut;
 class Devices;
 
+#include <random>
+
 class Motor {
 public:
 	static Motor* getInstance();
@@ -23,7 +25,7 @@ public:
 
 private:
 	Motor();
-	void calculateModel();
+	double doInject(double dc);
 
 	Devices* devs;
 
@@ -38,6 +40,11 @@ private:
 
 	Parameter*  batVoltage;
 	Parameter*  motorCurrent;
+
+	std::default_random_engine generator;
+	std::normal_distribution<double> ndis;
+	Parameter* injAmpl;
+	Parameter* injFreq;
 
 	static Motor* instance;
 };
