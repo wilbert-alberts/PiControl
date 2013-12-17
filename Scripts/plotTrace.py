@@ -5,7 +5,7 @@ import subprocess
 import string
 
 
-output = subprocess.check_output (["ssh", "root@192.168.1.2", "/home/pi/PiControl/Terminal/ARM-Debug/Terminal dumpTraces"])
+output = subprocess.check_output (["ssh", "root@rb", "/home/pi/PiControl/Terminal/ARM-Debug/Terminal dumpTraces"])
 
 lines = string.split(output,'\n')
 
@@ -14,7 +14,7 @@ traceOut.write(output)
 traceOut.close()
 
 
-fields=string.split(string.replace(lines[0], "# Samplecounter", ""))
+fields=string.split(string.replace(lines[0], "# SampleCounter", ""))
 
 
 idx=2

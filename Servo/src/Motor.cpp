@@ -21,7 +21,9 @@ Motor* Motor::getInstance() {
 	return instance;
 }
 
-Motor::Motor() {
+Motor::Motor()
+:	ndis(0.0, 1.0)
+{
 	enabled = new Parameter("Motor.enabled",0);
 
 	t = new Parameter("Motor.torque",0.0);
@@ -33,6 +35,10 @@ Motor::Motor() {
 	batVoltage = new Parameter("Motor.batVoltage",0.0);
 	motorCurrent = new Parameter("Motor.current",0.0);
 
+	injAmpl = new Parameter("Motor.inj_ampl", 0.0);
+	injFreq = new Parameter("Motor.inj_freq", 0.5);
+	noiseSample = new Parameter("Motor.noise", 0.0);
+
 	devs = Devices::getInstance();
 }
 
@@ -42,6 +48,16 @@ Motor::~Motor() {
 
 void Motor::setTorque(double tq) {
 	t->set(tq);
+}
+
+double Motor::doInject(double dc) {
+	double sample = ndis(generator);
+
+	noiseSample->set(sample);
+
+	if (sample < injFreq->get()) return dc - injAmpl->get();
+	if (sample > injFreq->get()) return dc + injAmpl->get();
+	return dc;
 }
 
 void Motor::sample() {
@@ -58,6 +74,9 @@ void Motor::sample() {
 	motorCurrent->set(im);
 	double vme = im * rm->get() + rvel * kv->get();
 	double dc = vme / batVoltage->get();
+
+	// Do injection
+	dc = doInject(dc);
 
 	// Normalize dc
 	if (dc > 1)  dc = 1.0;

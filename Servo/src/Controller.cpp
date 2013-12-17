@@ -31,6 +31,12 @@ Controller::Controller() {
 	angErrorParam = new Parameter("Controller.angError", 0);
 	posErrorParam = new Parameter("Controller.posError", 0);
 
+	co_poskp = new Parameter("Controller.co_poskp", 0);
+	co_poskd = new Parameter("Controller.co_poskd", 0);
+	co_poski = new Parameter("Controller.co_poski", 0);
+	co_angkp = new Parameter("Controller.co_angkp", 0);
+	co_angkd = new Parameter("Controller.co_angkd", 0);
+
 	mmdcMinAng = new Parameter("Controller.minAng", -100);
 	mmdcMaxAng = new Parameter("Controller.maxAng",  100);
 
@@ -81,6 +87,8 @@ void Controller::calculateModel()
 	double angError;
 	double angVError;
 
+	double angV;
+
 	pos = devs->getDeviceValue(Devices::pos);
 	if (updateActualPosition) {
 		// Get actual position from Devices
@@ -100,14 +108,29 @@ void Controller::calculateModel()
 
 	sumError += posError;
 
+	angV = devs->getDeviceValue(Devices::gyro);
+
 	if ((posError > 0 && prevPosError < 0)
 			|| (posError < 0 && prevPosError > 0))
 		sumError = 0;
 
 	// Calculate controller
+	/*
 	tq = ((pos_kp->get() * posError + pos_kd->get() * posVError)
 			+ (ang_kp->get() * angError + ang_kd->get() * angVError)
 			+ (pos_kd->get() * posVError + pos_ki->get() * sumError));
+    */
+
+	co_poskp->set(pos_kp->get() * posError);
+	co_poskd->set(pos_kd->get() * posVError);
+	co_poski->set(pos_ki->get() * sumError);
+
+	co_angkp->set(ang_kp->get() * angError);
+	co_angkd->set(ang_kd->get() * angV);
+
+	tq = ((pos_kp->get() * posError + pos_kd->get() * posVError + pos_ki->get() * sumError) +
+		   (ang_kp->get() * angError + ang_kd->get() * angV));
+
 
 	// Set torque.
 	if (enabled->get() != 0.0) {

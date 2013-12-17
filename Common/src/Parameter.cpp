@@ -73,6 +73,10 @@ Parameter::~Parameter() {
 
 }
 
+int Parameter::getIndex() {
+	return idx;
+}
+
 std::string Parameter::getName() {
   DB_mem* p=static_cast<DB_mem*>(db->get());
   DB_Parameter* par = &p->params[idx];

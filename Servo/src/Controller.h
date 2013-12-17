@@ -41,6 +41,13 @@ private:
 	Parameter* mmdcMinAng;
 	Parameter* mmdcMaxAng;
 
+	Parameter* co_poskp;
+	Parameter* co_poskd;
+	Parameter* co_poski;
+	Parameter* co_angkp;
+	Parameter* co_angkd;
+
+
 	Motor* motor;
 	bool updateActualPosition;
 	Devices* devs;

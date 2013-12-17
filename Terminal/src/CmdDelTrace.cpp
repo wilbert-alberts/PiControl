@@ -7,12 +7,13 @@
 
 #include "CmdDelTrace.h"
 
-#include "Traces_Term.h"
+#include "Traces.h"
 
 #include <iostream>
 #include <sstream>
 #include <list>
 #include <string>
+#include <stdexcept>
 
 CmdDelTrace::CmdDelTrace() :
 		Command("delTrace") {
@@ -40,7 +41,12 @@ void CmdDelTrace::execute(std::list<std::string>& args) {
 		return;
 	}
 
-	Traces_Term* traces = Traces_Term::getInstance();
+	Traces* traces = Traces::getInstance();
 
-	traces->destroyTrace(name);
+	int idx = Parameter::findParameter(name);
+
+	if (idx<1)
+		throw std::runtime_error("Unknown parameter: " + name );
+
+	traces->delTrace(new Parameter(idx));
 }

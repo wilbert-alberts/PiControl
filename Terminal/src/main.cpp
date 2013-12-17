@@ -8,7 +8,6 @@
 #include "DoubleBuffer.h"
 #include "Parameter.h"
 #include "StopTimer.h"
-#include "Traces_Term.h"
 
 #include "CommandProcessor.h"
 #include "CmdHelp.h"
