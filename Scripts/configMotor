@@ -18,7 +18,4 @@ $TERMINAL Motor.rm 4.72
 
 $TERMINAL Dev.oversampling 100
 
-$TERMINAL SPI.enabled 1
-$TERMINAL Motor.enabled 1
-
 $TERMINAL dumpParameters
