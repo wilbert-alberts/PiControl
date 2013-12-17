@@ -14,7 +14,7 @@ traceOut.write(output)
 traceOut.close()
 
 
-fields=string.split(string.replace(lines[0], "# Samplecounter", ""))
+fields=string.split(string.replace(lines[0], "# SampleCounter", ""))
 
 
 idx=2
