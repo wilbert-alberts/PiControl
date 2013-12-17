@@ -6,18 +6,17 @@ $TERMINAL Controller.minAng -7.5
 $TERMINAL Controller.maxAng 7.5
 
 $TERMINAL Controller.pos_sp 0.0
-$TERMINAL Controller.pos_kp 6000
-$TERMINAL Controller.pos_kd 10000
 $TERMINAL Controller.pos_kp 0
 $TERMINAL Controller.pos_kd 0
 $TERMINAL Controller.pos_ki 0.0
 
 $TERMINAL Controller.ang_sp 0.0
-$TERMINAL Controller.ang_kp 50
-$TERMINAL Controller.ang_kd -0.04
+$TERMINAL Controller.ang_kp 60
+$TERMINAL Controller.ang_kd -0.02
 $TERMINAL Controller.ang_ki 0.0
 
 $TERMINAL Motor.inj_freq 2.5
 $TERMINAL Motor.inj_ampl 0.0
 
+$TERMINAL SPI.enabled 1
 $TERMINAL dumpParameters

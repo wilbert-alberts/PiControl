@@ -12,6 +12,10 @@ class Parameter;
 class Motor;
 class Devices;
 
+#include <list>
+#include <random>
+
+
 class Controller {
 public:
 	static Controller* getInstance();
@@ -25,6 +29,8 @@ private:
 	void calculateModel();
 	bool mmdcSafe();
 	void disableController();
+	double filterGyro();
+	double doInject(double t);
 
 	static Controller* instance;
 	Parameter* enabled;
@@ -32,6 +38,7 @@ private:
 	Parameter* pos_kp;
 	Parameter* pos_kd;
 	Parameter* pos_ki;
+	Parameter* ang_sp_kp;
 	Parameter* ang_sp;
 	Parameter* ang_kp;
 	Parameter* ang_kd;
@@ -47,6 +54,11 @@ private:
 	Parameter* co_angkp;
 	Parameter* co_angkd;
 
+	std::default_random_engine generator;
+	std::normal_distribution<double> ndis;
+	Parameter* injAmpl;
+	Parameter* injFreq;
+	Parameter* noiseSample;
 
 	Motor* motor;
 	bool updateActualPosition;
@@ -57,6 +69,8 @@ private:
 	double relPosOffset;
 	double sumError;
 
+	std::list<double> angVBuffer;
+	double angVBufferSum;
 };
 
 #endif /* CONTROLLER_H_ */

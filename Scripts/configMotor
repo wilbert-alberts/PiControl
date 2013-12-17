@@ -2,7 +2,7 @@
 
 source ./environment.sh
 
-$TERMINAL PeriodicTimer.frequency 100
+$TERMINAL PeriodicTimer.frequency 167
 
 $TERMINAL Dev.posGain 0.00002262443
 
@@ -17,5 +17,6 @@ $TERMINAL Motor.kv 0.033
 $TERMINAL Motor.rm 4.72
 
 $TERMINAL Dev.oversampling 100
+$TERMINAL SPI.enabled 1
 
 $TERMINAL dumpParameters
