@@ -45,6 +45,8 @@ private:
 	std::normal_distribution<double> ndis;
 	Parameter* injAmpl;
 	Parameter* injFreq;
+	Parameter* noiseSample;
+
 
 	static Motor* instance;
 };
