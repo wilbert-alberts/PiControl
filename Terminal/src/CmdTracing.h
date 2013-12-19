@@ -5,10 +5,18 @@
  *      Author: wilbert
  */
 
-#ifndef CMDDELTRACE_H_
-#define CMDDELTRACE_H_
+#ifndef CMDTRACING_H_
+#define CMDTRACING_H_
 
 #include "Command.h"
+
+class CmdAddTrace : Command{
+public:
+	CmdAddTrace();
+	virtual ~CmdAddTrace();
+	virtual void displayHelp();
+	virtual void execute(std::list<std::string>& args);
+};
 
 class CmdDelTrace : Command
 {
