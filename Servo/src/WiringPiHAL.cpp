@@ -65,6 +65,7 @@ void WiringPiHAL::wiringPiSPIDataRW(int channel, unsigned char *data, int len)
 	//getInSync(channel);
 
 	// MBED en PI in sync, now communicate buffer.
+	//dumpBuffer("Before comm:" , framedData, len);
 	transmitBuffer(channel, framedData, len);
 	//dumpBuffer("After comm:" , framedData, len);
 
@@ -132,6 +133,9 @@ void WiringPiHAL::frameBuffer(unsigned char *data, int len)
 	data[2] = 0xAA;
 	data[3] = 0x55;
 
+	for (int i=4; i<len-4; i++)
+		data[i]=0x11;
+
 	data[len+4] = 0x55;
 	data[len+5] = 0xaa;
 	data[len+6] = 0x55;
@@ -156,6 +160,14 @@ void WiringPiHAL::captureBuffer(unsigned char* myBuffer, unsigned char* dest, in
 			(myBuffer[8+len-1] != 0x23)) {
 		std::cerr << "SPI communication error: incomplete/corrupt frame" << std::endl;
 		dumpBuffer("captured: ", myBuffer, len+8);
+
+		/* Hek is voorlopig niet meer nodig.
+		// Godverdakkie wat een vreselijke hek.
+		for (int i = 0; i < 8; i++) {
+			::wiringPiSPIDataRW(0, &dest[i], 1);
+		}
+		std::clog << " flushing " << 8 << " bytes " << std::endl;
+		*/
 	}
 	else {
 		for (int i=0; i<len; i++)

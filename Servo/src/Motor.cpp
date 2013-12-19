@@ -21,7 +21,9 @@ Motor* Motor::getInstance() {
 	return instance;
 }
 
-Motor::Motor() {
+Motor::Motor()
+:	ndis(0.0, 1.0)
+{
 	enabled = new Parameter("Motor.enabled",0);
 
 	t = new Parameter("Motor.torque",0.0);
