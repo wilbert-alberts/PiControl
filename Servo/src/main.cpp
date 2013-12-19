@@ -34,7 +34,6 @@ int main(int /*argc*/, char** /*argv[]*/) {
 	try {
 		PeriodicTimer* pt;
 		DoubleBuffer* db(DoubleBuffer::getInstance());
-		Traces_Servo* traces;
 
 #ifdef REALMODE
 		WiringPiHAL::registerHAL();
@@ -56,7 +55,6 @@ int main(int /*argc*/, char** /*argv[]*/) {
 
 		TimeStats_Servo::initSample();
 		Cmd_UpdateFrequency::execute(0);
-		traces = Traces_Servo::getInstance();
 
 		db->unlock();
 

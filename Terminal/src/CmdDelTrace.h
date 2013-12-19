@@ -10,10 +10,20 @@
 
 #include "Command.h"
 
-class CmdDelTrace : Command{
+class CmdDelTrace : Command
+{
 public:
 	CmdDelTrace();
 	virtual ~CmdDelTrace();
+	virtual void displayHelp();
+	virtual void execute(std::list<std::string>& args);
+};
+
+class CmdDelAllTraces : Command
+{
+public:
+	CmdDelAllTraces();
+	virtual ~CmdDelAllTraces();
 	virtual void displayHelp();
 	virtual void execute(std::list<std::string>& args);
 };

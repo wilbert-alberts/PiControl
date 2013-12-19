@@ -50,7 +50,7 @@ void Traces_Servo::sampleAllTraces(void* /*context*/)
   Traces_Servo* instance = Traces_Servo::getInstance();
   Traces*  traces = Traces::getInstance();
 
-  traces->sample(instance->sampleCounter);
+  traces->sample();
   instance->sampleCounter++;
 
   instance->par_sampleCounter->set((double)instance->sampleCounter);

@@ -74,6 +74,11 @@ void Trace::reset()
 	buffer.reset();
 }
 
+void Trace::clear()
+{
+	buffer.reset();
+}
+
 bool Trace::isSet()
 {
 	return parID>=0;
@@ -176,8 +181,17 @@ void Traces::delAllTraces()
 	unlock();
 }
 
+void Traces::clearAllTraces()
+{
+	lock();
+	for (int i=0; i<NRTRACES; i++) {
+		traces[i].clear();
+	}
+	unlock();
+}
 
-void Traces::sample(int samplecounter)
+
+void Traces::sample()
 {
 	static Parameter* p = new Parameter(SAMPLECOUNTER, 0.0);
 

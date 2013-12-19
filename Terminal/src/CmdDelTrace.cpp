@@ -50,3 +50,26 @@ void CmdDelTrace::execute(std::list<std::string>& args) {
 
 	traces->delTrace(new Parameter(idx));
 }
+
+CmdDelAllTraces::CmdDelAllTraces() :
+		Command("delAllTraces") {
+}
+
+CmdDelAllTraces::~CmdDelAllTraces() {
+}
+
+void CmdDelAllTraces::displayHelp() {
+	std::cout << "Usage: " << getName() << std::endl;
+	std::cout << "\tDelete all traces." << std::endl;
+
+}
+void CmdDelAllTraces::execute(std::list<std::string>& args) {
+	if (!args.empty()) {
+		displayHelp();
+		return;
+	}
+
+	Traces* traces = Traces::getInstance();
+
+	traces->delAllTraces();
+}
