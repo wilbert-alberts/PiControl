@@ -52,7 +52,9 @@ void registerCommands() {
 	new CmdDumpTraces();
 	new CmdAddTrace();
 	new CmdDelTrace();
+	new CmdClearTrace();
 	new CmdDelAllTraces();
+	new CmdClearAllTraces();
 	new CmdResetTimeStats();
 	new CmdDumpTiming();
 	new CmdDumpAllParams();

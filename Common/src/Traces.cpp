@@ -172,6 +172,22 @@ void Traces::delTrace(Parameter* p)
 	unlock();
 }
 
+void Traces::clearTrace(Parameter* p)
+{
+	lock();
+	int pID = p->getIndex();
+	for (int i=0; i<NRTRACES; i++) {
+		if (traces[i].isSet() &&
+			(traces[i].getParameterID()) == pID) {
+			traces[i].clear();
+			unlock();
+			return;
+		}
+	}
+	std::clog << "No trace found tracing " << p->getName() << std::endl;
+	unlock();
+}
+
 void Traces::delAllTraces()
 {
 	lock();

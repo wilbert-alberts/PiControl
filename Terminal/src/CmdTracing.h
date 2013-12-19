@@ -27,11 +27,29 @@ public:
 	virtual void execute(std::list<std::string>& args);
 };
 
+class CmdClearTrace : Command
+{
+public:
+	CmdClearTrace();
+	virtual ~CmdClearTrace();
+	virtual void displayHelp();
+	virtual void execute(std::list<std::string>& args);
+};
+
 class CmdDelAllTraces : Command
 {
 public:
 	CmdDelAllTraces();
 	virtual ~CmdDelAllTraces();
+	virtual void displayHelp();
+	virtual void execute(std::list<std::string>& args);
+};
+
+class CmdClearAllTraces : Command
+{
+public:
+	CmdClearAllTraces();
+	virtual ~CmdClearAllTraces();
 	virtual void displayHelp();
 	virtual void execute(std::list<std::string>& args);
 };
