@@ -22,6 +22,8 @@
 static const char* TRACING_MEM_ID = "/mem.Tracing";
 static const char* SAMPLECOUNTER = "Traces.sampleCounter";
 
+static const char* TRACESTREAMING = "Traces.streaming";
+
 CyclicBuffer::CyclicBuffer()
 : nrSamples(0)
 , idx(0)
@@ -96,10 +98,14 @@ int Trace::getParameterID()
 	return parID;
 }
 
-void Trace::sample()
+void Trace::sample(TraceMsg* msg)
 {
-	if (isSet())
-		buffer.pushValue(Parameter::getByIdx(parID));
+	if (isSet()) {
+		double v = Parameter::getByIdx(parID);
+
+		buffer.pushValue(v);
+		msg->addTraceEntry(parID, v);
+	}
 }
 
 void Trace::getValues(double* dest)
@@ -207,13 +213,14 @@ void Traces::clearAllTraces()
 }
 
 
-void Traces::sample()
+void Traces::sample(TraceMsg* msg)
 {
 	static Parameter* p = new Parameter(SAMPLECOUNTER, 0.0);
 
 	if (tryLock()) {
+
 		for (int i = 0; i < NRTRACES; i++) {
-			traces[i].sample();
+			traces[i].sample(msg);
 		}
 		sampleCounter++;
 		p->set(sampleCounter);
@@ -285,5 +292,79 @@ void Traces::unlock()
 	int r = sem_post(&semLock);
 	if (r!=0)
 		throw std::system_error(errno, std::system_category(),"unable to lock");
+}
+
+TraceMsg::TraceMsg()
+{
+
+}
+
+TraceMsg::~TraceMsg()
+{
+
+}
+
+void TraceMsg::addTraceEntry(int parId, double value)
+{
+	entries[parId] = value;
+}
+
+bool TraceMsg::send(int fd)
+{
+	try {
+		sendString("walb");
+		sendBody();
+		sendString("blaw");
+
+		unsigned int s = write(fd, msgbuf.data(), msgbuf.size());
+
+		if (s != msgbuf.size())
+			return false;
+
+		return true;
+	}
+	catch (std::runtime_error& m) {
+		std::clog << "Trace stream lost: " << m.what() << std::endl;
+		return false;
+	}
+	return false;
+}
+
+void TraceMsg::sendString(const std::string& msg)
+{
+	for (auto iter=msg.begin(); iter!=msg.end(); iter++) {
+		msgbuf.push_back(*iter);
+	}
+}
+
+void TraceMsg::sendInt(int v)
+{
+	unsigned char* p = (unsigned char*)&v;
+
+	for (unsigned int i=0; i<sizeof(int); i++) {
+		msgbuf.push_back(p[i]);
+	}
+}
+
+void TraceMsg::sendDouble(double v)
+{
+	unsigned char* p = (unsigned char*)&v;
+
+	for (unsigned int i=0; i<sizeof(double); i++) {
+		msgbuf.push_back(p[i]);
+	}
+
+}
+
+void TraceMsg::sendBody()
+{
+	sendInt(entries.size());
+	for (auto iter = entries.begin(); iter != entries.end(); iter++) {
+		int i = iter->first;
+		double v = iter->second;
+
+		sendInt(i);
+		sendDouble(v);
+	}
 }
 

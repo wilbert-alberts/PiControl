@@ -17,6 +17,8 @@
 #include <map>
 #include <string>
 
+class TraceMsg;
+
 class Traces_Servo{
 public:
 
@@ -25,10 +27,18 @@ public:
 
 private:
   Traces_Servo();
+  void reopenStream();
+  void sendMessage(TraceMsg* msg);
+  void abortStreaming(const std::string& msg);
 
   static Traces_Servo* instance;
+
   int        sampleCounter;
+  bool       streaming;
+  int        sockfd;
+
   Parameter* par_sampleCounter;
+  Parameter* par_streaming;
 };
 
 #endif /* TRACE_H_ */

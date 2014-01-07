@@ -8,6 +8,8 @@
 
 #include <cstring>
 #include <semaphore.h>
+#include <map>
+#include <vector>
 
 #include "Parameter.h"
 
@@ -36,6 +38,26 @@ private:
 };
 
 
+class TraceMsg
+{
+public:
+	TraceMsg();
+	virtual ~TraceMsg();
+	void addTraceEntry(int parId, double value);
+	bool send(int fd);
+
+private:
+	void sendString(const std::string& msg);
+	void sendInt(int v);
+	void sendDouble(double v);
+	void sendBody();
+	void sendEntry();
+
+	std::map<int, double> entries;
+	std::vector<unsigned char> msgbuf;
+};
+
+
 class Trace {
 public:
 	Trace();
@@ -47,7 +69,7 @@ public:
 	bool isSet();
 	void setParameterID(int id);
 	int  getParameterID();
-	void sample();
+	void sample(TraceMsg* msg);
 	void getValues(double *dest);
 
 private:
@@ -68,7 +90,7 @@ public:
 	void delAllTraces();
 	void clearAllTraces();
 
-	void sample();
+	void sample(TraceMsg* msg);
 	void dumpTraces();
 
 private:
@@ -84,6 +106,4 @@ private:
 	Trace traces[NRTRACES];
 	int   sampleCounter;
 };
-
-
 #endif /* TRACESV2_H_ */
