@@ -33,6 +33,7 @@ Traces_Servo* Traces_Servo::instance = 0;
 
 const int   PORTNR   = 9786;
 const char* HOSTNAME = "localhost";
+const char* TRACEENVVAR = "PITRACER";
 
 
 Traces_Servo* Traces_Servo::getInstance()
@@ -102,7 +103,12 @@ void Traces_Servo::reopenStream()
 	    	return;
 	    }
 
-	    server = gethostbyname(HOSTNAME);
+	    if (getenv("PITRACER") != NULL) {
+	    	server = gethostbyname(getenv(TRACEENVVAR));
+	    }
+	    else {
+	    	server = gethostbyname(HOSTNAME);
+	    }
 	    if (server == NULL) {
 	    	abortStreaming("Unable to resolve hostname");
 	    	return;
