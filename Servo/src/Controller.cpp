@@ -9,6 +9,8 @@
 #include "Motor.h"
 #include "Devices.h"
 #include "Parameter.h"
+#include "Filter.h"
+
 
 Controller* Controller::instance = 0;
 
@@ -40,7 +42,8 @@ Controller::Controller() {
 	co_poskd = new Parameter("Controller.co_poskd", 0);
 	co_poski = new Parameter("Controller.co_poski", 0);
 	co_angkp = new Parameter("Controller.co_angkp", 0);
-	co_angkd = new Parameter("Controller.co_angkd", 0);
+	//co_angkd = new Parameter("Controller.co_angkd", 0);
+	co_angkd = new Parameter("Controller.co_filtered_gyro", 0);
 
 	mmdcMinAng = new Parameter("Controller.minAng", -100);
 	mmdcMaxAng = new Parameter("Controller.maxAng",  100);
@@ -48,6 +51,10 @@ Controller::Controller() {
 	injAmpl = new Parameter("Motor.inj_ampl", 0.0);
 	injFreq = new Parameter("Motor.inj_freq", 0.5);
 	noiseSample = new Parameter("Motor.noise", 0.0);
+
+	flt_pos = new Filter("pos", 3);
+	flt_ang = new Filter("ang", 3);
+	flt_vang = new Filter("gyro", 3);
 
 
 	motor = Motor::getInstance();
@@ -97,58 +104,51 @@ void Controller::calculateModel()
 	double angError;
 	double angVError;
 
+	double ang;
 	double angV;
 
+	// Get position from device.
 	pos = devs->getDeviceValue(Devices::pos);
+	pos = filterDevice(flt_pos, pos);
+
 	if (updateActualPosition) {
 		// Get actual position from Devices
 		sumError = 0;
 		prevPosError = 0;
 		prevAngError = 0;
 		relPosOffset = pos;
-		angVBuffer.clear();
-		angVBuffer.push_back(0.0);
-		angVBuffer.push_back(0.0);
-		angVBuffer.push_back(0.0);
-		angVBuffer.push_back(0.0);
-		angVBuffer.push_back(0.0);
-		angVBuffer.push_back(0.0);
-		angVBuffer.push_back(0.0);
-		angVBuffer.push_back(0.0);
-		angVBuffer.push_back(0.0);
-		angVBuffer.push_back(0.0);
-		angVBufferSum = 0.0;
-
 		updateActualPosition = false;
 	}
 
-	// Determine controller error
+	// Determine position error
 	posError = pos_sp->get() - (pos - relPosOffset);
 	posVError = (posError - prevPosError);
 
+	// Determine setpoint for angle.
 	ang_sp->set(posError * ang_sp_kp->get());
 
+	// Limit angle setpoint between -1 and 1 degree
 	if (ang_sp->get() <-1) ang_sp->set(-1);
 	if (ang_sp->get() > 1) ang_sp->set( 1);
 
+	// Get angle from Device
+	ang = devs->getDeviceValue(Devices::angle);
+	ang = filterDevice(flt_ang, ang);
 
-	angError = ang_sp->get() - (devs->getDeviceValue(Devices::angle));
+	// Determine angle error
+	angError = ang_sp->get() - ang;
 	angVError = (angError - prevAngError);
 
+	// Get angular velocity from gyro Device
+	angV = devs->getDeviceValue(Devices::gyro);
+	angV = filterDevice(flt_vang, angV);
+
+	// Determine integrated position error
 	sumError += posError;
-
-	angV = filterGyro();
-
 	if ((posError > 0 && prevPosError < 0)
 			|| (posError < 0 && prevPosError > 0))
 		sumError = 0;
 
-	// Calculate controller
-	/*
-	tq = ((pos_kp->get() * posError + pos_kd->get() * posVError)
-			+ (ang_kp->get() * angError + ang_kd->get() * angVError)
-			+ (pos_kd->get() * posVError + pos_ki->get() * sumError));
-    */
 
 	// Store individual controller contributions
 	co_poskp->set(pos_kp->get() * posError);
@@ -157,6 +157,7 @@ void Controller::calculateModel()
 
 	co_angkp->set(ang_kp->get() * angError);
 	co_angkd->set(ang_kd->get() * angV);
+	co_angkd->set(angV); // TODO: remove this line
 
 	// Calculate final torque
 	tq = (pos_kp->get() * posError +
@@ -198,16 +199,9 @@ double Controller::doInject(double t) {
 }
 
 
-double Controller::filterGyro()
+double Controller::filterDevice(Filter* f, double i)
 {
-	double sample = devs->getDeviceValue(Devices::gyro);
-	angVBufferSum += sample;
-	angVBuffer.push_back(sample);
-	angVBufferSum -= angVBuffer.front();
-	angVBuffer.pop_front();
-
-	return angVBufferSum/angVBuffer.size();
-
+	return f->calculate(i);
 }
 
 void Controller::sample(void* /* context */) {
