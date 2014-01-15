@@ -12,8 +12,7 @@
 #include "CommandProcessor.h"
 #include "CmdHelp.h"
 #include "CmdDumpTraces.h"
-#include "CmdAddTrace.h"
-#include "CmdDelTrace.h"
+#include "CmdTracing.h"
 #include "CmdResetTimeStats.h"
 #include "CmdDumpTiming.h"
 #include "CmdDumpAllParams.h"
@@ -53,6 +52,9 @@ void registerCommands() {
 	new CmdDumpTraces();
 	new CmdAddTrace();
 	new CmdDelTrace();
+	new CmdClearTrace();
+	new CmdDelAllTraces();
+	new CmdClearAllTraces();
 	new CmdResetTimeStats();
 	new CmdDumpTiming();
 	new CmdDumpAllParams();

@@ -42,6 +42,7 @@ public:
 	virtual ~Trace();
 
 	void reset();
+	void clear();
 
 	bool isSet();
 	void setParameterID(int id);
@@ -63,9 +64,11 @@ public:
 
 	void addTrace(Parameter* p);
 	void delTrace(Parameter* p);
+	void clearTrace(Parameter* p);
 	void delAllTraces();
+	void clearAllTraces();
 
-	void sample(int samplecounter);
+	void sample();
 	void dumpTraces();
 
 private:
