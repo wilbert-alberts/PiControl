@@ -54,8 +54,6 @@ public class TraceParser implements Parser {
 			}
 			break;
 		case ENTRY:
-			System.out.println("Parsing entry " + cursor + "of " + nrEntries);
-			
 			r = entryParser.accept(c);
 			switch (r) {
 			case READY:
