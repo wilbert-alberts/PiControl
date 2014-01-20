@@ -17,7 +17,7 @@
 #include "CmdDumpTiming.h"
 #include "CmdDumpAllParams.h"
 #include "CmdParameter.h"
-
+#include "CmdConfigFilter.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -58,5 +58,6 @@ void registerCommands() {
 	new CmdResetTimeStats();
 	new CmdDumpTiming();
 	new CmdDumpAllParams();
+	new CmdConfigFilter();
 	CmdParameter::createParameterCommands();
 }
