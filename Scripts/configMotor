@@ -2,7 +2,7 @@
 
 source ./environment.sh
 
-$TERMINAL PeriodicTimer.frequency 167
+$TERMINAL PeriodicTimer.frequency 200
 
 $TERMINAL Dev.posGain 0.00002262443
 
@@ -18,5 +18,28 @@ $TERMINAL Motor.rm 4.72
 
 $TERMINAL Dev.oversampling 100
 $TERMINAL SPI.enabled 1
+
+
+$TERMINAL Flt_ang_a.0     1.0
+$TERMINAL Flt_ang_a.1     -0.7504942669
+$TERMINAL Flt_ang_a.2     0.2465969639
+$TERMINAL Flt_ang_b.0     0.0
+$TERMINAL Flt_ang_b.1     0.3059456199
+$TERMINAL Flt_ang_b.2     0.1901570772
+
+$TERMINAL Flt_gyro_a.0    1.0
+$TERMINAL Flt_gyro_a.1    -0.7504942669
+$TERMINAL Flt_gyro_a.2    0.2465969639
+$TERMINAL Flt_gyro_b.0    0.0
+$TERMINAL Flt_gyro_b.1    0.3059456199
+$TERMINAL Flt_gyro_b.2    0.1901570772
+
+$TERMINAL Flt_pos_a.0     1.0
+$TERMINAL Flt_pos_a.1     -0.7504942669
+$TERMINAL Flt_pos_a.2     0.2465969639
+$TERMINAL Flt_pos_b.0     0.0
+$TERMINAL Flt_pos_b.1     0.3059456199
+$TERMINAL Flt_pos_b.2     0.1901570772
+
 
 $TERMINAL dumpParameters
