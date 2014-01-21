@@ -12,13 +12,12 @@
 #include "CommandProcessor.h"
 #include "CmdHelp.h"
 #include "CmdDumpTraces.h"
-#include "CmdAddTrace.h"
-#include "CmdDelTrace.h"
+#include "CmdTracing.h"
 #include "CmdResetTimeStats.h"
 #include "CmdDumpTiming.h"
 #include "CmdDumpAllParams.h"
 #include "CmdParameter.h"
-
+#include "CmdConfigFilter.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -53,8 +52,12 @@ void registerCommands() {
 	new CmdDumpTraces();
 	new CmdAddTrace();
 	new CmdDelTrace();
+	new CmdClearTrace();
+	new CmdDelAllTraces();
+	new CmdClearAllTraces();
 	new CmdResetTimeStats();
 	new CmdDumpTiming();
 	new CmdDumpAllParams();
+	new CmdConfigFilter();
 	CmdParameter::createParameterCommands();
 }

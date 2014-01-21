@@ -74,6 +74,11 @@ void Trace::reset()
 	buffer.reset();
 }
 
+void Trace::clear()
+{
+	buffer.reset();
+}
+
 bool Trace::isSet()
 {
 	return parID>=0;
@@ -167,6 +172,22 @@ void Traces::delTrace(Parameter* p)
 	unlock();
 }
 
+void Traces::clearTrace(Parameter* p)
+{
+	lock();
+	int pID = p->getIndex();
+	for (int i=0; i<NRTRACES; i++) {
+		if (traces[i].isSet() &&
+			(traces[i].getParameterID()) == pID) {
+			traces[i].clear();
+			unlock();
+			return;
+		}
+	}
+	std::clog << "No trace found tracing " << p->getName() << std::endl;
+	unlock();
+}
+
 void Traces::delAllTraces()
 {
 	lock();
@@ -176,8 +197,17 @@ void Traces::delAllTraces()
 	unlock();
 }
 
+void Traces::clearAllTraces()
+{
+	lock();
+	for (int i=0; i<NRTRACES; i++) {
+		traces[i].clear();
+	}
+	unlock();
+}
 
-void Traces::sample(int samplecounter)
+
+void Traces::sample()
 {
 	static Parameter* p = new Parameter(SAMPLECOUNTER, 0.0);
 
