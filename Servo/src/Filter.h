@@ -30,4 +30,14 @@ private:
 	std::deque<double> out;
 };
 
+class HPFilter {
+	HPFilter(const std::string& id, int dimension);
+	virtual ~HPFilter();
+
+	double calculate(double in);
+private:
+	Filter lpf;
+
+};
+
 #endif /* FILTER_H_ */

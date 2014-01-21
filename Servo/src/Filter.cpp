@@ -68,3 +68,19 @@ double Filter::calculate(double i)
 	return o;
 }
 
+HPFilter::HPFilter(const std::string& id, int dimension)
+: lpf(id, dimension)
+{
+
+}
+
+HPFilter::~HPFilter()
+{
+}
+
+double HPFilter::calculate(double i)
+{
+	double l = lpf.calculate(i);
+	return i-l;
+}
+
