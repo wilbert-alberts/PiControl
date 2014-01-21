@@ -42,8 +42,10 @@ Controller::Controller() {
 	co_poskd = new Parameter("Controller.co_poskd", 0);
 	co_poski = new Parameter("Controller.co_poski", 0);
 	co_angkp = new Parameter("Controller.co_angkp", 0);
-	//co_angkd = new Parameter("Controller.co_angkd", 0);
-	co_angkd = new Parameter("Controller.co_filtered_gyro", 0);
+	co_angkd = new Parameter("Controller.co_angkd", 0);
+
+	vang_flt = new Parameter("Controller.angV_flt", 0);
+	ang_flt  = new Parameter("Controller.ang_flt", 0);
 
 	mmdcMinAng = new Parameter("Controller.minAng", -100);
 	mmdcMaxAng = new Parameter("Controller.maxAng",  100);
@@ -55,7 +57,7 @@ Controller::Controller() {
 	flt_pos = new Filter("pos", 3);
 	flt_ang = new Filter("ang", 3);
 	flt_vang = new Filter("gyro", 3);
-
+	flt_vang_hpf = new Filter("gyro_hpf", 3);
 
 	motor = Motor::getInstance();
 	devs = Devices::getInstance();
@@ -134,6 +136,7 @@ void Controller::calculateModel()
 	// Get angle from Device
 	ang = devs->getDeviceValue(Devices::angle);
 	ang = filterDevice(flt_ang, ang);
+	ang_flt->set(ang);
 
 	// Determine angle error
 	angError = ang_sp->get() - ang;
@@ -142,6 +145,8 @@ void Controller::calculateModel()
 	// Get angular velocity from gyro Device
 	angV = devs->getDeviceValue(Devices::gyro);
 	angV = filterDevice(flt_vang, angV);
+	angV = filterDevice(flt_vang_hpf, angV);
+	vang_flt->set(angV);
 
 	// Determine integrated position error
 	sumError += posError;

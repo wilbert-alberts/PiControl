@@ -56,9 +56,14 @@ private:
 	Parameter* co_angkp;
 	Parameter* co_angkd;
 
+	Parameter* ang_flt;
+	Parameter* vang_flt;
+
+
 	Filter* flt_pos;
 	Filter* flt_ang;
 	Filter* flt_vang;
+	Filter* flt_vang_hpf;
 
 	std::default_random_engine generator;
 	std::normal_distribution<double> ndis;
