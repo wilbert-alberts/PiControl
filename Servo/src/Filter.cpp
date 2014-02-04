@@ -6,6 +6,7 @@
  */
 
 #include <sstream>
+#include <iostream>
 
 #include "Filter.h"
 #include "Parameter.h"
@@ -41,15 +42,15 @@ Filter::~Filter() {
 	delete[] par_b;
 }
 
-double Filter::calculate(double i)
+double Filter::calculate(double d)
 {
-	double B;
-	double A;
-	double o;
+	double B(0.0);
+	double A(0.0);
+	double o(0.0);
 
 	// Note: newest input at index 0
 	//       oldest input at index d
-	in.push_front(i);
+	in.push_front(d);
 	in.pop_back();
 	for (int i=0; i<dimension; i++) {
 		// B += b[i]*in[i]

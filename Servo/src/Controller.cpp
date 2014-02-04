@@ -5,6 +5,8 @@
  *      Author: wilbert
  */
 
+#include <iostream>
+
 #include "Controller.h"
 #include "Motor.h"
 #include "Devices.h"
@@ -20,7 +22,12 @@ Controller* Controller::getInstance() {
 	return instance;
 }
 
-Controller::Controller() {
+Controller::Controller()
+: prevPosError(0.0)
+, prevAngError(0.0)
+, relPosOffset(0.0)
+, sumError(0.0)
+{
 	enabled = new Parameter("Controller.enabled", 0);
 	pos_sp = new Parameter("Controller.pos_sp", 0);
 	pos_kp = new Parameter("Controller.pos_kp", 0);
@@ -47,6 +54,12 @@ Controller::Controller() {
 	vang_flt = new Parameter("Controller.angV_flt", 0);
 	ang_flt  = new Parameter("Controller.ang_flt", 0);
 
+	vang_raw = new Parameter("Controller.angV_raw", 0);
+	ang_raw  = new Parameter("Controller.ang_raw", 0);
+
+	pos_flt  = new Parameter("Controller.pos_flt", 0);
+	pos_raw  = new Parameter("Controller.pos_raw", 0);
+
 	mmdcMinAng = new Parameter("Controller.minAng", -100);
 	mmdcMaxAng = new Parameter("Controller.maxAng",  100);
 
@@ -57,7 +70,7 @@ Controller::Controller() {
 	flt_pos = new Filter("pos", 3);
 	flt_ang = new Filter("ang", 3);
 	flt_vang = new Filter("gyro", 3);
-	flt_vang_hpf = new Filter("gyro_hpf", 3);
+	flt_vang_hpf = new HPFilter("gyro_hpf", 3);
 
 	motor = Motor::getInstance();
 	devs = Devices::getInstance();
@@ -99,19 +112,23 @@ void Controller::disableController()
 
 void Controller::calculateModel()
 {
-	double tq;
-	double pos;
-	double posError;
-	double posVError;
-	double angError;
-	double angVError;
+	double tq(0.0);
+	double pos(0.0);
+	double posError(0.0);
+	double posVError(0.0);
+	double angError(0.0);
+	double angVError(0.0);
 
-	double ang;
-	double angV;
+	double ang(0.0);
+	double angV1(0.0);
+	double angV2(0.0);
+	double angV3(0.0);
 
 	// Get position from device.
 	pos = devs->getDeviceValue(Devices::pos);
+	pos_raw->set(pos);
 	pos = filterDevice(flt_pos, pos);
+	pos_flt->set(pos);
 
 	if (updateActualPosition) {
 		// Get actual position from Devices
@@ -135,6 +152,7 @@ void Controller::calculateModel()
 
 	// Get angle from Device
 	ang = devs->getDeviceValue(Devices::angle);
+	ang_raw->set(ang);
 	ang = filterDevice(flt_ang, ang);
 	ang_flt->set(ang);
 
@@ -143,10 +161,11 @@ void Controller::calculateModel()
 	angVError = (angError - prevAngError);
 
 	// Get angular velocity from gyro Device
-	angV = devs->getDeviceValue(Devices::gyro);
-	angV = filterDevice(flt_vang, angV);
-	angV = filterDevice(flt_vang_hpf, angV);
-	vang_flt->set(angV);
+	angV1 = devs->getDeviceValue(Devices::gyro);
+	vang_raw->set(angV1);
+	angV2 = filterDevice(flt_vang_hpf, angV1);
+	angV3 = filterDevice(flt_vang, angV2);
+	vang_flt->set(angV3);
 
 	// Determine integrated position error
 	sumError += posError;
@@ -161,19 +180,18 @@ void Controller::calculateModel()
 	co_poski->set(pos_ki->get() * sumError);
 
 	co_angkp->set(ang_kp->get() * angError);
-	co_angkd->set(ang_kd->get() * angV);
-	co_angkd->set(angV); // TODO: remove this line
+	co_angkd->set(ang_kd->get() * angV3);
 
 	// Calculate final torque
 	tq = (pos_kp->get() * posError +
           pos_kd->get() * posVError +
 		  pos_ki->get() * sumError +
 		  ang_kp->get() * angError +
-		  ang_kd->get() * angV);
+		  ang_kd->get() * angV3);
 
 
 	// Inject noise
-	tq = doInject(tq);
+	//tq = doInject(tq);
 
 	// Set torque.
 	if (enabled->get() != 0.0) {
@@ -205,6 +223,11 @@ double Controller::doInject(double t) {
 
 
 double Controller::filterDevice(Filter* f, double i)
+{
+	return f->calculate(i);
+}
+
+double Controller::filterDevice(HPFilter* f, double i)
 {
 	return f->calculate(i);
 }

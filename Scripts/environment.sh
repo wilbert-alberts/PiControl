@@ -2,6 +2,7 @@
 
 SERVO=/home/pi/PiControl/Servo/ARM-Debug/Servo
 TERMINAL=/home/pi/PiControl/Terminal/ARM-Debug/Terminal
+PITRACER=192.168.1.120
 
 alias terminal="$TERMINAL"
 alias dumpParameters="$TERMINAL dumpParameters"

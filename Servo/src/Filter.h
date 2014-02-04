@@ -31,6 +31,7 @@ private:
 };
 
 class HPFilter {
+public:
 	HPFilter(const std::string& id, int dimension);
 	virtual ~HPFilter();
 

@@ -12,6 +12,7 @@ class Parameter;
 class Motor;
 class Devices;
 class Filter;
+class HPFilter;
 
 #include <list>
 #include <random>
@@ -31,6 +32,7 @@ private:
 	bool mmdcSafe();
 	void disableController();
 	double filterDevice(Filter* f, double i);
+	double filterDevice(HPFilter* f, double i);
 	double doInject(double t);
 
 	static Controller* instance;
@@ -56,14 +58,19 @@ private:
 	Parameter* co_angkp;
 	Parameter* co_angkd;
 
+	Parameter* pos_raw;
+	Parameter* pos_flt;
+
 	Parameter* ang_flt;
+	Parameter* ang_raw;
 	Parameter* vang_flt;
+	Parameter* vang_raw;
 
 
 	Filter* flt_pos;
 	Filter* flt_ang;
 	Filter* flt_vang;
-	Filter* flt_vang_hpf;
+	HPFilter* flt_vang_hpf;
 
 	std::default_random_engine generator;
 	std::normal_distribution<double> ndis;

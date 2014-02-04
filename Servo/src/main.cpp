@@ -22,7 +22,7 @@
 #include "HWDebug.h"
 
 
-constexpr int MEMORYSIZE=16*1024;  // 16 Kilobytes.
+constexpr int MEMORYSIZE=64*1024;  // 16 Kilobytes.
 constexpr int SERVOFREQUENCY=2;    // 2 Hz
 
 void lockDB(void* context);
