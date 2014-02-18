@@ -81,6 +81,13 @@ private:
 
 	Parameter* par_h1Ang;
 	Parameter* par_h2Ang;
+
+	Parameter* par_h1AngGain;
+	Parameter* par_h2AngGain;
+
+	Parameter* par_h1AngOffset;
+	Parameter* par_h2AngOffset;
+
 	Parameter* par_rawAngle;
 	Parameter* par_angle;
 	Parameter* par_angleV;

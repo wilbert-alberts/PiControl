@@ -43,6 +43,8 @@ SPI::SPI() {
 
 	createRegister(OVERSAMPLING, std::string("SPI.oversampling"), 104,  8);
 
+	createRegister(SAMPLESTAKEN, std::string("SPI.samplesTaken"), 112,  8);
+
 	Pi2Mbed = DigitalOut::create(std::string("SPI.pi2mbed"), 4, 1);
 	Mbed2Pi = DigitalIn::create("SPI.mbed2pi", 5);
 }

@@ -29,6 +29,13 @@ Devices::Devices() :
 
 		par_h1Ang(createParameter("Dev.h1Ang",0.0, h1Ang)),
 		par_h2Ang(createParameter("Dev.h2Ang",0.0, h2Ang)),
+
+		par_h1AngGain(new Parameter("Dev.h1Ang_gain",1.0)),
+		par_h2AngGain(new Parameter("Dev.h2Ang_gain",1.0)),
+
+		par_h1AngOffset(new Parameter("Dev.h1Ang_offset",0.0)),
+		par_h2AngOffset(new Parameter("Dev.h2Ang_offset",0.0)),
+
 		par_rawAngle(createParameter("Dev.rawAngle",0.0, rawAngle)),
 		par_angle(createParameter("Dev.angle",0.0, angle)),
 		par_angleV(createParameter("Dev.angleV",0.0, angleV)),
@@ -103,7 +110,8 @@ void Devices::sampleAngle(double frequency) {
 	par_h1Ang->set(h1);
 	double h2 = spi->getRegister(SPI::HEIGHT2);
 	par_h2Ang->set(h2);
-	double raw_angle = h1 - h2;
+	double raw_angle = (par_h1AngGain->get()*h1 + par_h1AngOffset->get()) -
+			           (par_h2AngGain->get()*h2 + par_h2AngOffset->get());
 	par_rawAngle->set(raw_angle);
 	// calculate new angle with gain and offset
 	angle_[0] = raw_angle * par_angleGain->get() + par_angleOffset->get();
