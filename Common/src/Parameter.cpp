@@ -99,6 +99,13 @@ double Parameter::get() {
   return par->value;
 }
 
+Parameter::operator double() {
+  DB_mem* p=static_cast<DB_mem*>(db->get());
+  DB_Parameter* par = &p->params[idx];
+
+  return par->value;
+}
+
 double Parameter::getByIdx(int i) {
   DB_mem* p=static_cast<DB_mem*>(DoubleBuffer::getInstance()->get());
 

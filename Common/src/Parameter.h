@@ -27,7 +27,7 @@ public:
   void set(double v);
   void setDeep(double v); // Carefull: requires locking both pages
 
-
+  operator double();
 
   static int getNrParameters();
   static int findParameter(const std::string& name);
