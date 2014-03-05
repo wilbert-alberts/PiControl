@@ -66,14 +66,14 @@ void Traces_Servo::sampleAllTraces(void* /*context*/)
   instance->sampleCounter++;
   instance->sendMessage(&msg);
 
-  instance->par_sampleCounter->set((double)instance->sampleCounter);
+  *instance->par_sampleCounter = (double)instance->sampleCounter;
 }
 
 void Traces_Servo::abortStreaming(const std::string& msg)
 {
 	std::clog << "Streaming aborted: " << msg << std::endl;
 	streaming = false;
-	par_streaming->set(0.0);
+	*par_streaming = 0.0;
 	if (sockfd > 0) {
 		close(sockfd);
 		sockfd = 0;
@@ -85,13 +85,13 @@ void Traces_Servo::reopenStream()
 	/* Check whether streaming is enabled.
 	 * Abort if not enabled.
 	 */
-	if (streaming && par_streaming->get()<= 0.0) {
+	if (streaming && *par_streaming<= 0.0) {
 		abortStreaming("Streaming turned off");
 		return;
 	}
 
 	/* Check whether streaming shoudl be re-enabled */
-	if (!streaming && par_streaming->get() > 0.0) {
+	if (!streaming && *par_streaming > 0.0) {
 	    int portno;
 	    struct sockaddr_in serv_addr;
 	    struct hostent *server;

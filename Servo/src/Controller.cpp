@@ -94,19 +94,19 @@ void Controller::sample() {
 
 bool Controller::mmdcSafe()
 {
-	if (enabled->get()==0.0)
+	if (*enabled==0.0)
 		return true;
 
 	double ang = devs->getDeviceValue(Devices::angle);
 
-	return ((ang >= mmdcMinAng->get()) &&
-	        (ang <= mmdcMaxAng->get()));
+	return ((ang >= *mmdcMinAng) &&
+	        (ang <= *mmdcMaxAng));
 }
 
 void Controller::disableController()
 {
 	motor->setTorque(0.0);
-	enabled->set(0.0);
+	*enabled = 0.0;
 	updateActualPosition = true;
 }
 
@@ -126,9 +126,9 @@ void Controller::calculateModel()
 
 	// Get position from device.
 	pos = devs->getDeviceValue(Devices::pos);
-	pos_raw->set(pos);
+	*pos_raw = pos;
 	pos = filterDevice(flt_pos, pos);
-	pos_flt->set(pos);
+	*pos_flt = pos;
 
 	if (updateActualPosition) {
 		// Get actual position from Devices
@@ -140,32 +140,32 @@ void Controller::calculateModel()
 	}
 
 	// Determine position error
-	posError = pos_sp->get() - (pos - relPosOffset);
+	posError = *pos_sp - (pos - relPosOffset);
 	posVError = (posError - prevPosError);
 
 	// Determine setpoint for angle.
-	ang_sp->set(posError * ang_sp_kp->get());
+	*ang_sp = posError * *ang_sp_kp;
 
 	// Limit angle setpoint between -1 and 1 degree
-	if (ang_sp->get() <-1) ang_sp->set(-1);
-	if (ang_sp->get() > 1) ang_sp->set( 1);
+	if (*ang_sp <-1) *ang_sp = -1;
+	if (*ang_sp > 1) *ang_sp =  1;
 
 	// Get angle from Device
 	ang = devs->getDeviceValue(Devices::angle);
-	ang_raw->set(ang);
+	*ang_raw = ang;
 	ang = filterDevice(flt_ang, ang);
-	ang_flt->set(ang);
+	*ang_flt = ang;
 
 	// Determine angle error
-	angError = ang_sp->get() - ang;
+	angError = *ang_sp - ang;
 	angVError = (angError - prevAngError);
 
 	// Get angular velocity from gyro Device
 	angV1 = devs->getDeviceValue(Devices::gyro);
-	vang_raw->set(angV1);
+	*vang_raw = angV1;
 	angV2 = filterDevice(flt_vang_hpf, angV1);
 	angV3 = filterDevice(flt_vang, angV2);
-	vang_flt->set(angV3);
+	*vang_flt = angV3;
 
 	// Determine integrated position error
 	sumError += posError;
@@ -175,26 +175,26 @@ void Controller::calculateModel()
 
 
 	// Store individual controller contributions
-	co_poskp->set(pos_kp->get() * posError);
-	co_poskd->set(pos_kd->get() * posVError);
-	co_poski->set(pos_ki->get() * sumError);
+	*co_poskp = *pos_kp * posError;
+	*co_poskd = *pos_kd * posVError;
+	*co_poski = *pos_ki * sumError;
 
-	co_angkp->set(ang_kp->get() * angError);
-	co_angkd->set(ang_kd->get() * angV3);
+	*co_angkp = *ang_kp * angError;
+	*co_angkd = *ang_kd * angV3;
 
 	// Calculate final torque
-	tq = (pos_kp->get() * posError +
-          pos_kd->get() * posVError +
-		  pos_ki->get() * sumError +
-		  ang_kp->get() * angError +
-		  ang_kd->get() * angV3);
+	tq = (*pos_kp * posError +
+          *pos_kd * posVError +
+		  *pos_ki * sumError +
+		  *ang_kp * angError +
+		  *ang_kd * angV3);
 
 
 	// Inject noise
 	//tq = doInject(tq);
 
 	// Set torque.
-	if (enabled->get() != 0.0) {
+	if (*enabled != 0.0) {
 		motor->setTorque(tq);
 
 		prevPosError = posError;
@@ -205,8 +205,8 @@ void Controller::calculateModel()
 		updateActualPosition = true;
 	}
 
-	posErrorParam->set(posError);
-	angErrorParam->set(angError);
+	*posErrorParam = posError;
+	*angErrorParam = angError;
 
 }
 
@@ -214,10 +214,10 @@ void Controller::calculateModel()
 double Controller::doInject(double t) {
 	double sample = ndis(generator);
 
-	noiseSample->set(sample);
+	*noiseSample = sample;
 
-	if (sample < injFreq->get()) return t - injAmpl->get();
-	if (sample > injFreq->get()) return t + injAmpl->get();
+	if (sample < *injFreq) return t - *injAmpl;
+	if (sample > *injFreq) return t + *injAmpl;
 	return t;
 }
 

@@ -88,7 +88,7 @@ double Devices::getDeviceValue(DeviceID id) {
 
 	Parameter* p = devices[id];
 
-	return p->get();
+	return *p;
 }
 
 void Devices::setDevice(DeviceID id, double v) {
@@ -96,8 +96,7 @@ void Devices::setDevice(DeviceID id, double v) {
 		throw std::invalid_argument("Devices::getDevice: illegal value for deviceID: " + id);
 
 	Parameter* p = devices[id];
-
-	return p->set(v);
+	*p = v;
 }
 
 void Devices::sampleAngle(double frequency) {
@@ -107,20 +106,20 @@ void Devices::sampleAngle(double frequency) {
 	angle_v[1] = angle_v[0];
 	// determine raw angle
 	double h1 = spi->getRegister(SPI::HEIGHT1);
-	par_h1Ang->set(h1);
+	*par_h1Ang = h1;
 	double h2 = spi->getRegister(SPI::HEIGHT2);
-	par_h2Ang->set(h2);
-	double raw_angle = (par_h1AngGain->get()*h1 + par_h1AngOffset->get()) -
-			           (par_h2AngGain->get()*h2 + par_h2AngOffset->get());
-	par_rawAngle->set(raw_angle);
+	*par_h2Ang = h2;
+	double raw_angle = (*par_h1AngGain*h1 + *par_h1AngOffset) -
+			           (*par_h2AngGain*h2 + *par_h2AngOffset);
+	*par_rawAngle = raw_angle;
 	// calculate new angle with gain and offset
-	angle_[0] = raw_angle * par_angleGain->get() + par_angleOffset->get();
+	angle_[0] = raw_angle * *par_angleGain + *par_angleOffset;
 	angle_v[0] = (angle_[0] - angle_[1]) * frequency;
 	angle_v[1] = (angle_[1] - angle_[2]) * frequency;
 	angle_a[0] = (angle_v[0] - angle_v[1]) * frequency;
 	// store calculated values into parameters
-	par_angle->set(angle_[0]);
-	par_angleA->set(angle_a[0]);
+	*par_angle = angle_[0];
+	*par_angleA = angle_a[0];
 }
 
 void Devices::sample() {
@@ -137,9 +136,9 @@ void Devices::sampleGyro(double /*frequency*/)
 	double rawGyro = spi->getRegister(SPI::GYRO);
 	if (rawGyro > 32767)
 		rawGyro -= 65536;
-	double gyro = rawGyro * par_gyroGain->get() + par_gyroOffset->get();
-	par_rawGyro->set(rawGyro);
-	par_gyro->set(gyro);
+	double gyro = rawGyro * *par_gyroGain + *par_gyroOffset;
+	*par_rawGyro = rawGyro;
+	*par_gyro = gyro;
 
 }
 
@@ -160,12 +159,12 @@ void Devices::samplePosition(double frequency) {
 	// Mask relevant bits
 	rawpos = rawpos & 0x0fff; // 12 bits
 	// determine delta w.r.t. previous sample;
-	par_rawPos->set(rawpos);
+	*par_rawPos = rawpos;
 
 	int delta = rawpos - prevRawPos;
 	// store new value for prevRawPos
 	prevRawPos = rawpos;
-	int nrIncs = par_nrIncrements->get();
+	int nrIncs = *par_nrIncrements;
 
 	// Correct for over/underruns
 	if (delta > nrIncs / 2) {
@@ -180,7 +179,7 @@ void Devices::samplePosition(double frequency) {
 	encPos += delta;
 
 	// Transform into real position
-	pos_[0] = encPos * par_posGain->get() + par_posOffset->get();
+	pos_[0] = encPos * *par_posGain + *par_posOffset;
 
 	// Calculate velocity and acceleration
 	pos_v[0] = (pos_[0] - pos_[1]) * frequency;
@@ -188,14 +187,14 @@ void Devices::samplePosition(double frequency) {
 	pos_a[0] = (pos_v[0] - pos_v[1]) * frequency;
 
 	// store calculated values into parameters
-	par_pos->set(pos_[0]);
-	par_posV->set(pos_v[0]);
-	par_posA->set(pos_a[0]);
+	*par_pos = pos_[0];
+	*par_posV = pos_v[0];
+	*par_posA = pos_a[0];
 }
 
 void Devices::sampleBattery()
 {
-	par_voltage->set(spi->getRegister(SPI::UBAT)*par_voltageGain->get()+par_voltageOffset->get());
+	*par_voltage = spi->getRegister(SPI::UBAT) * *par_voltageGain+ *par_voltageOffset;
 }
 
 void Devices::update(void* /*context*/) {
@@ -206,11 +205,11 @@ void Devices::update(void* /*context*/) {
 
 void Devices::update() {
 	updateDC();
-	spi->setRegister(SPI::OVERSAMPLING, par_oversampling->get());
+	spi->setRegister(SPI::OVERSAMPLING, *par_oversampling);
 }
 
 void Devices::updateDC() {
-	double dc = par_dutycycle->get()*(par_motordir->get() < 0? -1: 1);
+	double dc = *par_dutycycle*(*par_motordir < 0? -1: 1);
 	// Limit dc to -1.0 -  1.0
 	dc = dc> 1.0?  1.0 : dc;
 	dc = dc<-1.0? -1.0 : dc;

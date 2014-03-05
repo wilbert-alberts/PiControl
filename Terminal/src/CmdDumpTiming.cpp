@@ -41,13 +41,13 @@ void CmdDumpTiming::execute(std::list<std::string>& args) {
 	margin = new Parameter(TimeStats::par_margin,0.0);
 	frequency= new Parameter(TimeStats::par_frequency,0.0);
 
-	std::cout << "frequency: " << frequency->get() << "Hz (period: " << 1.0/frequency->get()<< " seconds)" << std::endl;
+	std::cout << "frequency: " << *frequency << "Hz (period: " << 1.0 / *frequency<< " seconds)" << std::endl;
 
 
-	unsigned int periodInUs = 1000000/frequency->get();
-	unsigned int actualPeriod = periodInUs - margin->get();
-	unsigned int smallestPeriod = periodInUs - maxMargin->get();
-	unsigned int largestPeriod = periodInUs - minMargin->get();
+	unsigned int periodInUs = 1000000 / *frequency;
+	unsigned int actualPeriod = periodInUs - *margin;
+	unsigned int smallestPeriod = periodInUs - *maxMargin;
+	unsigned int largestPeriod = periodInUs - *minMargin;
 
 
 	std::cout << "actual period:   " << actualPeriod/1000.0 << "ms ("<< 100.0*actualPeriod/periodInUs << "%)" << std::endl;

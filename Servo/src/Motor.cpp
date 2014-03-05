@@ -43,7 +43,8 @@ Motor::~Motor() {
 }
 
 void Motor::setTorque(double tq) {
-	t->set(tq);
+	*t = tq;
+	//t->set(tq);
 }
 
 void Motor::sample() {
@@ -51,22 +52,22 @@ void Motor::sample() {
 	double rvel = devs->getDeviceValue(Devices::posV);
 	double nrIncs = devs->getDeviceValue(Devices::nrIncrements);
 
-	batVoltage->set(devs->getDeviceValue(Devices::voltage));
+	*batVoltage= devs->getDeviceValue(Devices::voltage);
 
 	rvel = 2*M_PI*rvel/nrIncs; // Note rotations per second!
-	rotVelo->set(rvel);
+	*rotVelo = rvel;
 
-	double im =  t->get() / ki->get();             // Motor current.
-	motorCurrent->set(im);
-	double vme = im * rm->get() + rvel * kv->get();
-	double dc = vme / batVoltage->get();
+	double im =  *t / *ki;             // Motor current.
+	*motorCurrent = im;
+	double vme = im * *rm + rvel * *kv;
+	double dc = vme / *batVoltage;
 
 	// Normalize dc
 	if (dc > 1)  dc = 1.0;
 	if (dc < -1) dc = -1.0;
 
 	dutycycle->set(dc);
-	if (enabled->get() != 0.0) {
+	if (*enabled != 0.0) {
 		devs->setDevice(Devices::dutycycle, dc);
 	}
 	else {

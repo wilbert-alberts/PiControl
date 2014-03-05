@@ -72,7 +72,7 @@ void SPI::createRegister(int id, const std::string& n, int start, int length)
 
 bool SPI::isEnabled()
 {
-	if (bEnabled && enabled->get()==0.0) {
+	if (bEnabled && *enabled==0.0) {
 		// SPI got disabled
 		Mbed2Pi->setEnabled(false);
 		Pi2Mbed->setEnabled(false);
@@ -80,7 +80,7 @@ bool SPI::isEnabled()
 		return bEnabled;
 	}
 
-	if (!bEnabled && enabled->get() != 0.0) {
+	if (!bEnabled && *enabled != 0.0) {
 		// SPI got enabled
 		Mbed2Pi->setEnabled(true);
 		Pi2Mbed->setEnabled(true);
@@ -126,8 +126,8 @@ void SPI::copyFromParameters()
 		Parameter* p = iter->second;
 		int id = iter->first;
 
-		//std::clog <<"setting register " << p->getName() << " to value: " << p->get() << std::endl;
-		bb->setRegister(byteArray, id, p->get());
+		//std::clog <<"setting register " << p->getName() << " to value: " << *p << std::endl;
+		bb->setRegister(byteArray, id, *p);
 	}
 }
 
@@ -141,7 +141,7 @@ void SPI::copyToParameters()
 		Parameter* p = iter->second;
 		int id = iter->first;
 
-		p->set(bb->getRegister(byteArray, id));
+		*p = bb->getRegister(byteArray, id);
 	}
 
 }
@@ -217,6 +217,6 @@ void SPI::setRegister(int reg, double value)
 	bb->setRegister(byteArray, reg, value);
 
 	Parameter* p = registers[reg];
-	p->set(value);
+	*p = value;
 
 }

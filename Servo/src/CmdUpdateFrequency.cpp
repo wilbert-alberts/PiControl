@@ -32,7 +32,7 @@ Cmd_UpdateFrequency::~Cmd_UpdateFrequency() {
 
 void Cmd_UpdateFrequency::execute()
 {
-	double f = par_frequency->get();
+	double f = *par_frequency;
 	//std::clog << "frequency: " << f << std::endl;
 	if (f!=freq) {
 		PeriodicTimer::getInstance()->updateFrequency(f);

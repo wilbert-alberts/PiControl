@@ -42,20 +42,22 @@ void TimeStats_Servo::takeTimeStamp(void* context)
 
 	Parameter* p = static_cast<Parameter*>(context);
 
-	p->set(t);
+	*p = t;
 }
 
 void TimeStats_Servo::sampleCommand(void* /*context*/)
 {
   PeriodicTimer* pt = PeriodicTimer::getInstance();
 
-  sampleCounter->set(sampleCounter->get()+1);
-  margin->set(pt->getMargin());
-  minMargin->set(pt->getMinMargin());
-  maxMargin->set(pt->getMaxMargin());
-  overruns->set(pt->getNrOverruns());
-  if (reset->get() > 0.0) {
+  std::cerr << "sc before: " <<  *sampleCounter << std::endl;
+  *sampleCounter = *sampleCounter + 1.0;
+  std::cerr << "sc after: " <<  *sampleCounter << std::endl;
+  *margin = pt->getMargin();
+  *minMargin = pt->getMinMargin();
+  *maxMargin = pt->getMaxMargin();
+  *overruns = pt->getNrOverruns();
+  if (*reset > 0.0) {
     pt->resetStats();
-    reset->set(0.0);
+    *reset = 0.0;
   }
 }
