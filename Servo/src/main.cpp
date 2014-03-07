@@ -78,7 +78,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(Controller::sample,0);
 
 		// Run motor model
-		pt->addPeriodicFunction(Motor::sample, motor);
+		Motor::getInstance();
 
 		// Transform dutycycle into correct signals.
 		pt->addPeriodicFunction(Devices::update, 0);

@@ -22,29 +22,28 @@ Motor* Motor::getInstance() {
 }
 
 Motor::Motor()
-:	ndis(0.0, 1.0)
+: ServoModule("Motor", 0)
+, ndis(0.0, 1.0)
 {
-	enabled = new Parameter("Motor.enabled",0);
+	enabled = createParameter("enabled");
 
-	t = new Parameter("Motor.torque",0.0);
-	ki = new Parameter("Motor.ki",0.0);
-	kv = new Parameter("Motor.kv",0.0);
-	rm = new Parameter("Motor.rm",0.0);
-	rotVelo = new Parameter("Motor.rotationalVelo",0.0);
-	dutycycle = new Parameter("Motor.dutycycle",0.0);
-	batVoltage = new Parameter("Motor.batVoltage",0.0);
-	motorCurrent = new Parameter("Motor.current",0.0);
+	t = createParameter("torque");
+	ki = createParameter("ki");
+	kv = createParameter("kv");
+	rm = createParameter("rm");
+	rotVelo = createParameter("rotationalVelo");
+	dutycycle = createParameter("dutycycle");
+	batVoltage = createParameter("batVoltage");
+	motorCurrent = createParameter("current");
 
 	devs = Devices::getInstance();
 }
 
 Motor::~Motor() {
-	// TODO Auto-generated destructor stub
 }
 
 void Motor::setTorque(double tq) {
 	*t = tq;
-	//t->set(tq);
 }
 
 void Motor::sample() {
@@ -75,7 +74,3 @@ void Motor::sample() {
 	}
 }
 
-void Motor::sample(void* context) {
-	Motor* me = static_cast<Motor*>(context);
-	me->sample();
-}
