@@ -45,6 +45,8 @@ SPI::SPI() {
 
 	createRegister(SAMPLESTAKEN, std::string("SPI.samplesTaken"), 112,  8);
 
+	createRegister(ACC, std::string("SPI.Acc"), 120,  16);
+
 	Pi2Mbed = DigitalOut::create(std::string("SPI.pi2mbed"), 4, 1);
 	Mbed2Pi = DigitalIn::create("SPI.mbed2pi", 5);
 }

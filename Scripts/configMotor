@@ -13,15 +13,21 @@ $TERMINAL Dev.h2Ang_gain 0.0
 $TERMINAL Dev.angleGain 0.0003870809
 $TERMINAL Dev.angleOffset -1.2328527249
 
-$TERMINAL Dev.gyroGain 1.5259e-5
-$TERMINAL Dev.gyroOffset 0.0
+# Note: offset is added after multiplication with gain
+#       Changing gain must be followed by changing offset.
+$TERMINAL Dev.gyroGain 1.0
+$TERMINAL Dev.gyroOffset 665
+
+$TERMINAL Dev.accGain 0.0033674684
+$TERMINAL Dev.accOffset -123.3771896894
+
 
 $TERMINAL Motor.ki 0.033
 $TERMINAL Motor.kv 0.033
 $TERMINAL Motor.rm 4.72
 
-$TERMINAL Dev.oversampling 1
-$TERMINAL SPI.oversampling 1
+$TERMINAL Dev.oversampling 11
+$TERMINAL SPI.oversampling 11
 
 $TERMINAL SPI.enabled 1
 

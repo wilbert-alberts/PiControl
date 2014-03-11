@@ -35,7 +35,8 @@ public:
 	static constexpr int GYRO = 3;
 	static constexpr int UBAT = 4;
 	static constexpr int ENCPOS = 5;
-	static constexpr int SAMPLESTAKEN = 6;
+	static constexpr int ACC = 6;
+	static constexpr int SAMPLESTAKEN = 7;
 
 	static constexpr int PWM = 11;
 	static constexpr int MOTORDIR = 12;

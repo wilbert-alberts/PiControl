@@ -57,6 +57,11 @@ Devices::Devices() :
 		par_gyroGain(createParameter("Dev.gyroGain",0.0, gyroGain)),
 		par_gyroOffset(createParameter("Dev.gyroOffset",0.0, gyroOffset)),
 
+		par_rawAcc(createParameter("Dev.rawAcc",0.0, rawAcc)),
+		par_acc(createParameter("Dev.acc",0.0, acc)),
+		par_accGain(createParameter("Dev.accGain",0.0, accGain)),
+		par_accOffset(createParameter("Dev.accOffset",0.0, accOffset)),
+
 		par_nrIncrements(createParameter("Dev.nrIncrements",4096.0, nrIncrements)),
 
 		par_voltage(createParameter("Dev.voltage",0.0, voltage)),
@@ -128,6 +133,7 @@ void Devices::sample() {
 
 	sampleAngle(frequency);
 	sampleGyro(frequency);
+	sampleAcc(frequency);
 	samplePosition(frequency);
 	sampleBattery();
 }
@@ -140,7 +146,14 @@ void Devices::sampleGyro(double /*frequency*/)
 	double gyro = rawGyro * par_gyroGain->get() + par_gyroOffset->get();
 	par_rawGyro->set(rawGyro);
 	par_gyro->set(gyro);
+}
 
+void Devices::sampleAcc(double /*frequency*/)
+{
+	double rawAcc = spi->getRegister(SPI::ACC);
+	double acc = rawAcc* par_accGain->get() + par_accOffset->get();
+	par_rawAcc->set(rawAcc);
+	par_acc->set(acc);
 }
 
 void Devices::sample(void* /*context*/) {
