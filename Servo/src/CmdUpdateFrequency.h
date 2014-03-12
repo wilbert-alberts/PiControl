@@ -12,6 +12,8 @@
 
 #include <string>
 
+#include "ServoModule.h"
+
 class Parameter;
 class PeriodicTimer;
 
@@ -23,9 +25,8 @@ public:
 	void calculateAfter();
 
 private:
-
-	double freq;
 	Parameter* par_frequency;
+	double freq;
 };
 
 #endif /* CMDUPDATEFREQUENCY_H_ */

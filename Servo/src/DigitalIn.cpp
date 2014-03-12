@@ -60,3 +60,27 @@ void DigitalIn::captureAllIns(void* /*context*/) {
 		digo->get();
 	}
 }
+
+DigitalIns::DigitalIns()
+: ServoModule("DigitalIn", 0)
+{
+
+}
+
+DigitalIns::~DigitalIns() {
+}
+
+DigitalIns* DigitalIns::getInstance()
+{
+	static DigitalIns* instance;
+
+	if (instance==0) {
+		instance = new DigitalIns();
+	}
+	return instance;
+}
+
+void DigitalIns::sample()
+{
+	DigitalIn::captureAllIns(0);
+}

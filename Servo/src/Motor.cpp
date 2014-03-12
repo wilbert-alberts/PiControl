@@ -32,7 +32,6 @@ Motor::Motor(ServoModule* sm)
 }
 
 Motor::~Motor() {
-	// TODO Auto-generated destructor stub
 }
 
 void Motor::setTorque(double tq) {

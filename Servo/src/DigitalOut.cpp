@@ -66,3 +66,25 @@ void DigitalOut::activateAllOuts(void* /*context*/) {
 
 	}
 }
+
+DigitalOuts* DigitalOuts::getInstance()
+{
+	static DigitalOuts* instance(0);
+
+	if (instance==0) {
+		instance = new DigitalOuts();
+	}
+	return instance;
+}
+
+DigitalOuts::~DigitalOuts() {
+}
+
+void DigitalOuts::sample() {
+	DigitalOut::activateAllOuts(0);
+}
+
+DigitalOuts::DigitalOuts()
+: ServoModule("DigitalOut", 0)
+	{
+}

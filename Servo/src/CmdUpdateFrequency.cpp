@@ -32,4 +32,3 @@ void CmdUpdateFrequency::calculateAfter()
 		freq = f;
 	}
 }
-

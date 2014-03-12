@@ -17,12 +17,12 @@
 
 Controller::Controller(ServoModule* pre)
 : ServoModule("Controller", pre)
+, motor(0)
+, devs(0)
 , prevPosError(0.0)
 , prevAngError(0.0)
 , relPosOffset(0.0)
 , sumError(0.0)
-, devs(0)
-, motor(0)
 {
 	enabled = createParameter("enabled", 0);
 	pos_sp = createParameter("pos_sp", 0);

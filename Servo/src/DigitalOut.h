@@ -11,6 +11,8 @@
 #include <map>
 #include <string>
 
+#include "ServoModule.h"
+
 class Parameter;
 
 class DigitalOut {
@@ -34,6 +36,17 @@ private:
 	Parameter* par;
 
 	static std::map<const std::string, DigitalOut*> instances;
+};
+
+class DigitalOuts: public ServoModule
+{
+public:
+	static DigitalOuts* getInstance();
+	virtual ~DigitalOuts();
+
+	virtual void sample();
+private:
+	DigitalOuts();
 };
 
 #endif /* DIGITALOUT_H_ */

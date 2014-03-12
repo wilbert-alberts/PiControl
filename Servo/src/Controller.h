@@ -14,6 +14,8 @@ class Devices;
 class Filter;
 class HPFilter;
 
+#include "ServoModule.h"
+
 #include <list>
 #include <random>
 
