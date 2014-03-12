@@ -10,21 +10,21 @@
 
 #include <string>
 
-#include "ServoModule.h"
-
 class Parameter;
 
-class Cmd_UpdateFrequency : public ServoModule {
+class Cmd_UpdateFrequency {
 public:
 	static Cmd_UpdateFrequency* getInstance();
 	virtual ~Cmd_UpdateFrequency();
 
-	virtual void sample();
+	static void execute(void*);
+	void execute();
 
 private:
 	Cmd_UpdateFrequency();
 	static Cmd_UpdateFrequency* instance;
 
+	double freq;
 	Parameter* par_frequency;
 };
 

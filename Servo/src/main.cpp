@@ -54,7 +54,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt = PeriodicTimer::getInstance(SERVOFREQUENCY );
 
 		TimeStats_Servo::initSample();
-		//Cmd_UpdateFrequency::execute(0);
+		Cmd_UpdateFrequency::execute(0);
 
 		db->unlock();
 
@@ -95,7 +95,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsCheckStop);
 		pt->addPeriodicFunction(PeriodicTimer::checkStop, 0);
 
-		Cmd_UpdateFrequency::getInstance(); //pt->addPeriodicFunction(Cmd_UpdateFrequency::execute,0);
+		pt->addPeriodicFunction(Cmd_UpdateFrequency::execute,0);
 
 		pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsEnd);
 		pt->addPeriodicFunction(unlockDB, db);
