@@ -87,7 +87,6 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(SPI::writeBus, spibus);
 
 		// Activate digital outs.
-		DigitalOuts::getInstance();
 		pt->addPeriodicFunction(DigitalOut::activateAllOuts, 0);
 
 		pt->addPeriodicFunction(TimeStats_Servo::takeTimeStamp, tsTracing);
