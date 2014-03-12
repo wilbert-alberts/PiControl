@@ -11,8 +11,6 @@
 #include <map>
 #include <string>
 
-#include "ServoModule.h"
-
 class Parameter;
 
 class DigitalIn {
@@ -35,16 +33,6 @@ private:
 	bool enabled;
 
 	static std::map<const std::string, DigitalIn*> instances;
-};
-
-class DigitalIns : public ServoModule
-{
-public:
-	static DigitalIns* getInstance();
-	virtual ~DigitalIns();
-	virtual void sample();
-private:
-	DigitalIns();
 };
 
 #endif /* DIGITALOUT_H_ */

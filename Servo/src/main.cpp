@@ -65,7 +65,6 @@ int main(int /*argc*/, char** /*argv[]*/) {
 
 		// add sample functions
 		// Start with capturing digital Ins
-		DigitalIns::getInstance();
 		pt->addPeriodicFunction(DigitalIn::captureAllIns, 0);
 
 		// Read Bitbus
