@@ -15,57 +15,49 @@
 #include <iostream>
 #include <cmath>
 
-Devices* Devices::instance=0;
+Devices::Devices(ServoModule* wrapped) :
+ServoModule("Devices", wrapped),
+		spi(0),
 
-Devices* Devices::getInstance()
-{
-	if (instance == 0)
-		instance = new Devices();
-	return instance;
-}
+		par_h1Ang(createParameter("h1Ang",0.0, h1Ang)),
+		par_h2Ang(createParameter("h2Ang",0.0, h2Ang)),
 
-Devices::Devices() :
-		spi(SPI::getInstance()), pt(PeriodicTimer::getInstance()),
+		par_h1AngGain(new Parameter("h1Ang_gain",1.0)),
+		par_h2AngGain(new Parameter("h2Ang_gain",1.0)),
 
-		par_h1Ang(createParameter("Dev.h1Ang",0.0, h1Ang)),
-		par_h2Ang(createParameter("Dev.h2Ang",0.0, h2Ang)),
+		par_h1AngOffset(new Parameter("h1Ang_offset",0.0)),
+		par_h2AngOffset(new Parameter("h2Ang_offset",0.0)),
 
-		par_h1AngGain(new Parameter("Dev.h1Ang_gain",1.0)),
-		par_h2AngGain(new Parameter("Dev.h2Ang_gain",1.0)),
-
-		par_h1AngOffset(new Parameter("Dev.h1Ang_offset",0.0)),
-		par_h2AngOffset(new Parameter("Dev.h2Ang_offset",0.0)),
-
-		par_rawAngle(createParameter("Dev.rawAngle",0.0, rawAngle)),
-		par_angle(createParameter("Dev.angle",0.0, angle)),
-		par_angleV(createParameter("Dev.angleV",0.0, angleV)),
-		par_angleA(createParameter("Dev.angleA",0.0, angleA)),
-		par_angleGain(createParameter("Dev.angleGain",1.0, angleGain)),
-		par_angleOffset(createParameter("Dev.angleOffset",0.0, angleOffset)),
+		par_rawAngle(createParameter("rawAngle",0.0, rawAngle)),
+		par_angle(createParameter("angle",0.0, angle)),
+		par_angleV(createParameter("angleV",0.0, angleV)),
+		par_angleA(createParameter("angleA",0.0, angleA)),
+		par_angleGain(createParameter("angleGain",1.0, angleGain)),
+		par_angleOffset(createParameter("angleOffset",0.0, angleOffset)),
 
 		prevRawPos(0), encPos(0),
 
-		par_rawPos(createParameter("Dev.rawPos",0.0, rawPos)),
-		par_pos(createParameter("Dev.pos",0.0, pos)),
-		par_posV(createParameter("Dev.posV",0.0, posV)),
-		par_posA(createParameter("Dev.posA",0.0, posA)),
-		par_posGain(createParameter("Dev.posGain",1.0, posGain)),
-		par_posOffset(createParameter("Dev.posOffset",0.0, posOffset)),
+		par_rawPos(createParameter("rawPos",0.0, rawPos)),
+		par_pos(createParameter("pos",0.0, pos)),
+		par_posV(createParameter("posV",0.0, posV)),
+		par_posA(createParameter("posA",0.0, posA)),
+		par_posGain(createParameter("posGain",1.0, posGain)),
+		par_posOffset(createParameter("posOffset",0.0, posOffset)),
 
-		par_rawGyro(createParameter("Dev.rawGyro",0.0, rawGyro)),
-		par_gyro(createParameter("Dev.gyro",0.0, gyro)),
-		par_gyroGain(createParameter("Dev.gyroGain",0.0, gyroGain)),
-		par_gyroOffset(createParameter("Dev.gyroOffset",0.0, gyroOffset)),
+		par_rawGyro(createParameter("rawGyro",0.0, rawGyro)),
+		par_gyro(createParameter("gyro",0.0, gyro)),
+		par_gyroGain(createParameter("gyroGain",0.0, gyroGain)),
+		par_gyroOffset(createParameter("gyroOffset",0.0, gyroOffset)),
 
-		par_nrIncrements(createParameter("Dev.nrIncrements",4096.0, nrIncrements)),
+		par_nrIncrements(createParameter("nrIncrements",4096.0, nrIncrements)),
 
-		par_voltage(createParameter("Dev.voltage",0.0, voltage)),
-		par_voltageGain(createParameter("Dev.voltageGain",1.0, voltageGain)),
-		par_voltageOffset(createParameter("Dev.voltageOffset",0.0, voltageOffset)),
+		par_voltage(createParameter("voltage",0.0, voltage)),
+		par_voltageGain(createParameter("voltageGain",1.0, voltageGain)),
+		par_voltageOffset(createParameter("voltageOffset",0.0, voltageOffset)),
 
-		par_dutycycle(createParameter("Dev.dutycycle",0.0, dutycycle)),
-		par_motordir(createParameter("Dev.motordir",1.0, motordir)),
-		par_oversampling(createParameter("Dev.oversampling",25.0, oversampling))
+		par_dutycycle(createParameter("dutycycle",0.0, dutycycle)),
+		par_motordir(createParameter("motordir",1.0, motordir)),
+		par_oversampling(createParameter("oversampling",25.0, oversampling))
 
 {
 }
@@ -122,8 +114,8 @@ void Devices::sampleAngle(double frequency) {
 	*par_angleA = angle_a[0];
 }
 
-void Devices::sample() {
-	double frequency = pt->getFrequency();
+void Devices::calculateBefore() {
+	double frequency = getPeriodicTimer()->getFrequency();
 
 	sampleAngle(frequency);
 	sampleGyro(frequency);
@@ -140,12 +132,6 @@ void Devices::sampleGyro(double /*frequency*/)
 	*par_rawGyro = rawGyro;
 	*par_gyro = gyro;
 
-}
-
-void Devices::sample(void* /*context*/) {
-	Devices* d = Devices::getInstance();
-
-	d->sample();
 }
 
 void Devices::samplePosition(double frequency) {
@@ -197,13 +183,9 @@ void Devices::sampleBattery()
 	*par_voltage = spi->getRegister(SPI::UBAT) * *par_voltageGain+ *par_voltageOffset;
 }
 
-void Devices::update(void* /*context*/) {
-	Devices* d = Devices::getInstance();
 
-	d->update();
-}
 
-void Devices::update() {
+void Devices::calculateAfter() {
 	updateDC();
 	spi->setRegister(SPI::OVERSAMPLING, *par_oversampling);
 }

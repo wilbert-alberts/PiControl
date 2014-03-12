@@ -10,32 +10,25 @@
 #include "SPI.h"
 #include "Devices.h"
 
+#include <assert.h>
 #include <iostream>
 #include <cmath>
 
-Motor* Motor::instance = 0;
 
-Motor* Motor::getInstance() {
-	if (instance == 0)
-		instance = new Motor();
-	return instance;
-}
-
-Motor::Motor()
-:	ndis(0.0, 1.0)
+Motor::Motor(ServoModule* sm)
+: ServoModule("Motor", sm)
+, devs(0)
 {
-	enabled = new Parameter("Motor.enabled",0);
+	enabled = createParameter("enabled",0);
 
-	t = new Parameter("Motor.torque",0.0);
-	ki = new Parameter("Motor.ki",0.0);
-	kv = new Parameter("Motor.kv",0.0);
-	rm = new Parameter("Motor.rm",0.0);
-	rotVelo = new Parameter("Motor.rotationalVelo",0.0);
-	dutycycle = new Parameter("Motor.dutycycle",0.0);
-	batVoltage = new Parameter("Motor.batVoltage",0.0);
-	motorCurrent = new Parameter("Motor.current",0.0);
-
-	devs = Devices::getInstance();
+	t = createParameter("torque",0.0);
+	ki = createParameter("ki",0.0);
+	kv = createParameter("kv",0.0);
+	rm = createParameter("rm",0.0);
+	rotVelo = createParameter("rotationalVelo",0.0);
+	dutycycle = createParameter("dutycycle",0.0);
+	batVoltage = createParameter("batVoltage",0.0);
+	motorCurrent = createParameter("current",0.0);
 }
 
 Motor::~Motor() {
@@ -44,10 +37,11 @@ Motor::~Motor() {
 
 void Motor::setTorque(double tq) {
 	*t = tq;
-	//t->set(tq);
 }
 
-void Motor::sample() {
+void Motor::calculateAfter() {
+	assert(devs!=0);
+
 	// Calculate rotational velocity
 	double rvel = devs->getDeviceValue(Devices::posV);
 	double nrIncs = devs->getDeviceValue(Devices::nrIncrements);
@@ -75,7 +69,3 @@ void Motor::sample() {
 	}
 }
 
-void Motor::sample(void* context) {
-	Motor* me = static_cast<Motor*>(context);
-	me->sample();
-}

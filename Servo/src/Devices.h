@@ -11,6 +11,8 @@
 #include <map>
 #include <string>
 
+#include "ServoModule.h"
+
 class Parameter;
 class SPI;
 class PeriodicTimer;
@@ -29,15 +31,14 @@ enum DeviceID {
 } ;
 */
 
-class Devices {
+class Devices: public ServoModule {
 public:
-	static Devices* getInstance();
+	Devices(ServoModule* wrapped);
+
 	virtual ~Devices();
 
-	void sample();
-	static void sample(void* context);
-	void update();
-	static void update(void* context);
+	void calculateBefore();
+	void calculateAfter();
 
 	enum DeviceID {
 		h1Ang, h2Ang, rawAngle, angle, angleV, angleA, angleGain, angleOffset,
@@ -59,7 +60,6 @@ public:
 
 
 private:
-	Devices();
 	Parameter* createParameter(const std::string& n, double v, DeviceID id);
 	void sampleAngle(double frequency);
 	void samplePosition(double frequency);
@@ -71,8 +71,6 @@ private:
 	static Devices* instance;
 
 	SPI* spi;
-	PeriodicTimer* pt;
-
 	std::map<DeviceID, Parameter*> devices;
 
 	double angle_[3];

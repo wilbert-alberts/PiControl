@@ -8,24 +8,26 @@
 #ifndef SPI_H_
 #define SPI_H_
 
+#include "ServoModule.h"
+
 #include <string>
 #include <map>
+
+
 
 class BitBus;
 class DigitalOut;
 class DigitalIn;
 class Parameter;
 
-class SPI {
+class SPI: public ServoModule {
 public:
-	static SPI* getInstance();
+	SPI(ServoModule* wrapped);
 	virtual ~SPI();
 
-	void readBus();
-	void writeBus();
+	void calculateBefore();
+	void calculateAfter();
 
-	static void writeBus(void* context);
-	static void readBus(void* context);
 
 	double getRegister(int reg);
 	void   setRegister(int reg, double value);
@@ -43,9 +45,6 @@ public:
 
 
 private:
-	static SPI* instance;
-	SPI();
-
 	void waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs);
 	void createRegister(int id, const std::string& n, int start, int length);
 	void copyFromParameters();

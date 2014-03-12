@@ -13,35 +13,23 @@
 
 #include <iostream>
 
-Cmd_UpdateFrequency* Cmd_UpdateFrequency::instance = 0;
-
-Cmd_UpdateFrequency* Cmd_UpdateFrequency::getInstance()
+CmdUpdateFrequency::CmdUpdateFrequency(ServoModule* predecessor)
+: ServoModule("CmdUpdateFrequency", predecessor)
+, freq(0.0)
 {
-	if (instance == 0)
-		instance = new Cmd_UpdateFrequency();
-	return instance;
+	par_frequency = createParameter(TimeStats::par_frequency);
 }
 
-Cmd_UpdateFrequency::Cmd_UpdateFrequency() {
-	par_frequency = new Parameter(TimeStats::par_frequency,
-			PeriodicTimer::getInstance()->getFrequency());
+CmdUpdateFrequency::~CmdUpdateFrequency() {
 }
 
-Cmd_UpdateFrequency::~Cmd_UpdateFrequency() {
-}
 
-void Cmd_UpdateFrequency::execute()
+void CmdUpdateFrequency::calculateAfter()
 {
 	double f = *par_frequency;
-	//std::clog << "frequency: " << f << std::endl;
 	if (f!=freq) {
-		PeriodicTimer::getInstance()->updateFrequency(f);
+		getPeriodicTimer()->updateFrequency(f);
 		freq = f;
 	}
 }
 
-void Cmd_UpdateFrequency::execute(void* /* context */ )
-{
-	Cmd_UpdateFrequency* c = Cmd_UpdateFrequency::getInstance();
-	c->execute();
-}

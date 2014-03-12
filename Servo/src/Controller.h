@@ -17,17 +17,24 @@ class HPFilter;
 #include <list>
 #include <random>
 
+#include "ServoModule.h"
 
-class Controller {
+class Controller : public ServoModule {
 public:
-	static Controller* getInstance();
+	Controller(ServoModule* pre);
 	virtual ~Controller();
 
-	static void sample(void* context);
-	void sample();
+	void calculateAfter();
+
+	void setDevices(Devices* devs) {
+		this->devs = devs;
+	}
+
+	void setMotor(Motor* motor) {
+		this->motor = motor;
+	}
 
 private:
-	Controller();
 	void calculateModel();
 	bool mmdcSafe();
 	void disableController();
@@ -80,8 +87,9 @@ private:
 	Parameter* noiseSample;
 
 	Motor* motor;
-	bool updateActualPosition;
 	Devices* devs;
+
+	bool updateActualPosition;
 
 	double prevPosError;
 	double prevAngError;

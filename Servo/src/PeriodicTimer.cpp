@@ -15,91 +15,90 @@
 #include <system_error>
 #include <stdexcept>
 
+#include "TimespecConverter.h"
 #include "PeriodicTimer.h"
-#include "Parameter.h"
+#include "Statistics.h"
 
-PeriodicTimer* PeriodicTimer::instance = 0;
-
-PeriodicTimer* PeriodicTimer::getInstance(double f) {
-	if (instance == 0) {
-		instance = new PeriodicTimer(f);
-	} else {
-		if (instance->frequency != f)
-			instance->updateFrequency(f);
-	}
-	return instance;
-}
-
-PeriodicTimer* PeriodicTimer::getInstance() {
-	if (instance == 0)
-		return getInstance(1.0);
-	return instance;
-}
-
-PeriodicTimer::PeriodicTimer(double f) :
-		timer_fd(0), frequency(f), wakeups_missed(0), margin(0), minMargin(0), maxMargin(
-				1000000 * f), stopped(false) {
-	par_stopRunning = new Parameter("PeriodicTimer.stopRunning", 0);
+PeriodicTimer::PeriodicTimer(double f)
+: frequency(f)
+, timer_fd(0)
+, stopped(false)
+, marginStats(new Statistics())
+, nrOverruns(0)
+, prevPeriodDuration(0.0)
+{
+	marginStats = new Statistics();
 }
 
 PeriodicTimer::~PeriodicTimer() {
-
+	delete marginStats;
 }
 
-void PeriodicTimer::addPeriodicFunction(PeriodicFunction pf, void* context) {
-	CallbackContext c(pf, context);
-	callbacks.push_back(c);
+void PeriodicTimer::addCallback(PeriodicTimerCB* cb) {
+	callbacks.push_back(cb);
 }
 
-void PeriodicTimer::setupTimer(unsigned int periodInUs) {
+void PeriodicTimer::setupTimer(double frequency) {
 	int ret;
-	unsigned int ns;
-	unsigned int sec;
-	struct itimerspec itval;
+	double period = 1.0/frequency;
+	struct timespec timespec;
+	struct itimerspec timerspec;
+
+	/* Reset timer statistics */
+	marginStats->reset();
 
 	/* Create the timer */
 	timer_fd = timerfd_create(CLOCK_MONOTONIC, 0);
-	wakeups_missed = 0;
 	if (timer_fd == -1) {
 		throw std::system_error(errno, std::system_category(),
 				"unable to create timer");
 	}
+
+	secondsToTimespec(&timespec, period);
+	timerspec.it_interval = timespec;
+	timerspec.it_value = timespec;
+
 	/* Make the timer periodic */
-	sec = periodInUs / 1000000;
-	ns = (periodInUs - (sec * 1000000)) * 1000;
-	itval.it_interval.tv_sec = sec;
-	itval.it_interval.tv_nsec = ns;
-	itval.it_value.tv_sec = sec;
-	itval.it_value.tv_nsec = ns;
-	ret = timerfd_settime(timer_fd, 0, &itval, NULL);
+	ret = timerfd_settime(timer_fd, 0, &timerspec, NULL);
 	if (ret == -1) {
 		throw std::system_error(errno, std::system_category(),
 				"unable to start timer");
 	}
 }
 
+double PeriodicTimer::getTime() const {
+	int ret;
+	struct itimerspec timerspec;
+	double period = 1.0/frequency;
+
+	ret = timerfd_gettime(timer_fd, &timerspec);
+	if (ret == -1) {
+		perror("getTime");
+		return -1.0;
+	}
+	return period - timespecToSeconds(&timerspec.it_value);
+}
+
 void PeriodicTimer::start() {
 
-	/* Create the timer */
 	stopped = false;
-	setupTimer(static_cast<unsigned int>(1000000 * frequency));
+	marginStats->reset();
+	setupTimer(frequency);
 	while (!stopped) {
-		for (std::vector<CallbackContext>::iterator iter = callbacks.begin();
+		for (std::vector<PeriodicTimerCB*>::iterator iter = callbacks.begin();
 				iter != callbacks.end(); iter++) {
-			PeriodicFunction pf = (*iter).first;
-			void* context = (*iter).second;
-			pf(context);
+			(*iter)->sample(this);
 		}
-		updateStats();
-		//std::cout << "." << std::endl;
+		marginStats->sample(getTime());
+		prevPeriodDuration = getTime();
 		wait();
 	}
 	close(timer_fd);
 }
 
-void PeriodicTimer::checkStop(void* /*context*/) {
-	PeriodicTimer* me = PeriodicTimer::getInstance();
-	me->stopped = me->par_stopRunning->get() != 0.0;
+void PeriodicTimer::stop()
+{
+	stopped = true;
 }
 
 void PeriodicTimer::wait() {
@@ -116,80 +115,42 @@ void PeriodicTimer::wait() {
 
 	/* "missed" should always be >= 1, but just to be sure, check it is not 0 anyway */
 	if (missed > 0)
-		wakeups_missed += (missed - 1);
+		nrOverruns += (missed - 1);
 }
 
-unsigned int PeriodicTimer::getNrOverruns() {
-	return wakeups_missed;
+unsigned long long PeriodicTimer::getNrOverruns() const {
+	return nrOverruns;
 }
 
-double PeriodicTimer::getFrequency() {
+double PeriodicTimer::getFrequency() const {
 	return frequency;
 }
 
 void PeriodicTimer::updateStats() {
-	static struct itimerspec m;
-	int ret = timerfd_gettime(timer_fd, &m);
-	if (ret == -1) {
-		perror("Reading margin");
-	}
-	margin = m.it_value.tv_nsec / 1000;
-	minMargin = margin < minMargin ? margin : minMargin;
-	maxMargin = margin > maxMargin ? margin : maxMargin;
+	double time = getTime();
+
+	marginStats->sample(time);
 }
 
 void PeriodicTimer::updateFrequency(double frequency) {
-	unsigned int ns;
-	unsigned int sec;
+	struct timespec ts;
 	struct itimerspec itval;
 
-	int p = 1000000 / frequency;
+	double period = 1.0 / frequency;
 	int ret;
 
+	marginStats->reset();
 	if (timer_fd != 0) {
-		sec = p / 1000000;
-		ns = (p - (sec * 1000000)) * 1000;
-		itval.it_interval.tv_sec = sec;
-		itval.it_interval.tv_nsec = ns;
-		itval.it_value.tv_sec = sec;
-		itval.it_value.tv_nsec = ns;
+		secondsToTimespec(&ts, period);
+		itval.it_interval = ts;
+		itval.it_value = ts;
+
 		ret = timerfd_settime(timer_fd, 0, &itval, NULL);
 		if (ret == -1) {
 			throw std::system_error(errno, std::system_category(),
 					"unable to update timer");
 		}
 	}
-	resetStats();
 }
 
-unsigned int PeriodicTimer::getTimeElapsed() {
-	static struct itimerspec m;
-	int ret = timerfd_gettime(timer_fd, &m);
-	if (ret == -1) {
-		perror("Reading margin");
-	}
-	return (1000000 * frequency) - m.it_value.tv_nsec / 1000;
-}
 
-unsigned int PeriodicTimer::getMargin() {
-	return margin;
-}
-
-unsigned int PeriodicTimer::getMinMargin() {
-	return minMargin;
-}
-
-unsigned int PeriodicTimer::getMaxMargin() {
-	return maxMargin;
-}
-
-unsigned int PeriodicTimer::getPeriod() {
-	return static_cast<unsigned int>(1000000 * frequency);
-}
-
-void PeriodicTimer::resetStats() {
-	margin = getPeriod();
-	minMargin = getPeriod();
-	maxMargin = 0;
-	wakeups_missed = 0;
-}

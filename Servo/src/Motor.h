@@ -8,24 +8,28 @@
 #ifndef MOTOR_H_
 #define MOTOR_H_
 
+#include "ServoModule.h"
+
 class Parameter;
 class DigitalOut;
 class Devices;
 
-#include <random>
 
-class Motor {
+
+class Motor : public ServoModule {
 public:
-	static Motor* getInstance();
+	Motor(ServoModule* predecessor);
+
 	virtual ~Motor();
 
 	void setTorque(double torque);
-	static void sample(void* context);
-	void sample();
+	void calculateAfter();
+
+	void setDevices(Devices* devs) {
+		this->devs = devs;
+	}
 
 private:
-	Motor();
-	double doInject(double dc);
 
 	Devices* devs;
 
@@ -41,14 +45,6 @@ private:
 	Parameter*  batVoltage;
 	Parameter*  motorCurrent;
 
-	std::default_random_engine generator;
-	std::normal_distribution<double> ndis;
-	Parameter* injAmpl;
-	Parameter* injFreq;
-	Parameter* noiseSample;
-
-
-	static Motor* instance;
 };
 
 #endif /* MOTOR_H_ */

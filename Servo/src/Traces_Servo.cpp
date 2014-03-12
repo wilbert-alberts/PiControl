@@ -29,44 +29,39 @@
 #include "Parameter.h"
 
 
-Traces_Servo* Traces_Servo::instance = 0;
-
 const int   PORTNR   = 9786;
 const char* HOSTNAME = "localhost";
 const char* TRACEENVVAR = "PITRACER";
 
 
-Traces_Servo* Traces_Servo::getInstance()
-{
-  if (instance == 0) {
-    instance = new Traces_Servo();
-  }
-
-  return instance;
-}
-
-Traces_Servo::Traces_Servo()
-: sampleCounter(0)
+Traces_Servo::Traces_Servo(ServoModule* predecessor)
+: ServoModule("Tracer", predecessor)
+, sampleCounter(0)
 , streaming(false)
-, par_sampleCounter(new Parameter("Traces.sampleCounter"))
-, par_streaming(new Parameter("Traces.streaming"))
+, sockfd(0)
+, par_sampleCounter(createParameter("sampleCounter"))
+, par_streaming(createParameter("streaming"))
 {
 	Traces* t = Traces::getInstance();
 	t->reset();
 }
 
-void Traces_Servo::sampleAllTraces(void* /*context*/)
+Traces_Servo::~Traces_Servo()
 {
-  Traces_Servo* instance = Traces_Servo::getInstance();
+
+}
+
+void Traces_Servo::calculate()
+{
   Traces*  traces = Traces::getInstance();
   TraceMsg msg;
 
-  instance->reopenStream();
+  reopenStream();
   traces->sample(&msg);
-  instance->sampleCounter++;
-  instance->sendMessage(&msg);
+  sampleCounter++;
+  sendMessage(&msg);
 
-  *instance->par_sampleCounter = (double)instance->sampleCounter;
+  *par_sampleCounter = (double)sampleCounter;
 }
 
 void Traces_Servo::abortStreaming(const std::string& msg)
