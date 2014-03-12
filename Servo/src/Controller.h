@@ -14,18 +14,17 @@ class Devices;
 class Filter;
 class HPFilter;
 
-#include "ServoModule.h"
-
 #include <list>
 #include <random>
 
 
-class Controller : public ServoModule {
+class Controller {
 public:
 	static Controller* getInstance();
 	virtual ~Controller();
 
-	virtual void sample();
+	static void sample(void* context);
+	void sample();
 
 private:
 	Controller();

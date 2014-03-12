@@ -50,6 +50,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		Parameter* tsCheckStop = new Parameter("TimeStats.checkStop", 0.0);
 
 		SPI* spibus(SPI::getInstance());
+		Motor* motor(Motor::getInstance());
 		pt = PeriodicTimer::getInstance(SERVOFREQUENCY );
 
 		TimeStats_Servo::initSample();
@@ -74,7 +75,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		pt->addPeriodicFunction(Devices::sample, 0);
 
 		// Run servo
-		Controller::getInstance();
+		pt->addPeriodicFunction(Controller::sample,0);
 
 		// Run motor model
 		Motor::getInstance();

@@ -14,59 +14,58 @@
 #include "Filter.h"
 
 
-Controller* Controller::getInstance() {
-	static Controller* instance(0);
+Controller* Controller::instance = 0;
 
+Controller* Controller::getInstance() {
 	if (instance == 0)
 		instance = new Controller();
 	return instance;
 }
 
 Controller::Controller()
-: ServoModule("Controller" , 0)
-, prevPosError(0.0)
+: prevPosError(0.0)
 , prevAngError(0.0)
 , relPosOffset(0.0)
 , sumError(0.0)
 {
-	enabled = createParameter("enabled");
-	pos_sp = createParameter("pos_sp");
-	pos_kp = createParameter("pos_kp");
-	pos_kd = createParameter("pos_kd");
-	pos_ki = createParameter("pos_ki");
+	enabled = new Parameter("Controller.enabled", 0);
+	pos_sp = new Parameter("Controller.pos_sp", 0);
+	pos_kp = new Parameter("Controller.pos_kp", 0);
+	pos_kd = new Parameter("Controller.pos_kd", 0);
+	pos_ki = new Parameter("Controller.pos_ki", 0);
 
-	ang_sp_kp = createParameter("ang_sp_kp");
+	ang_sp_kp = new Parameter("Controller.ang_sp_kp", 0);
 
-	ang_sp = createParameter("ang_sp");
-	ang_kp = createParameter("ang_kp");
-	ang_kd = createParameter("ang_kd");
-	ang_ki = createParameter("ang_ki");
+	ang_sp = new Parameter("Controller.ang_sp", 0);
+	ang_kp = new Parameter("Controller.ang_kp", 0);
+	ang_kd = new Parameter("Controller.ang_kd", 0);
+	ang_ki = new Parameter("Controller.ang_ki", 0);
 
 
-	angErrorParam = createParameter("angError");
-	posErrorParam = createParameter("posError");
+	angErrorParam = new Parameter("Controller.angError", 0);
+	posErrorParam = new Parameter("Controller.posError", 0);
 
-	co_poskp = createParameter("co_poskp");
-	co_poskd = createParameter("co_poskd");
-	co_poski = createParameter("co_poski");
-	co_angkp = createParameter("co_angkp");
-	co_angkd = createParameter("co_angkd");
+	co_poskp = new Parameter("Controller.co_poskp", 0);
+	co_poskd = new Parameter("Controller.co_poskd", 0);
+	co_poski = new Parameter("Controller.co_poski", 0);
+	co_angkp = new Parameter("Controller.co_angkp", 0);
+	co_angkd = new Parameter("Controller.co_angkd", 0);
 
-	vang_flt = createParameter("angV_flt");
-	ang_flt  = createParameter("ang_flt");
+	vang_flt = new Parameter("Controller.angV_flt", 0);
+	ang_flt  = new Parameter("Controller.ang_flt", 0);
 
-	vang_raw = createParameter("angV_raw");
-	ang_raw  = createParameter("ang_raw");
+	vang_raw = new Parameter("Controller.angV_raw", 0);
+	ang_raw  = new Parameter("Controller.ang_raw", 0);
 
-	pos_flt  = createParameter("pos_flt");
-	pos_raw  = createParameter("pos_raw");
+	pos_flt  = new Parameter("Controller.pos_flt", 0);
+	pos_raw  = new Parameter("Controller.pos_raw", 0);
 
-	mmdcMinAng = createParameter("minAng", -100);
-	mmdcMaxAng = createParameter("maxAng",  100);
+	mmdcMinAng = new Parameter("Controller.minAng", -100);
+	mmdcMaxAng = new Parameter("Controller.maxAng",  100);
 
-	injAmpl = createParameter("inj_ampl");
-	injFreq = createParameter("inj_freq", 0.5);
-	noiseSample = createParameter("noise");
+	injAmpl = new Parameter("Motor.inj_ampl", 0.0);
+	injFreq = new Parameter("Motor.inj_freq", 0.5);
+	noiseSample = new Parameter("Motor.noise", 0.0);
 
 	flt_pos = new Filter("pos", 3);
 	flt_ang = new Filter("ang", 3);
@@ -233,3 +232,7 @@ double Controller::filterDevice(HPFilter* f, double i)
 	return f->calculate(i);
 }
 
+void Controller::sample(void* /* context */) {
+	Controller* me = Controller::getInstance(); // static_cast<Controller*>(context);
+	me->sample();
+}
