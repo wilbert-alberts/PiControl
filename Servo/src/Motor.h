@@ -12,19 +12,16 @@ class Parameter;
 class DigitalOut;
 class Devices;
 
-#include "ServoModule.h"
-
 #include <random>
 
-class Motor : public ServoModule {
+class Motor {
 public:
 	static Motor* getInstance();
 	virtual ~Motor();
 
-	virtual void sample();
-
 	void setTorque(double torque);
-
+	static void sample(void* context);
+	void sample();
 
 private:
 	Motor();
