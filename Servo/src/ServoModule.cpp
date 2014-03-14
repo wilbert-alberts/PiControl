@@ -19,23 +19,28 @@ ServoModule::ServoModule(const std::string& _id, ServoModule* _other)
 , tsEnd1(createParameter(id+"1.tsEnd"))
 , tsStart2(createParameter(id+"2.tsStart"))
 , tsEnd2(createParameter(id+"2.tsEnd"))
+, measureTiming(0)
 {
 }
 
 ServoModule::~ServoModule() {
 }
 
-void ServoModule::sample(PeriodicTimer* pt)
-{
+void ServoModule::sample(PeriodicTimer* pt) {
 	this->pt = pt;
-	*tsStart1 = pt->getTime();
+
+	if (measureTiming)
+		*tsStart1 = pt->getTime();
 	calculateBefore();
 	*tsEnd1 = pt->getTime();
-	if (other!=0)
+
+	if (other != 0)
 		other->sample(pt);
+
 	*tsStart2 = pt->getTime();
 	calculateAfter();
-	*tsEnd2 = pt->getTime();
+	if (measureTiming)
+		*tsEnd2 = pt->getTime();
 }
 
 void ServoModule::calculateBefore()

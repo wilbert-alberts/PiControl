@@ -35,6 +35,9 @@ public:
 	DigitalIn* createDigitalIn(const std::string& id, int pin);
 	DigitalOut* createDigitalOut(const std::string& id, int pin, int value);
 
+	void disableTiming() { measureTiming = false; }
+	void enableTiming() { measureTiming = false; }
+
 	PeriodicTimer* getPeriodicTimer() {
 		return pt;
 	}
@@ -48,6 +51,8 @@ private:
 	Parameter* tsEnd1;
 	Parameter* tsStart2;
 	Parameter* tsEnd2;
+
+	bool measureTiming;
 };
 
 #endif /* SERVOMODULE_H_ */
