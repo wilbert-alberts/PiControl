@@ -23,6 +23,7 @@ void CmdServer::displayHelp(std::ostream& out)
 {
 	out << "Usage: " << getName() << std::endl;
 	out << "\tStarts interactive server session over stdin/stdout" << std::endl;
+	out << "\tExit by entering 'exit' or an empty line" << std::endl;
 }
 
 virtual void CmdServer::execute(std::ostream& output)
@@ -33,11 +34,11 @@ virtual void CmdServer::execute(std::ostream& output)
 		std::cin.getline(lineBuffer, 255);
 		std::string line(lineBuffer);
 
-		if (!exitCommand(line))
-			std::stringstream inargs(line);
+		if (exitCommand(line))
+			return;
 
-			processor->processCommand(inargs, output);
-		}
+		std::stringstream inargs(line);
+		processor->processCommand(inargs, output);
 	}
 }
 
