@@ -40,6 +40,8 @@ public:
 	void calculateBefore();
 	void calculateAfter();
 
+	void setSPI(SPI* s) { spi = s; }
+
 	enum DeviceID {
 		h1Ang, h2Ang, rawAngle, angle, angleV, angleA, angleGain, angleOffset,
 

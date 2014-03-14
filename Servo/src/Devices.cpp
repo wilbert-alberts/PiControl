@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <cmath>
+#include <cassert>
 
 Devices::Devices(ServoModule* wrapped) :
 ServoModule("Devices", wrapped),
@@ -115,6 +116,7 @@ void Devices::sampleAngle(double frequency) {
 }
 
 void Devices::calculateBefore() {
+	assert(spi!=0);
 	double frequency = getPeriodicTimer()->getFrequency();
 
 	sampleAngle(frequency);
