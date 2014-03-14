@@ -11,6 +11,7 @@
 #include <Command.h>
 
 #include <iostream>
+#include <string>
 
 #define DEFAULTPORTNUMBER (9988)
 
@@ -26,7 +27,9 @@ private:
 	void setupServer(int port);
 	std::string getRequest();
 	void sendReply(const std::string& reply);
-	bool exitCommand(const std::string& line) {
+	bool exitCommand(const std::string& line);
+
+	int clientSockfd;
 };
 
 #endif /* CMDREMOTESERVER_H_ */

@@ -9,7 +9,7 @@
 #define CMDSERVER_H_
 
 #include <Command.h>
-#include
+#include <string>
 
 class CmdServer: public Command {
 public:
@@ -20,7 +20,7 @@ public:
 	virtual void execute(std::ostream& output);
 
 private:
-	bool exitCommand(const std::string& line) {
+	bool exitCommand(const std::string& line);
 };
 
 #endif /* CMDSERVER_H_ */

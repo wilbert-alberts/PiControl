@@ -67,17 +67,17 @@ void CommandProcessor::processCommand(int argc, char* argv[])
 	commando->perform(streamArgs, std::cout);
 }
 
-void CommandProcessor::processCommand(istream& args, ostream& results)
+void CommandProcessor::processCommand(std::istream& args, std::ostream& results)
 {
 	std::string cmd;
 	args >> cmd;
 
-	if (args.length>0) {
+	if (cmd.length()>0) {
 		if (commands.find(cmd) == commands.end()) {
 			throw std::runtime_error("unknown command " + cmd);
 		}
 		Command* commando =commands[cmd];
-		commando->perform(args, std::cout);
+		commando->perform(args, results);
 	}
 	else {
 		throw std::runtime_error("No command found" + cmd);

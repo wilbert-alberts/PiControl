@@ -6,11 +6,15 @@
  */
 
 #include "CmdServer.h"
+#include "CommandProcessor.h"
 
 #include <string>
 #include <sstream>
+#include <iostream>
 
-CmdServer::CmdServer() {
+CmdServer::CmdServer()
+: Command("server")
+{
 	// TODO Auto-generated constructor stub
 
 }
@@ -26,10 +30,10 @@ void CmdServer::displayHelp(std::ostream& out)
 	out << "\tExit by entering 'exit' or an empty line" << std::endl;
 }
 
-virtual void CmdServer::execute(std::ostream& output)
+void CmdServer::execute(std::ostream& output)
 {
 	CommandProcessor* processor = CommandProcessor::getInstance();
-	while() {
+	while(true) {
 		char lineBuffer[255];
 		std::cin.getline(lineBuffer, 255);
 		std::string line(lineBuffer);

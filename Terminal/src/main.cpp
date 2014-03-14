@@ -18,6 +18,8 @@
 #include "CmdDumpAllParams.h"
 #include "CmdParameter.h"
 #include "CmdConfigFilter.h"
+#include "CmdServer.h"
+#include "CmdRemoteServer.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -60,5 +62,6 @@ void registerCommands() {
 	new CmdDumpAllParams();
 	new CmdConfigFilter();
 	new CmdServer();
+	new CmdRemoteServer();
 	CmdParameter::createParameterCommands();
 }
