@@ -7,9 +7,9 @@
 
 #include "DoubleBuffer.h"
 #include "Parameter.h"
-#include "StopTimer.h"
 
 #include "CommandProcessor.h"
+#include "CmdStopTimer.h"
 #include "CmdHelp.h"
 #include "CmdDumpTraces.h"
 #include "CmdTracing.h"
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
 
 void registerCommands() {
 	new CmdHelp();
-	new StopTimer();
+	new Cmd_StopTimer();
 	new CmdDumpTraces();
 	new CmdAddTrace();
 	new CmdDelTrace();

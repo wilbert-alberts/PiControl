@@ -14,8 +14,8 @@ class CmdResetTimeStats: Command {
 public:
 	CmdResetTimeStats();
 	virtual ~CmdResetTimeStats();
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& output);
+	virtual void execute(std::ostream& output);
 };
 
 #endif /* CMDRESETTIMESTATS_H_ */

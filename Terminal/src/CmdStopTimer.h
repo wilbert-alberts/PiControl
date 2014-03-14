@@ -13,13 +13,13 @@
 #include <list>
 #include <string>
 
-class StopTimer: Command {
+class Cmd_StopTimer: Command {
 public:
-	StopTimer();
-	virtual ~StopTimer();
+	Cmd_StopTimer();
+	virtual ~Cmd_StopTimer();
 
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& output);
+	virtual void execute(std::ostream& output);
 };
 
 #endif /* STOPTIMER_H_ */

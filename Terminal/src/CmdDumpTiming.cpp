@@ -20,17 +20,13 @@ CmdDumpTiming::CmdDumpTiming() :
 CmdDumpTiming::~CmdDumpTiming() {
 }
 
-void CmdDumpTiming::displayHelp()
+void CmdDumpTiming::displayHelp(std::ostream& out)
 {
-	std::cout << "Usage: " << getName() << std::endl;
-	std::cout << "\tShow timing statistics." << std::endl;
+	out << "Usage: " << getName() << std::endl;
+	out << "\tShow timing statistics." << std::endl;
 }
 
-void CmdDumpTiming::execute(std::list<std::string>& args) {
-	if (!args.empty()) {
-		displayHelp();
-	}
-
+void CmdDumpTiming::execute(std::ostream& output) {
 	Parameter* minMargin;
 	Parameter* maxMargin;
 	Parameter* margin;
@@ -41,7 +37,7 @@ void CmdDumpTiming::execute(std::list<std::string>& args) {
 	margin = new Parameter(TimeStats::par_margin,0.0);
 	frequency= new Parameter(TimeStats::par_frequency,0.0);
 
-	std::cout << "frequency: " << *frequency << "Hz (period: " << 1.0 / *frequency<< " seconds)" << std::endl;
+	output << "frequency: " << *frequency << "Hz (period: " << 1.0 / *frequency<< " seconds)" << std::endl;
 
 
 	unsigned int periodInUs = 1000000 / *frequency;
@@ -50,8 +46,8 @@ void CmdDumpTiming::execute(std::list<std::string>& args) {
 	unsigned int largestPeriod = periodInUs - *minMargin;
 
 
-	std::cout << "actual period:   " << actualPeriod/1000.0 << "ms ("<< 100.0*actualPeriod/periodInUs << "%)" << std::endl;
-	std::cout << "largest period:  " << largestPeriod/1000.0 << "ms ("<< 100.0*largestPeriod/periodInUs << "%)" << std::endl;
-	std::cout << "smallest period: " << smallestPeriod/1000.0 << "ms ("<< 100.0*smallestPeriod/periodInUs << "%)" << std::endl;
+	output << "actual period:   " << actualPeriod/1000.0 << "ms ("<< 100.0*actualPeriod/periodInUs << "%)" << std::endl;
+	output << "largest period:  " << largestPeriod/1000.0 << "ms ("<< 100.0*largestPeriod/periodInUs << "%)" << std::endl;
+	output << "smallest period: " << smallestPeriod/1000.0 << "ms ("<< 100.0*smallestPeriod/periodInUs << "%)" << std::endl;
 }
 

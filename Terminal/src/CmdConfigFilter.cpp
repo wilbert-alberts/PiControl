@@ -25,62 +25,28 @@ CmdConfigFilter::CmdConfigFilter() :
 CmdConfigFilter::~CmdConfigFilter() {
 }
 
-void CmdConfigFilter::displayHelp() {
-	std::cout << "Usage: " << getName() << " <filtername>  omega0, lambda "
+void CmdConfigFilter::displayHelp(std::ostream& out) {
+	out << "Usage: " << getName() << " <filtername>  omega0, lambda "
 			<< std::endl;
-	std::cout << "\tConfigure 2'nd order filter <filtername>." << std::endl;
+	out << "\tConfigure 2'nd order filter <filtername>." << std::endl;
 }
 
-void CmdConfigFilter::execute(std::list<std::string>& args)
+void CmdConfigFilter::execute(std::ostream& /*out*/)
 {
 	std::stringstream converter;
 	std::vector<double> a;
 	std::vector<double> b;
 
-	if (args.empty()) {
-		displayHelp();
-		return;
-	}
-
-	std::string name = args.front();
-	args.pop_front();
-
-	if (args.empty()) {
-		displayHelp();
-		return;
-	}
-
-	std::string o0 = args.front();
-	args.pop_front();
-
-	if (args.empty()) {
-		displayHelp();
-		return;
-	}
-
-	std::string l = args.front();
-	args.pop_front();
-
-	if (!args.empty()) {
-		displayHelp();
-		return;
-	}
-
-	double omega0;
-	double lambda;
+	std::string name = getNextArgumentAsString();
+	double omega0 = getNextArgumentAsDouble();
+	double lambda = getNextArgumentAsDouble();
 	double speriod = getSamplePeriod();
-
-	converter.str(l);
-	converter >> lambda;
-
-	converter.clear();
-	converter.str(o0);
-	converter >> omega0;
 
 	calculate(a,b, omega0, lambda, speriod);
 
 	setValues(name, a, b);
 }
+
 
 void CmdConfigFilter::calculate(std::vector<double>& a, std::vector<double>& b, double omega0, double lambda, double speriod)
 {

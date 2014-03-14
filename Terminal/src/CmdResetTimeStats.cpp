@@ -19,13 +19,11 @@ CmdResetTimeStats::CmdResetTimeStats() :
 
 CmdResetTimeStats::~CmdResetTimeStats() {}
 
-void CmdResetTimeStats::displayHelp() {
-	std::cout << "Usage: " << getName() << std::endl;
-	std::cout << "\tReset all timing statistics." << std::endl;
+void CmdResetTimeStats::displayHelp(std::ostream& output) {
+	output << "Usage: " << getName() << std::endl;
+	output << "\tReset all timing statistics." << std::endl;
 
 }
-void CmdResetTimeStats::execute(std::list<std::string>& /*args*/) {
+void CmdResetTimeStats::execute(std::ostream& /* output*/) {
 	Parameter* __attribute__ ((unused)) reset(new Parameter(TimeStats::par_reset,1.0));
-
-	std::cout << "OK" << std::endl;
 }

@@ -14,6 +14,7 @@
 #include <map>
 #include <stdexcept>
 #include <string>
+#include <sstream>
 
 CommandProcessor* CommandProcessor::instance=0;
 
@@ -32,8 +33,8 @@ CommandProcessor* CommandProcessor::getInstance()
 
 void CommandProcessor::processCommand(int argc, char* argv[])
 {
-	std::list<std::string> args;
 	std::string cmd(strrchr(argv[0], '/')+1);
+	std::stringstream streamArgs;
 	CommandProcessor* inst = CommandProcessor::getInstance();
 
 	// In case command is invoked via Terminal, extrace
@@ -59,12 +60,12 @@ void CommandProcessor::processCommand(int argc, char* argv[])
 
 	// Create stream holding arguments.
 	while (argc>0) {
-		args.push_back(argv[0]);
+		streamArgs << argv[0] << ' ';
 		argv++;
 		argc--;
 	}
 	Command* commando =inst->commands[cmd];
-	commando->execute(args);
+	commando->perform(streamArgs, std::cout);
 }
 
 void CommandProcessor::registerCommand(Command* cmd)
