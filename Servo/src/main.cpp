@@ -52,11 +52,13 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		CmdUpdateFrequency* cmdUpdateFreq = new CmdUpdateFrequency(cmdCheckStop);
 		DBLocker* dblocker = new DBLocker(cmdUpdateFreq);
 
-		pt->addCallback(dblocker);
-
+		dblocker->setDoubleBuffer(db);
 		motor->setDevices(devices);
 		controller->setDevices(devices);
 		controller->setMotor(motor);
+		devices->setSPI(spi);
+
+		pt->addCallback(dblocker);
 
 		db->unlock();
 		pt->start();
