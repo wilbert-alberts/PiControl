@@ -23,6 +23,8 @@ public:
 	virtual ~CommandProcessor();
 
 	void processCommand(int argc, char* argv[]);
+	void processCommand(istream& args, ostream& results);
+
 	void registerCommand(Command* cmd);
 	Command* lookupCommand(const std::string& cmd);
 	void retrieveAllCommands(std::vector<Command*>& commands);

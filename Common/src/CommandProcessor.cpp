@@ -35,9 +35,8 @@ void CommandProcessor::processCommand(int argc, char* argv[])
 {
 	std::string cmd(strrchr(argv[0], '/')+1);
 	std::stringstream streamArgs;
-	CommandProcessor* inst = CommandProcessor::getInstance();
 
-	// In case command is invoked via Terminal, extrace
+	// In case command is invoked via Terminal, extract
 	// real command by looking to next argument.
 	if ((cmd == "Terminal") && (argc ==1)) {
 		throw std::runtime_error("Terminal requires at least one argument");
@@ -49,7 +48,7 @@ void CommandProcessor::processCommand(int argc, char* argv[])
 		cmd = argv[0];
 	}
 
-	if (inst->commands.find(cmd) == inst->commands.end()) {
+	if (commands.find(cmd) == commands.end()) {
 		throw std::runtime_error("unknown command " + cmd);
 	}
 
@@ -64,8 +63,25 @@ void CommandProcessor::processCommand(int argc, char* argv[])
 		argv++;
 		argc--;
 	}
-	Command* commando =inst->commands[cmd];
+	Command* commando =commands[cmd];
 	commando->perform(streamArgs, std::cout);
+}
+
+void CommandProcessor::processCommand(istream& args, ostream& results)
+{
+	std::string cmd;
+	args >> cmd;
+
+	if (args.length>0) {
+		if (commands.find(cmd) == commands.end()) {
+			throw std::runtime_error("unknown command " + cmd);
+		}
+		Command* commando =commands[cmd];
+		commando->perform(args, std::cout);
+	}
+	else {
+		throw std::runtime_error("No command found" + cmd);
+	}
 }
 
 void CommandProcessor::registerCommand(Command* cmd)

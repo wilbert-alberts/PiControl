@@ -59,5 +59,6 @@ void registerCommands() {
 	new CmdDumpTiming();
 	new CmdDumpAllParams();
 	new CmdConfigFilter();
+	new CmdServer();
 	CmdParameter::createParameterCommands();
 }
