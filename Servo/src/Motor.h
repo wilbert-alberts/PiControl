@@ -14,11 +14,9 @@ class Parameter;
 class DigitalOut;
 class Devices;
 
-#include "ServoModule.h"
-
 #include <random>
 
-class Motor : public ServoModule {
+class Motor: public ServoModule {
 public:
 	Motor(ServoModule* predecessor);
 

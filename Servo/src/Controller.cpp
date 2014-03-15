@@ -56,8 +56,8 @@ Controller::Controller(ServoModule* pre)
 	pos_flt  = createParameter("pos_flt", 0);
 	pos_raw  = createParameter("pos_raw", 0);
 
-	mmdcMinAng = createParameter("minAng", -100);
-	mmdcMaxAng = createParameter("maxAng",  100);
+	mmdcMinAng = new Parameter("Controller.minAng", -100);
+	mmdcMaxAng = new Parameter("Controller.maxAng",  100);
 
 	injAmpl = createParameter("inj_ampl", 0.0);
 	injFreq = createParameter("inj_freq", 0.5);

@@ -32,10 +32,12 @@ Motor::Motor(ServoModule* sm)
 }
 
 Motor::~Motor() {
+	// TODO Auto-generated destructor stub
 }
 
 void Motor::setTorque(double tq) {
 	*t = tq;
+	//t->set(tq);
 }
 
 void Motor::calculateAfter() {
@@ -67,4 +69,3 @@ void Motor::calculateAfter() {
 		//devs->setDevice(Devices::dutycycle, 0.0);
 	}
 }
-

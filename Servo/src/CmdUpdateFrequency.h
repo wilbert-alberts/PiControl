@@ -12,8 +12,6 @@
 
 #include <string>
 
-#include "ServoModule.h"
-
 class Parameter;
 class PeriodicTimer;
 

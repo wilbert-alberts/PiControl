@@ -14,14 +14,12 @@ class Devices;
 class Filter;
 class HPFilter;
 
-#include "ServoModule.h"
-
 #include <list>
 #include <random>
 
 #include "ServoModule.h"
 
-class Controller : public ServoModule {
+class Controller : public ServoModule{
 public:
 	Controller(ServoModule* pre);
 	virtual ~Controller();

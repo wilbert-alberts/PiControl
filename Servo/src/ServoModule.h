@@ -1,7 +1,6 @@
 /*
  * ServoModule.h
  *
-<<<<<<< HEAD
  *  Created on: Mar 8, 2014
  *      Author: wilbert
  */

@@ -25,11 +25,12 @@
 #include "DBLocker.h"
 
 constexpr int MEMORYSIZE=64*1024;  // 16 Kilobytes.
+constexpr int SERVOFREQUENCY=1;  
 
 int main(int /*argc*/, char** /*argv[]*/) {
 
 	try {
-		PeriodicTimer* pt(new PeriodicTimer(1));
+		PeriodicTimer* pt(new PeriodicTimer(SERVOFREQUENCY));
 		DoubleBuffer* db(DoubleBuffer::getInstance());
 
 #ifdef REALMODE
