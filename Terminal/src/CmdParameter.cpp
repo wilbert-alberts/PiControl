@@ -8,6 +8,8 @@
 #include "CmdParameter.h"
 
 #include "Parameter.h"
+#include "DoubleBuffer.h"
+
 #include <iostream>
 #include <sstream>
 #include <list>
@@ -30,6 +32,8 @@ void CmdParameter::displayHelp(std::ostream& output)
 
 void CmdParameter::execute(std::ostream& output)
 {
+	DoubleBufferLock dbl;
+
 	if (!hasNextArgument()) {
 		output << par->get() << std::endl;
 	}

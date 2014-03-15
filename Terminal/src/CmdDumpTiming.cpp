@@ -5,9 +5,11 @@
  *      Author: wilbert
  */
 
+#include "CmdDumpTiming.h"
+
 #include "Parameter.h"
 #include "TimeStats.h"
-#include "CmdDumpTiming.h"
+#include "DoubleBuffer.h"
 
 #include <iostream>
 #include <string>
@@ -27,6 +29,7 @@ void CmdDumpTiming::displayHelp(std::ostream& out)
 }
 
 void CmdDumpTiming::execute(std::ostream& output) {
+	DoubleBufferLock dbl;
 	Parameter* minMargin;
 	Parameter* maxMargin;
 	Parameter* margin;
@@ -44,7 +47,6 @@ void CmdDumpTiming::execute(std::ostream& output) {
 	unsigned int actualPeriod = periodInUs - *margin;
 	unsigned int smallestPeriod = periodInUs - *maxMargin;
 	unsigned int largestPeriod = periodInUs - *minMargin;
-
 
 	output << "actual period:   " << actualPeriod/1000.0 << "ms ("<< 100.0*actualPeriod/periodInUs << "%)" << std::endl;
 	output << "largest period:  " << largestPeriod/1000.0 << "ms ("<< 100.0*largestPeriod/periodInUs << "%)" << std::endl;

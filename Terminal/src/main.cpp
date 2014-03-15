@@ -31,18 +31,18 @@
 void registerCommands();
 
 int main(int argc, char* argv[]) {
-	DoubleBuffer* db = DoubleBuffer::getInstance();
+	//DoubleBuffer* db = DoubleBuffer::getInstance();
 
 	try {
-		db->connect();
-		db->lock();
+		//db->connect();
+		//db->lock();
 		registerCommands();
 
 		CommandProcessor::getInstance()->processCommand(argc, argv);
-		db->unlock();
+		//db->unlock();
 	} catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
-		db->unlock();
+		//db->unlock();
 	}
 
 	return 0;

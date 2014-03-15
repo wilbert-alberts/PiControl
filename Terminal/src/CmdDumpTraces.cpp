@@ -8,6 +8,7 @@
 #include "CmdDumpTraces.h"
 
 #include "Traces.h"
+#include "DoubleBuffer.h"
 
 #include <iostream>
 #include <list>
@@ -26,6 +27,7 @@ void CmdDumpTraces::displayHelp(std::ostream& output) {
 
 }
 void CmdDumpTraces::execute(std::ostream& output) {
+	DoubleBufferLock dbl;
 	Traces* traces  = Traces::getInstance();
 	traces->dumpTraces(output);
 }

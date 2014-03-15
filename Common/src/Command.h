@@ -13,6 +13,8 @@
 
 #include <iostream>
 
+class DoubleBuffer;
+
 class Command {
 public:
 	Command(const std::string& n);
@@ -34,7 +36,6 @@ private:
 	bool inExecution;
 	std::istream* inArgs;
 	std::ostream* outResults;
-
 };
 
 #endif

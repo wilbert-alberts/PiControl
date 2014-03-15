@@ -6,8 +6,10 @@
  */
 
 #include "CmdResetTimeStats.h"
+
 #include "TimeStats.h"
 #include "Parameter.h"
+#include "DoubleBuffer.h"
 
 #include <iostream>
 #include <string>
@@ -25,5 +27,7 @@ void CmdResetTimeStats::displayHelp(std::ostream& output) {
 
 }
 void CmdResetTimeStats::execute(std::ostream& /* output*/) {
+	DoubleBufferLock dbl;
+
 	Parameter* __attribute__ ((unused)) reset(new Parameter(TimeStats::par_reset,1.0));
 }

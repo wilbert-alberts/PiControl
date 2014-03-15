@@ -7,6 +7,7 @@
 
 #include "CmdDumpAllParams.h"
 
+#include "DoubleBuffer.h"
 #include "Parameter.h"
 
 #include <iostream>
@@ -26,6 +27,7 @@ void CmdDumpAllParams::displayHelp(std::ostream& output) {
 }
 
 void CmdDumpAllParams::execute(std::ostream& out) {
+	DoubleBufferLock dbl;
 	for (int i = 0; i < Parameter::getNrParameters(); i++) {
 		std::string parname = Parameter::getNameByIdx(i);
 		double value = Parameter::getByIdx(i);

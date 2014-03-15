@@ -5,9 +5,10 @@
  *      Author: wilbert
  */
 
+#include "CmdStopTimer.h"
+
 #include "DoubleBuffer.h"
 #include "Parameter.h"
-#include "CmdStopTimer.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -27,5 +28,6 @@ void Cmd_StopTimer::displayHelp(std::ostream& output) {
 }
 
 void Cmd_StopTimer::execute(std::ostream& /*output*/) {
+	DoubleBufferLock dbl;
 	Parameter* __attribute__ ((unused)) par = new Parameter("PeriodicTimer.stopRunning",1.0);
 }

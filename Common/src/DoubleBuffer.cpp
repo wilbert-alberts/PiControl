@@ -245,3 +245,15 @@ void DoubleBuffer::copyTo() {
 	memcpy (dst, src, pageHandles[1-other].page->pagesize);
 	unlock(other);
 }
+
+DoubleBufferLock::DoubleBufferLock()
+: db(DoubleBuffer::getInstance())
+{
+	db->connect();
+	db->lock();
+}
+
+DoubleBufferLock::~DoubleBufferLock() {
+	db->unlock();
+}
+

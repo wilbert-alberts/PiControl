@@ -8,6 +8,7 @@
 #include "CmdTracing.h"
 
 #include "Traces.h"
+#include "DoubleBuffer.h"
 
 #include <iostream>
 #include <sstream>
@@ -29,6 +30,8 @@ void CmdAddTrace::displayHelp(std::ostream& output) {
 }
 
 void CmdAddTrace::execute(std::ostream& /*output*/) {
+	DoubleBufferLock dbl;
+
 	std::string name = getNextArgumentAsString();
 
 	Traces* traces = Traces::getInstance();
@@ -54,6 +57,7 @@ void CmdDelTrace::displayHelp(std::ostream& output) {
 
 }
 void CmdDelTrace::execute(std::ostream& /*output*/) {
+	DoubleBufferLock dbl;
 	std::string name = getNextArgumentAsString();
 
 	Traces* traces = Traces::getInstance();
@@ -79,7 +83,9 @@ void CmdClearTrace::displayHelp(std::ostream& output) {
 
 }
 void CmdClearTrace::execute(std::ostream& /*output*/) {
+	DoubleBufferLock dbl;
 	std::string name = getNextArgumentAsString();
+
 	Traces* traces = Traces::getInstance();
 
 	int idx = Parameter::findParameter(name);
@@ -103,6 +109,7 @@ void CmdDelAllTraces::displayHelp(std::ostream& output) {
 
 }
 void CmdDelAllTraces::execute(std::ostream& /*output*/) {
+	DoubleBufferLock dbl;
 	Traces* traces = Traces::getInstance();
 
 	traces->delAllTraces();
@@ -121,6 +128,7 @@ void CmdClearAllTraces::displayHelp(std::ostream& output) {
 
 }
 void CmdClearAllTraces::execute(std::ostream& /*output*/) {
+	DoubleBufferLock dbl;
 	Traces* traces = Traces::getInstance();
 
 	traces->clearAllTraces();

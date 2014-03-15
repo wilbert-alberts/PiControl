@@ -10,6 +10,7 @@
 #include "Traces.h"
 #include "Parameter.h"
 #include "TimeStats.h"
+#include "DoubleBuffer.h"
 
 #include <iostream>
 #include <sstream>
@@ -36,15 +37,19 @@ void CmdConfigFilter::execute(std::ostream& /*out*/)
 	std::stringstream converter;
 	std::vector<double> a;
 	std::vector<double> b;
+	DoubleBufferLock dbl;
 
 	std::string name = getNextArgumentAsString();
 	double omega0 = getNextArgumentAsDouble();
 	double lambda = getNextArgumentAsDouble();
+
+
 	double speriod = getSamplePeriod();
 
 	calculate(a,b, omega0, lambda, speriod);
 
 	setValues(name, a, b);
+
 }
 
 

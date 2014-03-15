@@ -7,6 +7,7 @@
 
 #include "Command.h"
 #include "CommandProcessor.h"
+#include "DoubleBuffer.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -95,4 +96,3 @@ void Command::perform(std::istream& in, std::ostream& out) {
 	inArgs = 0;
 	outResults = 0;
 }
-
