@@ -26,6 +26,6 @@ void Cmd_StopTimer::displayHelp(std::ostream& output) {
 	output << "\tStops execution of Servo loop." << std::endl;
 }
 
-void Cmd_StopTimer::execute(std::ostream& output) {
+void Cmd_StopTimer::execute(std::ostream& /*output*/) {
 	Parameter* __attribute__ ((unused)) par = new Parameter("PeriodicTimer.stopRunning",1.0);
 }

@@ -34,7 +34,7 @@ void CmdRemoteServer::displayHelp(std::ostream& out) {
 	out << "\tServer exits after receiving 'exit'" << std::endl;
 }
 
-void CmdRemoteServer::execute(std::ostream& output) {
+void CmdRemoteServer::execute(std::ostream& /*output*/) {
 	CommandProcessor* processor = CommandProcessor::getInstance();
 	int port(DEFAULTPORTNUMBER);
 
@@ -134,7 +134,7 @@ void CmdRemoteServer::sendReply(const std::string& reply) {
     	throw std::system_error(errno, std::system_category(), "ERROR on write");
 	}
 
-	if (c<reply.length()) {
+	if (c< (int)reply.length()) {
     	throw std::system_error(errno, std::system_category(), "Unable to write full reply");
 	}
 }

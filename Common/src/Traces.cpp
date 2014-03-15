@@ -22,8 +22,6 @@
 static const char* TRACING_MEM_ID = "/mem.Tracing";
 static const char* SAMPLECOUNTER = "Traces.sampleCounter";
 
-static const char* TRACESTREAMING = "Traces.streaming";
-
 CyclicBuffer::CyclicBuffer()
 : nrSamples(0)
 , idx(0)

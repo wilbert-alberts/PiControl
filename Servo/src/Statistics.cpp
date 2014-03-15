@@ -11,10 +11,10 @@
 #include <cmath>
 
 Statistics::Statistics()
-: max(std::numeric_limits<double>::min())
-, min(std::numeric_limits<double>::max())
-, nrSamples(0)
+: min(std::numeric_limits<double>::max())
+, max(std::numeric_limits<double>::min())
 , sum(0.0)
+, nrSamples(0)
 , sumsum(0.0)
 {
 }

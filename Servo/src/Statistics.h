@@ -21,12 +21,11 @@ public:
 	double getStd() const;
 
 private:
-	double sum;
 	double min;
 	double max;
-	double sumsum;
+	double sum;
 	int    nrSamples;
-
+	double sumsum;
 };
 
 #endif /* STATISTICS_H_ */

@@ -53,6 +53,5 @@ bool CmdServer::exitCommand(const std::string& line) {
 	if (line.length()==0)
 		return true;
 
-	if (line == "\d")
-		return true;
+	return false;
 }
