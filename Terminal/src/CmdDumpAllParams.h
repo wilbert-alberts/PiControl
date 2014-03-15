@@ -14,8 +14,8 @@ class CmdDumpAllParams : Command{
 public:
 	CmdDumpAllParams();
 	virtual ~CmdDumpAllParams();
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& output);
+	virtual void execute(std::ostream& output);
 };
 
 #endif /* CMDDUMPALLPARAMS_H_ */

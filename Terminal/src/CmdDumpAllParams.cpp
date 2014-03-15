@@ -19,21 +19,17 @@ CmdDumpAllParams::CmdDumpAllParams() :
 CmdDumpAllParams::~CmdDumpAllParams() {
 }
 
-void CmdDumpAllParams::displayHelp() {
-	std::cout << "Usage: " << getName() << std::endl;
-	std::cout << "\tPrint all known parameters and values." << std::endl;
+void CmdDumpAllParams::displayHelp(std::ostream& output) {
+	output << "Usage: " << getName() << std::endl;
+	output << "\tPrint all known parameters and values." << std::endl;
 
 }
 
-void CmdDumpAllParams::execute(std::list<std::string>& args) {
-	if (!args.empty()) {
-		displayHelp();
-	}
-
+void CmdDumpAllParams::execute(std::ostream& out) {
 	for (int i = 0; i < Parameter::getNrParameters(); i++) {
 		std::string parname = Parameter::getNameByIdx(i);
 		double value = Parameter::getByIdx(i);
-		std::cout << parname << "\t" << value << std::endl;
+		out << parname << "\t" << value << std::endl;
 	}
 }
 

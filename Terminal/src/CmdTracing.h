@@ -14,8 +14,8 @@ class CmdAddTrace : Command{
 public:
 	CmdAddTrace();
 	virtual ~CmdAddTrace();
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& output);
+	virtual void execute(std::ostream& output);
 };
 
 class CmdDelTrace : Command
@@ -23,8 +23,8 @@ class CmdDelTrace : Command
 public:
 	CmdDelTrace();
 	virtual ~CmdDelTrace();
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& output);
+	virtual void execute(std::ostream& output);
 };
 
 class CmdClearTrace : Command
@@ -32,8 +32,8 @@ class CmdClearTrace : Command
 public:
 	CmdClearTrace();
 	virtual ~CmdClearTrace();
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& output);
+	virtual void execute(std::ostream& output);
 };
 
 class CmdDelAllTraces : Command
@@ -41,8 +41,8 @@ class CmdDelAllTraces : Command
 public:
 	CmdDelAllTraces();
 	virtual ~CmdDelAllTraces();
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& output);
+	virtual void execute(std::ostream& output);
 };
 
 class CmdClearAllTraces : Command
@@ -50,8 +50,8 @@ class CmdClearAllTraces : Command
 public:
 	CmdClearAllTraces();
 	virtual ~CmdClearAllTraces();
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& output);
+	virtual void execute(std::ostream& output);
 };
 
 #endif /* CMDADDTRACE_H_ */

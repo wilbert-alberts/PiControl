@@ -20,18 +20,12 @@ CmdDumpTraces::CmdDumpTraces() :
 CmdDumpTraces::~CmdDumpTraces() {
 }
 
-void CmdDumpTraces::displayHelp() {
-	std::cout << "Usage: " << getName() << std::endl;
-	std::cout << "\tDump traced data." << std::endl;
+void CmdDumpTraces::displayHelp(std::ostream& output) {
+	output << "Usage: " << getName() << std::endl;
+	output << "\tDump traced data." << std::endl;
 
 }
-void CmdDumpTraces::execute(std::list<std::string>& args) {
-	if (!args.empty()) {
-		displayHelp();
-		return;
-	}
-
+void CmdDumpTraces::execute(std::ostream& output) {
 	Traces* traces  = Traces::getInstance();
-
-	traces->dumpTraces();
+	traces->dumpTraces(output);
 }

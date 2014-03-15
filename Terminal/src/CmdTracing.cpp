@@ -22,26 +22,14 @@ CmdAddTrace::CmdAddTrace() :
 CmdAddTrace::~CmdAddTrace() {
 }
 
-void CmdAddTrace::displayHelp() {
-	std::cout << "Usage: " << getName() << " <parameter> [ <length> ]"
+void CmdAddTrace::displayHelp(std::ostream& output) {
+	output << "Usage: " << getName() << " <parameter> [ <length> ]"
 			<< std::endl;
-	std::cout << "\tStart tracing <parameter>." << std::endl;
+	output << "\tStart tracing <parameter>." << std::endl;
 }
 
-void CmdAddTrace::execute(std::list<std::string>& args) {
-
-	if (args.empty()) {
-		displayHelp();
-		return;
-	}
-
-	std::string name = args.front();
-	args.pop_front();
-
-	if (!args.empty()) {
-		displayHelp();
-		return;
-	}
+void CmdAddTrace::execute(std::ostream&output) {
+	std::string name = getNextArgumentAsString();
 
 	Traces* traces = Traces::getInstance();
 
@@ -60,24 +48,13 @@ CmdDelTrace::CmdDelTrace() :
 CmdDelTrace::~CmdDelTrace() {
 }
 
-void CmdDelTrace::displayHelp() {
-	std::cout << "Usage: " << getName() << " <parameter>" << std::endl;
-	std::cout << "\tStop tracing <parameter>." << std::endl;
+void CmdDelTrace::displayHelp(std::ostream& output) {
+	output << "Usage: " << getName() << " <parameter>" << std::endl;
+	output << "\tStop tracing <parameter>." << std::endl;
 
 }
-void CmdDelTrace::execute(std::list<std::string>& args) {
-	if (args.empty()) {
-		displayHelp();
-		return;
-	}
-
-	std::string name = args.front();
-	args.pop_front();
-
-	if (!args.empty()) {
-		displayHelp();
-		return;
-	}
+void CmdDelTrace::execute(std::ostream&output) {
+	std::string name = getNextArgumentAsString();
 
 	Traces* traces = Traces::getInstance();
 
@@ -96,25 +73,13 @@ CmdClearTrace::CmdClearTrace() :
 CmdClearTrace::~CmdClearTrace() {
 }
 
-void CmdClearTrace::displayHelp() {
-	std::cout << "Usage: " << getName() << " <parameter>" << std::endl;
-	std::cout << "\tClear trace data for <parameter>." << std::endl;
+void CmdClearTrace::displayHelp(std::ostream& output) {
+	output << "Usage: " << getName() << " <parameter>" << std::endl;
+	output << "\tClear trace data for <parameter>." << std::endl;
 
 }
-void CmdClearTrace::execute(std::list<std::string>& args) {
-	if (args.empty()) {
-		displayHelp();
-		return;
-	}
-
-	std::string name = args.front();
-	args.pop_front();
-
-	if (!args.empty()) {
-		displayHelp();
-		return;
-	}
-
+void CmdClearTrace::execute(std::ostream&output) {
+	std::string name = getNextArgumentAsString();
 	Traces* traces = Traces::getInstance();
 
 	int idx = Parameter::findParameter(name);
@@ -132,17 +97,12 @@ CmdDelAllTraces::CmdDelAllTraces() :
 CmdDelAllTraces::~CmdDelAllTraces() {
 }
 
-void CmdDelAllTraces::displayHelp() {
-	std::cout << "Usage: " << getName() << std::endl;
-	std::cout << "\tDelete all traces." << std::endl;
+void CmdDelAllTraces::displayHelp(std::ostream& output) {
+	output << "Usage: " << getName() << std::endl;
+	output << "\tDelete all traces." << std::endl;
 
 }
-void CmdDelAllTraces::execute(std::list<std::string>& args) {
-	if (!args.empty()) {
-		displayHelp();
-		return;
-	}
-
+void CmdDelAllTraces::execute(std::ostream&output) {
 	Traces* traces = Traces::getInstance();
 
 	traces->delAllTraces();
@@ -155,17 +115,12 @@ CmdClearAllTraces::CmdClearAllTraces() :
 CmdClearAllTraces::~CmdClearAllTraces() {
 }
 
-void CmdClearAllTraces::displayHelp() {
-	std::cout << "Usage: " << getName() << std::endl;
-	std::cout << "\tClearas all traces." << std::endl;
+void CmdClearAllTraces::displayHelp(std::ostream& output) {
+	output << "Usage: " << getName() << std::endl;
+	output << "\tClearas all traces." << std::endl;
 
 }
-void CmdClearAllTraces::execute(std::list<std::string>& args) {
-	if (!args.empty()) {
-		displayHelp();
-		return;
-	}
-
+void CmdClearAllTraces::execute(std::ostream&output) {
 	Traces* traces = Traces::getInstance();
 
 	traces->clearAllTraces();

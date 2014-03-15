@@ -12,6 +12,7 @@
 #include <map>
 #include <vector>
 
+#include <iostream>
 
 class Command;
 typedef std::map<const std::string, Command*> CommandMap;
@@ -23,6 +24,8 @@ public:
 	virtual ~CommandProcessor();
 
 	void processCommand(int argc, char* argv[]);
+	void processCommand(std::istream& args, std::ostream& results);
+
 	void registerCommand(Command* cmd);
 	Command* lookupCommand(const std::string& cmd);
 	void retrieveAllCommands(std::vector<Command*>& commands);

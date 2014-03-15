@@ -7,9 +7,9 @@
 
 #include "DoubleBuffer.h"
 #include "Parameter.h"
-#include "StopTimer.h"
 
 #include "CommandProcessor.h"
+#include "CmdStopTimer.h"
 #include "CmdHelp.h"
 #include "CmdDumpTraces.h"
 #include "CmdTracing.h"
@@ -18,6 +18,8 @@
 #include "CmdDumpAllParams.h"
 #include "CmdParameter.h"
 #include "CmdConfigFilter.h"
+#include "CmdServer.h"
+#include "CmdRemoteServer.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -48,7 +50,7 @@ int main(int argc, char* argv[]) {
 
 void registerCommands() {
 	new CmdHelp();
-	new StopTimer();
+	new Cmd_StopTimer();
 	new CmdDumpTraces();
 	new CmdAddTrace();
 	new CmdDelTrace();
@@ -59,5 +61,7 @@ void registerCommands() {
 	new CmdDumpTiming();
 	new CmdDumpAllParams();
 	new CmdConfigFilter();
+	new CmdServer();
+	new CmdRemoteServer();
 	CmdParameter::createParameterCommands();
 }

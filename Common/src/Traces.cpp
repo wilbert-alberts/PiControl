@@ -228,7 +228,7 @@ void Traces::sample(TraceMsg* msg)
 	}
 }
 
-void Traces::dumpTraces() {
+void Traces::dumpTraces(std::ostream& out) {
 	lock();
 	int      parSampleCounterIdx = Parameter::findParameter(SAMPLECOUNTER);
 
@@ -251,19 +251,19 @@ void Traces::dumpTraces() {
 		activeTraces[i]->getValues(destBuffers[i]);
 	}
 
-	std::cout << "# SampleCounter";
+	out << "# SampleCounter";
 	for (int i=0; i<nrActiveTraces; i++) {
-		std::cout << "\t" << Parameter::getNameByIdx(activeTraces[i]->getParameterID());
+		out << "\t" << Parameter::getNameByIdx(activeTraces[i]->getParameterID());
 	}
-	std::cout << std::endl;
+	out << std::endl;
 
 	int start = Parameter::getByIdx(parSampleCounterIdx) - BUFFERSIZE;
 	for (int i=0; i<BUFFERSIZE; i++) {
-		std::cout << start;
+		out << start;
 		for (int t=0; t<nrActiveTraces; t++) {
-			std::cout << "\t" << destBuffers[t][i];
+			out << "\t" << destBuffers[t][i];
 		}
-		std::cout << std::endl;
+		out << std::endl;
 		start++;
 	}
 	unlock();
