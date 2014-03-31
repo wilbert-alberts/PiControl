@@ -98,9 +98,9 @@ void Devices::sampleAngle(double frequency) {
 	angle_[1] = angle_[0];
 	angle_v[1] = angle_v[0];
 	// determine raw angle
-	double h1 = spi->getRegister(SPI::HEIGHT1);
+	double h1 = *spi->getRegister(SPI::HEIGHT1);
 	*par_h1Ang = h1;
-	double h2 = spi->getRegister(SPI::HEIGHT2);
+	double h2 = *spi->getRegister(SPI::HEIGHT2);
 	*par_h2Ang = h2;
 	double raw_angle = (*par_h1AngGain*h1 + *par_h1AngOffset) -
 			           (*par_h2AngGain*h2 + *par_h2AngOffset);
@@ -127,7 +127,7 @@ void Devices::calculateBefore() {
 
 void Devices::sampleGyro(double /*frequency*/)
 {
-	double rawGyro = spi->getRegister(SPI::GYRO);
+	double rawGyro = *spi->getRegister(SPI::GYRO);
 	if (rawGyro > 32767)
 		rawGyro -= 65536;
 	double gyro = rawGyro * *par_gyroGain + *par_gyroOffset;
@@ -142,8 +142,7 @@ void Devices::samplePosition(double frequency) {
 	pos_[1] = pos_[0];
 	pos_v[1] = pos_v[0];
 
-	unsigned int rawpos = static_cast<unsigned int>(spi->getRegister(
-			SPI::ENCPOS));
+	unsigned int rawpos = static_cast<unsigned int>(*spi->getRegister(SPI::ENCPOS));
 	// Mask relevant bits
 	rawpos = rawpos & 0x0fff; // 12 bits
 	// determine delta w.r.t. previous sample;
@@ -182,14 +181,14 @@ void Devices::samplePosition(double frequency) {
 
 void Devices::sampleBattery()
 {
-	*par_voltage = spi->getRegister(SPI::UBAT) * *par_voltageGain+ *par_voltageOffset;
+	*par_voltage = *spi->getRegister(SPI::UBAT) * *par_voltageGain+ *par_voltageOffset;
 }
 
 
 
 void Devices::calculateAfter() {
 	updateDC();
-	spi->setRegister(SPI::OVERSAMPLING, *par_oversampling);
+	*spi->getRegister(SPI::OVERSAMPLING)= *par_oversampling;
 }
 
 void Devices::updateDC() {
@@ -202,6 +201,6 @@ void Devices::updateDC() {
 	int dir = dc<0.0 ? 1 : 0;
 	int rawDC = (int)(65535.0*fabs(dc));
 
-	spi->setRegister(SPI::PWM, static_cast<double>(rawDC));
-	spi->setRegister(SPI::MOTORDIR, static_cast<double>(dir));
+	*spi->getRegister(SPI::PWM) = static_cast<double>(rawDC);
+	*spi->getRegister(SPI::MOTORDIR) = static_cast<double>(dir);
 }

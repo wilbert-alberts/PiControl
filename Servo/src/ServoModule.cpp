@@ -11,15 +11,11 @@
 #include "DigitalOut.h"
 #include "PeriodicTimer.h"
 
-ServoModule::ServoModule(const std::string& _id, ServoModule* _other)
-: id(_id)
-, other(_other)
-, tsStart1(createParameter(id+"1.tsStart"))
-, tsEnd1(createParameter(id+"1.tsEnd"))
-, tsStart2(createParameter(id+"2.tsStart"))
-, tsEnd2(createParameter(id+"2.tsEnd"))
-, measureTiming(1)
-{
+ServoModule::ServoModule(const std::string& _id, ServoModule* _other) :
+		id(_id), other(_other), tsStart1(createParameter(id + "1.tsStart")), tsEnd1(
+				createParameter(id + "1.tsEnd")), tsStart2(
+				createParameter(id + "2.tsStart")), tsEnd2(
+				createParameter(id + "2.tsEnd")), measureTiming(1) {
 }
 
 ServoModule::~ServoModule() {
@@ -42,19 +38,18 @@ void ServoModule::sample(PeriodicTimer* pt) {
 		*tsEnd2 = pt->getTime();
 }
 
-void ServoModule::calculateBefore()
-{
+void ServoModule::calculateBefore() {
 }
 
-void ServoModule::calculateAfter()
-{
+void ServoModule::calculateAfter() {
 }
-
 
 Parameter* ServoModule::createParameter(const std::string& id) {
-	return createParameter(id, 0.0);
+	return createParameter(getId() + "." + id, 0.0);
 }
-	Parameter* ServoModule::createParameter(const std::string& id, const double value) {
+
+Parameter* ServoModule::createParameter(const std::string& id,
+		const double value) {
 	return new Parameter(getId() + "." + id, value);
 }
 
@@ -62,6 +57,7 @@ DigitalIn* ServoModule::createDigitalIn(const std::string& id, int pin) {
 	return DigitalIn::create(getId() + "." + id, pin);
 }
 
-DigitalOut* ServoModule::createDigitalOut(const std::string& id, int pin, int value) {
+DigitalOut* ServoModule::createDigitalOut(const std::string& id, int pin,
+		int value) {
 	return DigitalOut::create(getId() + "." + id, pin, value);
 }

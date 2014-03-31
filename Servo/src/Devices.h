@@ -123,6 +123,8 @@ private:
 	Parameter* par_dutycycle;
 	Parameter* par_motordir;
 	Parameter* par_oversampling;
+
+	Parameter* spi_motordir;
 };
 
 #endif /* DEVICES_H_ */
