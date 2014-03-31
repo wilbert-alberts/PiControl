@@ -80,6 +80,7 @@ void CommandProcessor::processCommand(std::istream& args, std::ostream& results)
 		commando->perform(args, results);
 	}
 	else {
+		std::clog << "No command found: " << cmd << std::endl;
 		throw std::runtime_error("No command found" + cmd);
 	}
 }
