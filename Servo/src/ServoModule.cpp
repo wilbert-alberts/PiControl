@@ -18,7 +18,7 @@ ServoModule::ServoModule(const std::string& _id, ServoModule* _other)
 , tsEnd1(createParameter(id+"1.tsEnd"))
 , tsStart2(createParameter(id+"2.tsStart"))
 , tsEnd2(createParameter(id+"2.tsEnd"))
-, measureTiming(0)
+, measureTiming(1)
 {
 }
 
