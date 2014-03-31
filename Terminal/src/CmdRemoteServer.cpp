@@ -53,6 +53,7 @@ void CmdRemoteServer::execute(std::ostream& /*output*/) {
 
 		processor->processCommand(inargs, outResults);
 		sendReply(outResults.str());
+		sendReply(".\n");
 	}
 }
 
