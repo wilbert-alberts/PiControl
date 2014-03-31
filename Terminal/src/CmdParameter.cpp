@@ -45,6 +45,7 @@ void CmdParameter::execute(std::ostream& output)
 
 void CmdParameter::createParameterCommands()
 {
+	DoubleBufferLock dbl;
 	for (int idx=0; idx< Parameter::getNrParameters(); idx++) {
 		new CmdParameter(new Parameter(idx));
 	}
