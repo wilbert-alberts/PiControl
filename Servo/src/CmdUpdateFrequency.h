@@ -8,24 +8,23 @@
 #ifndef CMDUPDATEFREQUENCY_H_
 #define CMDUPDATEFREQUENCY_H_
 
+#include "ServoModule.h"
+
 #include <string>
 
 class Parameter;
+class PeriodicTimer;
 
-class Cmd_UpdateFrequency {
+class CmdUpdateFrequency : public ServoModule {
 public:
-	static Cmd_UpdateFrequency* getInstance();
-	virtual ~Cmd_UpdateFrequency();
+	CmdUpdateFrequency(ServoModule* predecessor);
+	virtual ~CmdUpdateFrequency();
 
-	static void execute(void*);
-	void execute();
+	void calculateAfter();
 
 private:
-	Cmd_UpdateFrequency();
-	static Cmd_UpdateFrequency* instance;
-
-	double freq;
 	Parameter* par_frequency;
+	double freq;
 };
 
 #endif /* CMDUPDATEFREQUENCY_H_ */

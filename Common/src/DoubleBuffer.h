@@ -67,5 +67,12 @@ typedef struct DoubleBufferPage
   char* mem[0];
 } DoubleBufferPage;
 
+class DoubleBufferLock {
+public:
+	DoubleBufferLock();
+	virtual ~DoubleBufferLock();
+private:
+	DoubleBuffer* db;
+};
 
 #endif /* DOUBLEBUFFERIMP_H_ */

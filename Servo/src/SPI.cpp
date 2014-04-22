@@ -17,38 +17,31 @@
 #include <sys/time.h>
 #include <algorithm>
 
-SPI* SPI::instance = 0;
-
-SPI* SPI::getInstance()
+SPI::SPI(ServoModule* wrapped)
+: ServoModule("SPI", wrapped)
 {
-	if (instance==0)
-		instance = new SPI();
-	return instance;
-}
-
-SPI::SPI() {
-	enabled = new Parameter(std::string("SPI.enabled"), 0.0);
+	enabled = createParameter("enabled");
 	bb = new BitBus();
 
-	createRegister(HEIGHT1, std::string("SPI.Height1"),    0, 16);
-	createRegister(HEIGHT2, std::string("SPI.Height2"),   16, 16);
+	createRegister(HEIGHT1, std::string("Height1"),    0, 16);
+	createRegister(HEIGHT2, std::string("Height2"),   16, 16);
 
-	createRegister(UBAT, std::string("SPI.UBat"),   32, 16);
+	createRegister(UBAT, std::string("UBat"),   32, 16);
 
-	createRegister(GYRO, std::string("SPI.Gyro"),      48, 16);
-	createRegister(ENCPOS, std::string("SPI.EncPos"),    64, 16);
+	createRegister(GYRO, std::string("Gyro"),      48, 16);
+	createRegister(ENCPOS, std::string("EncPos"),    64, 16);
 
-	createRegister(PWM, std::string("SPI.PWM"),      80, 16);
-	createRegister(MOTORDIR, std::string("SPI.MotorDir"), 96,  8);
+	createRegister(PWM, std::string("PWM"),      80, 16);
+	createRegister(MOTORDIR, std::string("MotorDir"), 96,  8);
 
-	createRegister(OVERSAMPLING, std::string("SPI.oversampling"), 104,  8);
+	createRegister(OVERSAMPLING, std::string("oversampling"), 104,  8);
 
-	createRegister(SAMPLESTAKEN, std::string("SPI.samplesTaken"), 112,  8);
+	createRegister(SAMPLESTAKEN, std::string("samplesTaken"), 112,  8);
 
 	createRegister(ACC, std::string("SPI.Acc"), 120,  16);
 
-	Pi2Mbed = DigitalOut::create(std::string("SPI.pi2mbed"), 4, 1);
-	Mbed2Pi = DigitalIn::create("SPI.mbed2pi", 5);
+	Pi2Mbed = createDigitalOut("pi2mbed", 4, 1);
+	Mbed2Pi = createDigitalIn("mbed2pi", 5);
 }
 
 SPI::~SPI() {
@@ -59,7 +52,7 @@ SPI::~SPI() {
 void SPI::createRegister(int id, const std::string& n, int start, int length)
 {
 	bb->createRegister(id, n, start, length);
-	registers[id]=new Parameter(n,0.0);
+	registers[id]=createParameter(n,0.0);
 
 	int nb = (start+length)/8 + ((start+length)%8==0 ? 0 : 1);
 	if (nb > nrBytes) {
@@ -74,7 +67,7 @@ void SPI::createRegister(int id, const std::string& n, int start, int length)
 
 bool SPI::isEnabled()
 {
-	if (bEnabled && enabled->get()==0.0) {
+	if (bEnabled && *enabled==0.0) {
 		// SPI got disabled
 		Mbed2Pi->setEnabled(false);
 		Pi2Mbed->setEnabled(false);
@@ -82,7 +75,7 @@ bool SPI::isEnabled()
 		return bEnabled;
 	}
 
-	if (!bEnabled && enabled->get() != 0.0) {
+	if (!bEnabled && *enabled != 0.0) {
 		// SPI got enabled
 		Mbed2Pi->setEnabled(true);
 		Pi2Mbed->setEnabled(true);
@@ -94,7 +87,7 @@ bool SPI::isEnabled()
 	return bEnabled;
 }
 
-void SPI::writeBus() {
+void SPI::calculateAfter() {
 	// Protocol to read from the bus consists of:
 	// 1) Pulling Pi2Mbed to zero
 	// 2) Wait until Mbed2Pi is zero
@@ -128,8 +121,8 @@ void SPI::copyFromParameters()
 		Parameter* p = iter->second;
 		int id = iter->first;
 
-		//std::clog <<"setting register " << p->getName() << " to value: " << p->get() << std::endl;
-		bb->setRegister(byteArray, id, p->get());
+		//std::clog <<"setting register " << p->getName() << " to value: " << *p << std::endl;
+		bb->setRegister(byteArray, id, *p);
 	}
 }
 
@@ -143,11 +136,11 @@ void SPI::copyToParameters()
 		Parameter* p = iter->second;
 		int id = iter->first;
 
-		p->set(bb->getRegister(byteArray, id));
+		*p = bb->getRegister(byteArray, id);
 	}
 
 }
-void SPI::readBus() {
+void SPI::calculateBefore() {
 	// Protocol to read from the bus consists of:
 	// 1) Pulling Pi2Mbed to zero
 	// 2) Wait until Mbed2Pi is zero
@@ -199,13 +192,6 @@ void SPI::waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs) {
 	throw(1);
 }
 
-void SPI::writeBus(void* context) {
-	static_cast<SPI*>(context)->writeBus();
-}
-
-void SPI::readBus(void* context) {
-	static_cast<SPI*>(context)->readBus();
-}
 
 double SPI::getRegister(int reg)
 {
@@ -219,6 +205,6 @@ void SPI::setRegister(int reg, double value)
 	bb->setRegister(byteArray, reg, value);
 
 	Parameter* p = registers[reg];
-	p->set(value);
+	*p = value;
 
 }

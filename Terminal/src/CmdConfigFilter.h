@@ -17,8 +17,8 @@ class CmdConfigFilter : Command{
 public:
 	CmdConfigFilter();
 	virtual ~CmdConfigFilter();
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& out);
+	virtual void execute(std::ostream& out);
 
 private:
 	void calculate(

@@ -6,8 +6,10 @@
  */
 
 #include "CmdResetTimeStats.h"
+
 #include "TimeStats.h"
 #include "Parameter.h"
+#include "DoubleBuffer.h"
 
 #include <iostream>
 #include <string>
@@ -19,13 +21,13 @@ CmdResetTimeStats::CmdResetTimeStats() :
 
 CmdResetTimeStats::~CmdResetTimeStats() {}
 
-void CmdResetTimeStats::displayHelp() {
-	std::cout << "Usage: " << getName() << std::endl;
-	std::cout << "\tReset all timing statistics." << std::endl;
+void CmdResetTimeStats::displayHelp(std::ostream& output) {
+	output << "Usage: " << getName() << std::endl;
+	output << "\tReset all timing statistics." << std::endl;
 
 }
-void CmdResetTimeStats::execute(std::list<std::string>& /*args*/) {
-	Parameter* __attribute__ ((unused)) reset(new Parameter(TimeStats::par_reset,1.0));
+void CmdResetTimeStats::execute(std::ostream& /* output*/) {
+	DoubleBufferLock dbl;
 
-	std::cout << "OK" << std::endl;
+	Parameter* __attribute__ ((unused)) reset(new Parameter(TimeStats::par_reset,1.0));
 }

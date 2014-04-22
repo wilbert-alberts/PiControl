@@ -20,32 +20,31 @@ CmdHelp::~CmdHelp() {
 	// TODO Auto-generated destructor stub
 }
 
-void CmdHelp::execute(std::list<std::string>& args)
-{
-	if (args.empty()) {
-		displayHelp();
+void CmdHelp::execute(std::ostream& output) {
+	if (!hasNextArgument()) {
+		displayHelp(output);
 	} else {
-		std::string c = args.front();
+		std::string c = getNextArgumentAsString();
 
 		Command* cmd = CommandProcessor::getInstance()->lookupCommand(c);
 		if (cmd != 0) {
-			cmd->displayHelp();
+			cmd->displayHelp(output);
 		} else {
 			std::clog << "Error, unknown command: " << c << std::endl;
 		}
 	}
 }
 
-void CmdHelp::displayHelp() {
-	std::cout << "Usage: Terminal help <cmd>" << std::endl;
-	std::cout << "\tAvailable commands:" << std::endl;
+void CmdHelp::displayHelp(std::ostream& output) {
+	output << "Usage: Terminal help <cmd>" << std::endl;
+	output << "\tAvailable commands:" << std::endl;
 
 	std::vector<Command*> commands;
 
 	CommandProcessor::getInstance()->retrieveAllCommands(commands);
 
 	for (auto i = commands.begin(); i != commands.end(); i++) {
-		std::cout << "\t\t" << (*i)->getName()  << std::endl;
+		output << "\t\t" << (*i)->getName() << std::endl;
 
 	}
 

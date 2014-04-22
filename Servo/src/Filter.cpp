@@ -54,11 +54,11 @@ double Filter::calculate(double d)
 	in.pop_back();
 	for (int i=0; i<dimension; i++) {
 		// B += b[i]*in[i]
-		B += par_b[i]->get()*in.at(i);
+		B += *par_b[i]*in.at(i);
 	}
 
 	for (int i=1; i<dimension; i++) {
-		A += par_a[i]->get()*out.at(i-1);
+		A += *par_a[i]*out.at(i-1);
 	}
 
 	o = B-A;

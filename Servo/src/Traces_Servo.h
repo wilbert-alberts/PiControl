@@ -9,6 +9,7 @@
 #define TRACES_SERVO_H_
 
 #include "Parameter.h"
+#include "ServoModule.h"
 
 #include <fcntl.h>
 #include <semaphore.h>
@@ -19,26 +20,24 @@
 
 class TraceMsg;
 
-class Traces_Servo{
+class Traces_Servo: public ServoModule {
 public:
+	Traces_Servo(ServoModule* predecessor);
+	virtual ~Traces_Servo();
 
-  static void sampleAllTraces(void* db);
-  static Traces_Servo* getInstance();
+	void calculate();
 
 private:
-  Traces_Servo();
-  void reopenStream();
-  void sendMessage(TraceMsg* msg);
-  void abortStreaming(const std::string& msg);
+	void reopenStream();
+	void sendMessage(TraceMsg* msg);
+	void abortStreaming(const std::string& msg);
 
-  static Traces_Servo* instance;
+	int sampleCounter;
+	bool streaming;
+	int sockfd;
 
-  int        sampleCounter;
-  bool       streaming;
-  int        sockfd;
-
-  Parameter* par_sampleCounter;
-  Parameter* par_streaming;
+	Parameter* par_sampleCounter;
+	Parameter* par_streaming;
 };
 
 #endif /* TRACE_H_ */

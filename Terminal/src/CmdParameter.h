@@ -17,8 +17,8 @@ public:
 	static void createParameterCommands();
 	virtual ~CmdParameter();
 
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& output);
+	virtual void execute(std::ostream& output);
 
 private:
 	CmdParameter(Parameter* p);

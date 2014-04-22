@@ -16,8 +16,8 @@ class CmdDumpTiming: Command {
 public:
 	CmdDumpTiming();
 	virtual ~CmdDumpTiming();
-	virtual void displayHelp();
-	virtual void execute(std::list<std::string>& args);
+	virtual void displayHelp(std::ostream& output);
+	virtual void execute(std::ostream& output);
 };
 
 #endif /* TIMESTATS_H_ */

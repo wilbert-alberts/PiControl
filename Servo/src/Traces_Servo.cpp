@@ -29,51 +29,46 @@
 #include "Parameter.h"
 
 
-Traces_Servo* Traces_Servo::instance = 0;
-
 const int   PORTNR   = 9786;
 const char* HOSTNAME = "localhost";
 const char* TRACEENVVAR = "PITRACER";
 
 
-Traces_Servo* Traces_Servo::getInstance()
-{
-  if (instance == 0) {
-    instance = new Traces_Servo();
-  }
-
-  return instance;
-}
-
-Traces_Servo::Traces_Servo()
-: sampleCounter(0)
+Traces_Servo::Traces_Servo(ServoModule* predecessor)
+: ServoModule("Tracer", predecessor)
+, sampleCounter(0)
 , streaming(false)
-, par_sampleCounter(new Parameter("Traces.sampleCounter"))
-, par_streaming(new Parameter("Traces.streaming"))
+, sockfd(0)
+, par_sampleCounter(createParameter("sampleCounter"))
+, par_streaming(createParameter("streaming"))
 {
 	Traces* t = Traces::getInstance();
 	t->reset();
 }
 
-void Traces_Servo::sampleAllTraces(void* /*context*/)
+Traces_Servo::~Traces_Servo()
 {
-  Traces_Servo* instance = Traces_Servo::getInstance();
+
+}
+
+void Traces_Servo::calculate()
+{
   Traces*  traces = Traces::getInstance();
   TraceMsg msg;
 
-  instance->reopenStream();
+  reopenStream();
   traces->sample(&msg);
-  instance->sampleCounter++;
-  instance->sendMessage(&msg);
+  sampleCounter++;
+  sendMessage(&msg);
 
-  instance->par_sampleCounter->set((double)instance->sampleCounter);
+  *par_sampleCounter = (double)sampleCounter;
 }
 
 void Traces_Servo::abortStreaming(const std::string& msg)
 {
 	std::clog << "Streaming aborted: " << msg << std::endl;
 	streaming = false;
-	par_streaming->set(0.0);
+	*par_streaming = 0.0;
 	if (sockfd > 0) {
 		close(sockfd);
 		sockfd = 0;
@@ -85,13 +80,13 @@ void Traces_Servo::reopenStream()
 	/* Check whether streaming is enabled.
 	 * Abort if not enabled.
 	 */
-	if (streaming && par_streaming->get()<= 0.0) {
+	if (streaming && *par_streaming<= 0.0) {
 		abortStreaming("Streaming turned off");
 		return;
 	}
 
 	/* Check whether streaming shoudl be re-enabled */
-	if (!streaming && par_streaming->get() > 0.0) {
+	if (!streaming && *par_streaming > 0.0) {
 	    int portno;
 	    struct sockaddr_in serv_addr;
 	    struct hostent *server;
