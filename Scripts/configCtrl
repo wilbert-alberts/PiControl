@@ -11,8 +11,8 @@ $TERMINAL Controller.pos_kd 0
 $TERMINAL Controller.pos_ki 0.0
 
 $TERMINAL Controller.ang_sp 0.0
-$TERMINAL Controller.ang_kp 0.0
-$TERMINAL Controller.ang_kd 0.0
+$TERMINAL Controller.ang_kp -50 
+$TERMINAL Controller.ang_kd -5
 $TERMINAL Controller.ang_ki 0.0
 
 $TERMINAL Motor.inj_freq 2.5

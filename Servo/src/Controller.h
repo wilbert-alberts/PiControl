@@ -66,7 +66,14 @@ private:
 	Parameter* vang_flt;
 	Parameter* vang_raw;
 
+	Parameter* accAng_raw;
+	Parameter* accAng_flt;
 
+	Parameter* ang_mix;
+	Parameter* ang_mix_d1;
+	Parameter* ang_mix_d2;
+
+	Filter* flt_acc;
 	Filter* flt_pos;
 	Filter* flt_ang;
 	Filter* flt_vang;

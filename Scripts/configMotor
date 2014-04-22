@@ -11,15 +11,15 @@ $TERMINAL Dev.posGain 0.00002262443
 $TERMINAL Dev.h2Ang_gain 0.0
 
 $TERMINAL Dev.angleGain 0.0003870809
-$TERMINAL Dev.angleOffset -1.2328527249
+$TERMINAL Dev.angleOffset -0.4
 
 # Note: offset is added after multiplication with gain
 #       Changing gain must be followed by changing offset.
-$TERMINAL Dev.gyroGain 1.0
-$TERMINAL Dev.gyroOffset 665
+$TERMINAL Dev.gyroGain -0.012
+$TERMINAL Dev.gyroOffset -7.98
 
 $TERMINAL Dev.accGain 0.0033674684
-$TERMINAL Dev.accOffset -123.3771896894
+$TERMINAL Dev.accOffset -122.1
 
 
 $TERMINAL Motor.ki 0.033
@@ -32,6 +32,7 @@ $TERMINAL SPI.oversampling 11
 $TERMINAL SPI.enabled 1
 
 $TERMINAL cfgFilter ang 60 0.7
+$TERMINAL cfgFilter acc 6 0.7
 $TERMINAL cfgFilter pos 60 0.7
 $TERMINAL cfgFilter gyro 60 0.7
 $TERMINAL cfgFilter gyro_hpf 0.1 0.7
