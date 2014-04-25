@@ -11,6 +11,8 @@
 #include "DigitalOut.h"
 #include "PeriodicTimer.h"
 
+#include <iostream>
+
 ServoModule::ServoModule(const std::string& _id, ServoModule* _other)
 : id(_id)
 , other(_other)

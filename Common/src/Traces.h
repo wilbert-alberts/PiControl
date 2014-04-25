@@ -90,7 +90,7 @@ public:
 	void delAllTraces();
 	void clearAllTraces();
 
-	void sample(TraceMsg* msg);
+	void sample(TraceMsg* msg, double sampleCounter);
 	void dumpTraces(std::ostream& output);
 
 private:

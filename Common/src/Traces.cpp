@@ -20,7 +20,6 @@
 #include <system_error>
 
 static const char* TRACING_MEM_ID = "/mem.Tracing";
-static const char* SAMPLECOUNTER = "Traces.sampleCounter";
 
 CyclicBuffer::CyclicBuffer()
 : nrSamples(0)
@@ -211,24 +210,20 @@ void Traces::clearAllTraces()
 }
 
 
-void Traces::sample(TraceMsg* msg)
+void Traces::sample(TraceMsg* msg, double sc)
 {
-	static Parameter* p = new Parameter(SAMPLECOUNTER, 0.0);
-
 	if (tryLock()) {
 
 		for (int i = 0; i < NRTRACES; i++) {
 			traces[i].sample(msg);
 		}
-		sampleCounter++;
-		p->set(sampleCounter);
+		sampleCounter = sc;
 		unlock();
 	}
 }
 
 void Traces::dumpTraces(std::ostream& out) {
 	lock();
-	int      parSampleCounterIdx = Parameter::findParameter(SAMPLECOUNTER);
 
 	double*  destBuffers[100];
 	Trace*   activeTraces[100];
@@ -255,7 +250,7 @@ void Traces::dumpTraces(std::ostream& out) {
 	}
 	out << std::endl;
 
-	int start = Parameter::getByIdx(parSampleCounterIdx) - BUFFERSIZE;
+	int start = sampleCounter - BUFFERSIZE;
 	for (int i=0; i<BUFFERSIZE; i++) {
 		out << start;
 		for (int t=0; t<nrActiveTraces; t++) {
