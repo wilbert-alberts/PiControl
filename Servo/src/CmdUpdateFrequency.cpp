@@ -11,24 +11,32 @@
 #include "PeriodicTimer.h"
 #include "TimeStats.h"
 
-#include <iostream>
+#include <cassert>
 
 CmdUpdateFrequency::CmdUpdateFrequency(ServoModule* predecessor)
 : ServoModule("CmdUpdateFrequency", predecessor)
-, freq(0.0)
+, pt(0)
+, freq(1)
 {
-	par_frequency = createParameter(TimeStats::par_frequency);
+	par_frequency = createParameter("frequency");
 }
 
 CmdUpdateFrequency::~CmdUpdateFrequency() {
 }
 
+void CmdUpdateFrequency::setPeriodicTimer(PeriodicTimer* _pt)
+{
+	pt = _pt;
+
+	freq = pt->getFrequency();
+	par_frequency->setDeep(freq);
+}
 
 void CmdUpdateFrequency::calculateAfter()
 {
-	double f = *par_frequency;
-	if (f!=freq) {
-		getPeriodicTimer()->updateFrequency(f);
-		freq = f;
+	assert(pt!=0);
+	if (*par_frequency != freq) {
+		freq = *par_frequency;
+		getPeriodicTimer()->updateFrequency(freq);
 	}
 }
