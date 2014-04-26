@@ -38,11 +38,13 @@ void PeriodicTimer::addCallback(PeriodicTimerCB* cb) {
 	callbacks.push_back(cb);
 }
 
-void PeriodicTimer::setupTimer(double frequency) {
+void PeriodicTimer::setupTimer(double f) {
 	int ret;
-	double period = 1.0/frequency;
+	double period = 1.0/f;
 	struct timespec timespec;
 	struct itimerspec timerspec;
+
+	frequency = f;
 
 	/* Reset timer statistics */
 	marginStats->reset();
@@ -54,29 +56,25 @@ void PeriodicTimer::setupTimer(double frequency) {
 				"unable to create timer");
 	}
 
-	secondsToTimespec(&timespec, period);
-	timerspec.it_interval = timespec;
-	timerspec.it_value = timespec;
-
-	/* Make the timer periodic */
-	ret = timerfd_settime(timer_fd, 0, &timerspec, NULL);
-	if (ret == -1) {
-		throw std::system_error(errno, std::system_category(),
-				"unable to start timer");
-	}
+	updateFrequency(f);
 }
 
 double PeriodicTimer::getTime() const {
 	int ret;
 	struct itimerspec timerspec;
-	double period = 1.0/frequency;
+	double period(1.0/frequency);
+	double time(0.0);
+
+	std::cerr << "period: " << period << std::endl;
 
 	ret = timerfd_gettime(timer_fd, &timerspec);
 	if (ret == -1) {
 		perror("getTime");
 		return -1.0;
 	}
-	return period - timespecToSeconds(&timerspec.it_value);
+	time = period - timespecToSeconds(&timerspec.it_value);
+	std::cerr << "time: " << time << std::endl;
+	return time;
 }
 
 void PeriodicTimer::start() {
@@ -132,11 +130,11 @@ void PeriodicTimer::updateStats() {
 	marginStats->sample(time);
 }
 
-void PeriodicTimer::updateFrequency(double frequency) {
+void PeriodicTimer::updateFrequency(double f) {
 	struct timespec ts;
 	struct itimerspec itval;
 
-	double period = 1.0 / frequency;
+	double period(1.0 / f);
 	int ret;
 
 	marginStats->reset();
@@ -150,6 +148,7 @@ void PeriodicTimer::updateFrequency(double frequency) {
 			throw std::system_error(errno, std::system_category(),
 					"unable to update timer");
 		}
+		frequency = f;
 	}
 }
 
