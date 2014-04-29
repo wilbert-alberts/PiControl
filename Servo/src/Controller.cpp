@@ -102,7 +102,7 @@ bool Controller::mmdcSafe()
 		return true;
 
 	//double ang = devs->getDeviceValue(Devices::angle);
-	double ang = ang_mix->get();
+	double ang = *ang_mix;
 
 	return ((ang >= *mmdcMinAng) &&
 	        (ang <= *mmdcMaxAng));
@@ -191,9 +191,9 @@ void Controller::calculateModel()
 	am = 0.98*(am + angV2 / 100.0) + 0.02*am_d2;
 	am_i = am_i + am/100.0;
 
-	ang_mix_d1->set(am_d1);
-	ang_mix_d2->set(am_d2);
-	ang_mix->set(am);
+	*ang_mix_d1 = am_d1 ;
+	*ang_mix_d2 = am_d2 ;
+	*ang_mix    = am ;
 
 
 	// Determine integrated position error
