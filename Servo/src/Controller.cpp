@@ -136,7 +136,7 @@ void Controller::calculateModel()
 
 
 	// Get position from device.
-	pos = devs->getDeviceValue(Devices::pos);
+	pos = *devs->getDevice(Devices::ENCPOS);
 	*pos_raw = pos;
 	pos = filterDevice(flt_pos, pos);
 	*pos_flt = pos;
@@ -169,7 +169,7 @@ void Controller::calculateModel()
 //	ang_flt->set(ang);
 
 	// Get angle from Device
-	ang = devs->getDeviceValue(Devices::acc);
+	ang = *devs->getDevice(Devices::HEIGHT);
 	*ang_raw = ang;
 	//ang = filterDevice(flt_ang, ang);
 	*ang_flt = ang;
@@ -179,7 +179,7 @@ void Controller::calculateModel()
 	angVError = (angError - prevAngError);
 
 	// Get angular velocity from gyro Device
-	angV1 = devs->getDeviceValue(Devices::gyro);
+	angV1 = *devs->getDevice(Devices::GYRO);
 	*vang_raw = angV1;
 	angV2 = filterDevice(flt_vang_hpf, angV1);
 	angV3 = filterDevice(flt_vang, angV2);

@@ -56,8 +56,8 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		motor->setDevices(devices);
 		controller->setDevices(devices);
 		controller->setMotor(motor);
-		devices->setSPI(spi);
 		cmdUpdateFreq->setPeriodicTimer(pt);
+		devices->setSPI(spi);
 
 		pt->addCallback(dblocker);
 

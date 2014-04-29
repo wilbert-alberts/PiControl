@@ -34,6 +34,8 @@ private:
 	Devices* devs;
 
 	Parameter* enabled;
+	Parameter* nrIncrements;
+
 	Parameter* t;
 	Parameter* ki;
 	Parameter* kv;
