@@ -36,7 +36,8 @@ public:
 		PWM,
 		MOTORDIR,
 		OVERSAMPLING,
-		SAMPLESTAKEN
+		SAMPLESTAKEN,
+		ACC
 	} RegisterID;
 
 	Parameter* getRegister(RegisterID  id);
@@ -51,9 +52,10 @@ private:
 		uint16_t gyro;
 		uint16_t encpos;
 		uint16_t pwm;
-		uint8_t motordir;
-		uint8_t oversampling;
-		uint8_t samplestaken;
+		uint8_t  motordir;
+		uint8_t  oversampling;
+		uint8_t  samplestaken;
+		uint16_t acc;
 	};
 
 	SPIRegisters buffer;

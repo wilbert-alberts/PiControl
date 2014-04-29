@@ -24,8 +24,7 @@ class Traces_Servo: public ServoModule {
 public:
 	Traces_Servo(ServoModule* predecessor);
 	virtual ~Traces_Servo();
-
-	void calculate();
+	virtual void calculateAfter();
 
 private:
 	void reopenStream();

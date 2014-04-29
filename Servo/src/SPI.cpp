@@ -34,7 +34,12 @@ SPI::SPI(ServoModule* wrapped)
 	createRegister8(SPI::OVERSAMPLING, "oversampling", &buffer.oversampling);
 	createRegister8(SPI::SAMPLESTAKEN, "samplestaken", &buffer.samplestaken);
 
+	createRegister16(SPI::ACC, "acc", &buffer.acc);
+
 	par_enabled = createParameter("enabled");
+
+	Pi2Mbed = createDigitalOut("pi2mbed", 4, 1);
+	Mbed2Pi = createDigitalIn("mbed2pi", 5);
 }
 
 SPI::~SPI()

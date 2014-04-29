@@ -49,6 +49,8 @@ public:
 
 		rawGyro, gyro, gyroGain, gyroOffset,
 
+		rawAcc, acc, accGain, accOffset,
+
 		nrIncrements,
 
 		voltage, voltageGain, voltageOffset,
@@ -66,6 +68,7 @@ private:
 	void sampleAngle(double frequency);
 	void samplePosition(double frequency);
 	void sampleGyro(double frequency);
+	void sampleAcc(double frequency);
 	void sampleBattery();
 
 	void updateDC();
@@ -113,6 +116,11 @@ private:
 	Parameter* par_gyro;
 	Parameter* par_gyroGain;
 	Parameter* par_gyroOffset;
+
+	Parameter* par_rawAcc;
+	Parameter* par_acc;
+	Parameter* par_accGain;
+	Parameter* par_accOffset;
 
 	Parameter* par_nrIncrements;
 

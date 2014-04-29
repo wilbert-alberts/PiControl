@@ -11,11 +11,17 @@
 #include "DigitalOut.h"
 #include "PeriodicTimer.h"
 
-ServoModule::ServoModule(const std::string& _id, ServoModule* _other) :
-		id(_id), other(_other), tsStart1(createParameter(id + "1.tsStart")), tsEnd1(
-				createParameter(id + "1.tsEnd")), tsStart2(
-				createParameter(id + "2.tsStart")), tsEnd2(
-				createParameter(id + "2.tsEnd")), measureTiming(1) {
+#include <iostream>
+
+ServoModule::ServoModule(const std::string& _id, ServoModule* _other)
+: id(_id)
+, other(_other)
+, tsStart1(createParameter(id+"1.tsStart"))
+, tsEnd1(createParameter(id+"1.tsEnd"))
+, tsStart2(createParameter(id+"2.tsStart"))
+, tsEnd2(createParameter(id+"2.tsEnd"))
+, measureTiming(1)
+{
 }
 
 ServoModule::~ServoModule() {

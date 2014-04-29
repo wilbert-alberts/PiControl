@@ -13,7 +13,7 @@
 #include "Devices.h"
 #include "Parameter.h"
 #include "Filter.h"
-
+#include "PeriodicTimer.h"
 
 Controller::Controller(ServoModule* pre)
 : ServoModule("Controller", pre)
@@ -37,6 +37,9 @@ Controller::Controller(ServoModule* pre)
 	ang_kd = createParameter("ang_kd", 0);
 	ang_ki = createParameter("ang_ki", 0);
 
+	ang_mix = new Parameter("Controller.ang_mix", 0);
+	ang_mix_d1 = new Parameter("Controller.ang_mix_d1", 0);
+	ang_mix_d2 = new Parameter("Controller.ang_mix_d2", 0);
 
 	angErrorParam = createParameter("angError", 0);
 	posErrorParam = createParameter("posError", 0);
@@ -53,8 +56,11 @@ Controller::Controller(ServoModule* pre)
 	vang_raw = createParameter("angV_raw", 0);
 	ang_raw  = createParameter("ang_raw", 0);
 
-	pos_flt  = createParameter("pos_flt", 0);
-	pos_raw  = createParameter("pos_raw", 0);
+	accAng_raw = new Parameter("Controller.accAng_raw",0);
+	accAng_flt = new Parameter("Controller.accAng_flt",0);
+
+	pos_flt  = new Parameter("Controller.pos_flt", 0);
+	pos_raw  = new Parameter("Controller.pos_raw", 0);
 
 	mmdcMinAng = new Parameter("Controller.minAng", -100);
 	mmdcMaxAng = new Parameter("Controller.maxAng",  100);
@@ -67,6 +73,7 @@ Controller::Controller(ServoModule* pre)
 	flt_ang = new Filter("ang", 3);
 	flt_vang = new Filter("gyro", 3);
 	flt_vang_hpf = new HPFilter("gyro_hpf", 3);
+	flt_acc = new Filter("acc", 3);
 
 	updateActualPosition = true;
 }
@@ -94,7 +101,8 @@ bool Controller::mmdcSafe()
 	if (*enabled==0.0)
 		return true;
 
-	double ang = devs->getDeviceValue(Devices::angle);
+	//double ang = devs->getDeviceValue(Devices::angle);
+	double ang = *ang_mix;
 
 	return ((ang >= *mmdcMinAng) &&
 	        (ang <= *mmdcMaxAng));
@@ -121,6 +129,12 @@ void Controller::calculateModel()
 	double angV2(0.0);
 	double angV3(0.0);
 
+	static double am_d1(0.0);
+	static double am_d2(0.0);
+	static double am(0.0);
+	static double am_i(0.0);
+
+
 	// Get position from device.
 	pos = devs->getDeviceValue(Devices::pos);
 	*pos_raw = pos;
@@ -134,6 +148,7 @@ void Controller::calculateModel()
 		prevAngError = 0;
 		relPosOffset = pos;
 		updateActualPosition = false;
+		am_i=0.0;
 	}
 
 	// Determine position error
@@ -147,10 +162,16 @@ void Controller::calculateModel()
 	if (*ang_sp <-1) *ang_sp = -1;
 	if (*ang_sp > 1) *ang_sp =  1;
 
+	// Get angle from height sensor
+//	ang = devs->getDeviceValue(Devices::angle);
+//	ang_raw->set(ang);
+//	ang = filterDevice(flt_ang, ang);
+//	ang_flt->set(ang);
+
 	// Get angle from Device
-	ang = devs->getDeviceValue(Devices::angle);
+	ang = devs->getDeviceValue(Devices::acc);
 	*ang_raw = ang;
-	ang = filterDevice(flt_ang, ang);
+	//ang = filterDevice(flt_ang, ang);
 	*ang_flt = ang;
 
 	// Determine angle error
@@ -164,6 +185,17 @@ void Controller::calculateModel()
 	angV3 = filterDevice(flt_vang, angV2);
 	*vang_flt = angV3;
 
+	// Determine mixed angle
+	am_d1 = am_d1 + angV2 / 100.0;
+	am_d2 = ang;
+	am = 0.98*(am + angV2 / 100.0) + 0.02*am_d2;
+	am_i = am_i + am/100.0;
+
+	*ang_mix_d1 = am_d1 ;
+	*ang_mix_d2 = am_d2 ;
+	*ang_mix    = am ;
+
+
 	// Determine integrated position error
 	sumError += posError;
 	if ((posError > 0 && prevPosError < 0)
@@ -176,19 +208,27 @@ void Controller::calculateModel()
 	*co_poskd = *pos_kd * posVError;
 	*co_poski = *pos_ki * sumError;
 
-	*co_angkp = *ang_kp * angError;
+	*co_angkp = *ang_kp * (*ang_mix);
 	*co_angkd = *ang_kd * angV3;
 
 	// Calculate final torque
-	tq = (*pos_kp * posError +
-          *pos_kd * posVError +
-		  *pos_ki * sumError +
-		  *ang_kp * angError +
-		  *ang_kd * angV3);
-
+	tq = (pos_kp->get() * posError +
+          pos_kd->get() * posVError +
+		  pos_ki->get() * sumError +
+		  ang_kp->get() * am +
+		  ang_kd->get() * angV3 +
+		  ang_ki->get() * am_i);
 
 	// Inject noise
 	//tq = doInject(tq);
+
+	// Perform safety check
+	if (!mmdcSafe())
+	{
+		disableController();
+		return;
+	}
+
 
 	// Set torque.
 	if (*enabled != 0.0) {

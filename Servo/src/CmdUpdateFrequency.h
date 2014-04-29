@@ -21,9 +21,12 @@ public:
 	virtual ~CmdUpdateFrequency();
 
 	void calculateAfter();
+	void setPeriodicTimer(PeriodicTimer* _pt);
+
 
 private:
 	Parameter* par_frequency;
+	PeriodicTimer* pt;
 	double freq;
 };
 

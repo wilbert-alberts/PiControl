@@ -35,7 +35,7 @@ const char* TRACEENVVAR = "PITRACER";
 
 
 Traces_Servo::Traces_Servo(ServoModule* predecessor)
-: ServoModule("Tracer", predecessor)
+: ServoModule("Traces", predecessor)
 , sampleCounter(0)
 , streaming(false)
 , sockfd(0)
@@ -51,17 +51,17 @@ Traces_Servo::~Traces_Servo()
 
 }
 
-void Traces_Servo::calculate()
+void Traces_Servo::calculateAfter()
 {
   Traces*  traces = Traces::getInstance();
   TraceMsg msg;
 
   reopenStream();
-  traces->sample(&msg);
-  sampleCounter++;
+  traces->sample(&msg, sampleCounter);
   sendMessage(&msg);
-
+  sampleCounter++;
   *par_sampleCounter = (double)sampleCounter;
+
 }
 
 void Traces_Servo::abortStreaming(const std::string& msg)
