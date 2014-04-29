@@ -51,7 +51,7 @@ void ServoModule::calculateAfter() {
 }
 
 Parameter* ServoModule::createParameter(const std::string& id) {
-	return createParameter(getId() + "." + id, 0.0);
+	return createParameter(id, 0.0);
 }
 
 Parameter* ServoModule::createParameter(const std::string& id,
