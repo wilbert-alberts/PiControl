@@ -202,6 +202,7 @@ void Devices::sampleBattery()
 
 
 void Devices::calculateAfter() {
+	//std::clog << "Devices::calculateAfter()" << std::endl;
 	updateDC();
 	spi->setRegister(SPI::OVERSAMPLING, *par_oversampling);
 }
@@ -216,6 +217,7 @@ void Devices::updateDC() {
 	int dir = dc<0.0 ? 1 : 0;
 	int rawDC = (int)(65535.0*fabs(dc));
 
+	//std::clog << "Devices::updateDC: " << rawDC << std::endl;
 	spi->setRegister(SPI::PWM, static_cast<double>(rawDC));
 	spi->setRegister(SPI::MOTORDIR, static_cast<double>(dir));
 }

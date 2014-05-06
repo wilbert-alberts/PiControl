@@ -221,7 +221,7 @@ void Controller::calculateModel()
 
 	if ((tq<0) && (tq>-45))
 		tq = -45;
-	if ((tq>0) && (tq>40))
+	if ((tq>0) && (tq<40))
 		tq = 40;
 
 	// Inject noise
