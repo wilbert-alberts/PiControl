@@ -219,6 +219,11 @@ void Controller::calculateModel()
 		  ang_kd->get() * angV3 +
 		  ang_ki->get() * am_i);
 
+	if ((tq<0) && (tq>-45))
+		tq = -45;
+	if ((tq>0) && (tq>40))
+		tq = 40;
+
 	// Inject noise
 	//tq = doInject(tq);
 
