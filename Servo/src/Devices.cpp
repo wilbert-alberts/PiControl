@@ -31,7 +31,7 @@ Devices::Devices(ServoModule* other)
 	devices[UBAT] = new SPIDevice("Dev.ubat", SPI::UBAT);
 	devices[DC] = new DutyCycle(SPI::PWM, SPI::MOTORDIR);
 
-	devices[TEST] = new GODevice(new Counter());
+	devices[TEST] = new DDevice((new Counter()));
 }
 
 Devices::~Devices()
@@ -167,6 +167,7 @@ void Encoder::setSPI(SPI* spi)
 
 void Encoder::readDevice(int /*f*/) {
 	unsigned int rawpos = static_cast<unsigned int>(*spiPos);
+
 	// Mask relevant bits
 	rawpos = rawpos & 0x0fff; // 12 bits
 	// determine delta w.r.t. previous sample;
@@ -225,8 +226,9 @@ void D2Ang::readDevice(int f)
 }
 
 DDevice::DDevice(Device* _d)
-: Device(_d->getID()+std::string("_D"))
+: Device(_d->getID()+std::string(".D"))
 , d(_d)
+, prev(0.0)
 {
 }
 
@@ -237,15 +239,19 @@ void DDevice::setSPI(SPI* spi)
 
 void DDevice::readDevice(int f)
 {
-	double oldValue(*d);
+	double n;
 
 	d->readDevice(f);
-	*value = *d - oldValue;
+
+	n = *d;
+	*value = n - prev;
+	prev = n;
 }
 
 IDevice::IDevice(Device* _d)
-: Device(_d->getID()+std::string("_D"))
+: Device(_d->getID()+std::string(".I"))
 , d(_d)
+, i(0.0)
 {
 }
 
@@ -256,10 +262,9 @@ void IDevice::setSPI(SPI* spi)
 
 void IDevice::readDevice(int f)
 {
-	double oldValue(*d);
-
 	d->readDevice(f);
-	*value = *d - oldValue;
+	i+= *d;
+	*value = i;
 }
 
 DutyCycle::DutyCycle(SPI::RegisterID _spiPw, SPI::RegisterID _spiDir)

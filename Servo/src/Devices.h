@@ -139,6 +139,7 @@ public:
 
 private:
 	Device* d;
+	double  prev;
 };
 
 class Counter: public Device
@@ -159,6 +160,7 @@ public:
 
 private:
 	Device* d;
+	double  i;
 };
 
 class Devices: public ServoModule {
