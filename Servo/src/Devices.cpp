@@ -20,6 +20,7 @@
 
 Devices::Devices(ServoModule* other)
 : ServoModule("Dev", other)
+, ctr(0)
 {
 	devices[ENCPOS] = new GODevice(new Encoder(SPI::ENCPOS));
 	devices[ENCPOS_D] = new DDevice(devices[ENCPOS]);
@@ -30,12 +31,7 @@ Devices::Devices(ServoModule* other)
 	devices[UBAT] = new SPIDevice("Dev.ubat", SPI::UBAT);
 	devices[DC] = new DutyCycle(SPI::PWM, SPI::MOTORDIR);
 
-	readDevices.insert(devices[ENCPOS_D]);
-	readDevices.insert(devices[HEIGHT]);
-	readDevices.insert(devices[GYRO]);
-	readDevices.insert(devices[UBAT]);
-
-	writeDevices.insert(devices[DC]);
+	devices[TEST] = new GODevice(new Counter());
 }
 
 Devices::~Devices()
@@ -53,12 +49,20 @@ void Devices::setSPI(SPI* spi)
 
 void Devices::calculateBefore()
 {
-	std::for_each(readDevices.begin(), readDevices.end(), std::mem_fun(&Device::readDevice));
+	for(auto iter = devices.begin(); iter!=devices.end(); iter ++)
+	{
+		iter->second->readDevice(ctr);
+	}
+	ctr++;
 }
 
 void Devices::calculateAfter()
 {
-	std::for_each(writeDevices.begin(), writeDevices.end(), std::mem_fun(&Device::writeDevice));
+	for(auto iter = devices.begin(); iter!=devices.end(); iter ++)
+	{
+		iter->second->writeDevice(ctr);
+	}
+	ctr++;
 }
 
 Device* Devices::getDevice(DeviceID did)
@@ -95,6 +99,19 @@ Device& Device::operator=(const double other)
 	return *this;
 };
 
+void Device::read(int f)
+{
+	if (f!= fresh)
+		readDevice(f);
+	fresh = f;
+}
+
+void Device::write(int f)
+{
+	if (f!= fresh)
+		readDevice(f);
+	fresh = f;
+}
 GODevice::GODevice(Device* raw)
 : Device(raw->getID() + std::string(".go"))
 , rawDevice(raw)
@@ -108,9 +125,9 @@ void GODevice::setSPI(SPI* spi)
 	rawDevice->setSPI(spi);
 }
 
-void GODevice::readDevice()
+void GODevice::readDevice(int f)
 {
-	rawDevice->readDevice();
+	rawDevice->read(f);
 	*value = *rawDevice* (*gain) + (*offset);
 }
 
@@ -128,9 +145,9 @@ void LPFDevice::setSPI(SPI* spi)
 	rawDevice->setSPI(spi);
 }
 
-void LPFDevice::readDevice()
+void LPFDevice::readDevice(int f)
 {
-	rawDevice->readDevice();
+	rawDevice->readDevice(f);
 	*value = filter->calculate(*rawDevice);
 }
 
@@ -148,7 +165,7 @@ void Encoder::setSPI(SPI* spi)
 	spiPos = spi->getRegister(spiReg);
 }
 
-void Encoder::readDevice() {
+void Encoder::readDevice(int /*f*/) {
 	unsigned int rawpos = static_cast<unsigned int>(*spiPos);
 	// Mask relevant bits
 	rawpos = rawpos & 0x0fff; // 12 bits
@@ -181,7 +198,7 @@ void SPIDevice::setSPI(SPI* spi)
 	spiH = spi->getRegister(spiReg);
 }
 
-void SPIDevice::readDevice()
+void SPIDevice::readDevice(int /*f*/)
 {
 	*value = *spiH;
 }
@@ -199,10 +216,10 @@ void D2Ang::setSPI(SPI* spi)
 	devH2->setSPI(spi);
 }
 
-void D2Ang::readDevice()
+void D2Ang::readDevice(int f)
 {
-	devH1->readDevice();
-	devH2->readDevice();
+	devH1->read(f);
+	devH2->read(f);
 
 	*value = *devH1 - *devH1;
 }
@@ -218,11 +235,30 @@ void DDevice::setSPI(SPI* spi)
 	d->setSPI(spi);
 }
 
-void DDevice::readDevice()
+void DDevice::readDevice(int f)
 {
 	double oldValue(*d);
 
-	d->readDevice();
+	d->readDevice(f);
+	*value = *d - oldValue;
+}
+
+IDevice::IDevice(Device* _d)
+: Device(_d->getID()+std::string("_D"))
+, d(_d)
+{
+}
+
+void IDevice::setSPI(SPI* spi)
+{
+	d->setSPI(spi);
+}
+
+void IDevice::readDevice(int f)
+{
+	double oldValue(*d);
+
+	d->readDevice(f);
 	*value = *d - oldValue;
 }
 
@@ -241,7 +277,7 @@ void DutyCycle::setSPI(SPI* spi)
 	dir = spi->getRegister(spiDir);
 }
 
-void DutyCycle::writeDevice()
+void DutyCycle::writeDevice(int /*f*/)
 {
 	double dc;
 	double val(*value);
@@ -250,4 +286,17 @@ void DutyCycle::writeDevice()
 
 	*pw = fabs(dc)*65535.0;
 	*dir = (*value) <0 ? 1 : 0;
+}
+
+
+Counter::Counter()
+: Device("Dev.Counter")
+, ctr(0.0)
+{
+}
+
+void Counter::readDevice(int /*f*/)
+{
+	ctr+= 1.0;
+	*value = ctr;
 }

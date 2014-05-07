@@ -5,8 +5,8 @@
  *      Author: wilbert
  */
 
-#ifndef NEWDEVICE_H_
-#define NEWDEVICE_H_
+#ifndef DEVICES_H
+#define DEVICES_H
 
 #include "ServoModule.h"
 #include "SPI.h"
@@ -32,11 +32,17 @@ public:
 	virtual operator double();
 	virtual Device& operator=(const double other);
 
-	virtual void readDevice() {};
-	virtual void writeDevice() {};
+	virtual void readDevice(int) {};
+	virtual void writeDevice(int) {};
+
+	void read(int f);
+	void write(int f);
+
 
 private:
 	const std::string id;
+
+	int fresh;
 
 protected:
 	Parameter* value;
@@ -49,8 +55,8 @@ public:
 	virtual ~GODevice() {};
 	virtual void setSPI(SPI* spi);
 
-	virtual void readDevice();
-	virtual void writeDevice() {};
+	virtual void readDevice(int);
+	virtual void writeDevice(int) {};
 
 private:
 	Device*   rawDevice;
@@ -64,7 +70,7 @@ public:
 	virtual ~LPFDevice() {};
 	virtual void setSPI(SPI* spi);
 
-	virtual void readDevice();
+	virtual void readDevice(int f);
 private:
 	Device* rawDevice;
 	Filter* filter;
@@ -74,7 +80,7 @@ class Encoder : public Device
 {
 public:
 	Encoder(SPI::RegisterID spiReg);
-	void readDevice();
+	void readDevice(int f);
 	void setSPI(SPI* spi);
 
 private:
@@ -88,7 +94,7 @@ class SPIDevice: public Device
 {
 public:
 	SPIDevice(const std::string& id, SPI::RegisterID spiReg);
-	void readDevice();
+	void readDevice(int f);
 	void setSPI(SPI* spi);
 
 private:
@@ -101,7 +107,7 @@ class DutyCycle: public Device
 public:
 	DutyCycle(SPI::RegisterID spiPw, SPI::RegisterID spiDir);
 	void setSPI(SPI* spi);
-	void writeDevice();
+	void writeDevice(int f);
 
 private:
 	SPI::RegisterID spiPw;
@@ -116,7 +122,7 @@ class D2Ang: public Device
 {
 public:
 	D2Ang(Device* d1, Device* d2);
-	virtual void readDevice();
+	virtual void readDevice(int f);
 	virtual void setSPI(SPI* spi);
 
 private:
@@ -128,7 +134,27 @@ class DDevice : public Device
 {
 public:
 	DDevice(Device* d);
-	virtual void readDevice();
+	virtual void readDevice(int f);
+	virtual void setSPI(SPI* spi);
+
+private:
+	Device* d;
+};
+
+class Counter: public Device
+{
+public:
+	Counter();
+	virtual void readDevice(int f);
+private:
+	double ctr;
+};
+
+class IDevice: public Device
+{
+public:
+	IDevice(Device* d);
+	virtual void readDevice(int f);
 	virtual void setSPI(SPI* spi);
 
 private:
@@ -147,7 +173,8 @@ public:
 		GYRO,
 		NRINCREMENTS,
 		UBAT,
-		DC
+		DC,
+		TEST
 	} DeviceID;
 
 	Devices(ServoModule* other);
@@ -163,6 +190,8 @@ private:
 	std::map<DeviceID, Device*> devices;
 	std::set<Device*>  readDevices;
 	std::set<Device*>  writeDevices;
+
+	int ctr;
 };
 
 #endif /* NEWDEVICE_H_ */
