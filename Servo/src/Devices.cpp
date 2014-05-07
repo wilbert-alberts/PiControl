@@ -23,11 +23,12 @@ ServoModule("Devices", wrapped),
 		par_h1Ang(createParameter("h1Ang",0.0, h1Ang)),
 		par_h2Ang(createParameter("h2Ang",0.0, h2Ang)),
 
-		par_h1AngGain(new Parameter("h1Ang_gain",1.0)),
-		par_h2AngGain(new Parameter("h2Ang_gain",1.0)),
 
-		par_h1AngOffset(new Parameter("h1Ang_offset",0.0)),
-		par_h2AngOffset(new Parameter("h2Ang_offset",0.0)),
+		par_h1AngGain( createParameter("h1Ang_gain",1.0, h1Ang_gain)),
+		par_h2AngGain( createParameter("h2Ang_gain",1.0, h2Ang_gain)),
+
+		par_h1AngOffset( createParameter("h1Ang_offset",0.0, h1Ang_offset)),
+		par_h2AngOffset( createParameter("h2Ang_offset",0.0, h1Ang_offset)),
 
 		par_rawAngle(createParameter("rawAngle",0.0, rawAngle)),
 		par_angle(createParameter("angle",0.0, angle)),
@@ -50,12 +51,12 @@ ServoModule("Devices", wrapped),
 		par_gyroGain(createParameter("gyroGain",0.0, gyroGain)),
 		par_gyroOffset(createParameter("gyroOffset",0.0, gyroOffset)),
 
-		par_rawAcc(createParameter("Dev.rawAcc",0.0, rawAcc)),
-		par_acc(createParameter("Dev.acc",0.0, acc)),
-		par_accGain(createParameter("Dev.accGain",0.0, accGain)),
-		par_accOffset(createParameter("Dev.accOffset",0.0, accOffset)),
+		par_rawAcc(createParameter("rawAcc",0.0, rawAcc)),
+		par_acc(createParameter("acc",0.0, acc)),
+		par_accGain(createParameter("accGain",0.0, accGain)),
+		par_accOffset(createParameter("accOffset",0.0, accOffset)),
 
-		par_nrIncrements(createParameter("Dev.nrIncrements",4096.0, nrIncrements)),
+		par_nrIncrements(createParameter("nrIncrements",4096.0, nrIncrements)),
 
 		par_voltage(createParameter("voltage",0.0, voltage)),
 		par_voltageGain(createParameter("voltageGain",1.0, voltageGain)),
@@ -74,7 +75,7 @@ Devices::~Devices() {
 
 Parameter* Devices::createParameter(const std::string& name, double v, Devices::DeviceID id)
 {
-	Parameter* result = new Parameter(name, v);
+	Parameter* result = new Parameter(std::string("Dev.")+name, v);
 
 	devices[id]=result;
 	return result;
@@ -201,6 +202,7 @@ void Devices::sampleBattery()
 
 
 void Devices::calculateAfter() {
+	//std::clog << "Devices::calculateAfter()" << std::endl;
 	updateDC();
 	spi->setRegister(SPI::OVERSAMPLING, *par_oversampling);
 }
@@ -215,6 +217,7 @@ void Devices::updateDC() {
 	int dir = dc<0.0 ? 1 : 0;
 	int rawDC = (int)(65535.0*fabs(dc));
 
+	//std::clog << "Devices::updateDC: " << rawDC << std::endl;
 	spi->setRegister(SPI::PWM, static_cast<double>(rawDC));
 	spi->setRegister(SPI::MOTORDIR, static_cast<double>(dir));
 }

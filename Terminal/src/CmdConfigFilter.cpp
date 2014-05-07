@@ -79,7 +79,7 @@ void CmdConfigFilter::calculate(std::vector<double>& a, std::vector<double>& b, 
 
 double CmdConfigFilter::getSamplePeriod()
 {
-	Parameter* frequency= new Parameter(TimeStats::par_frequency,0.0);
+	Parameter* frequency= new Parameter("CmdUpdateFrequency.frequency",0.0);
 
 	return 1.0/frequency->get();
 }

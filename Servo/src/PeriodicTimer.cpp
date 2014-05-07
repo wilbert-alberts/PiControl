@@ -65,7 +65,7 @@ double PeriodicTimer::getTime() const {
 	double period(1.0/frequency);
 	double time(0.0);
 
-	std::cerr << "period: " << period << std::endl;
+	//std::cerr << "period: " << period << std::endl;
 
 	ret = timerfd_gettime(timer_fd, &timerspec);
 	if (ret == -1) {
@@ -73,7 +73,7 @@ double PeriodicTimer::getTime() const {
 		return -1.0;
 	}
 	time = period - timespecToSeconds(&timerspec.it_value);
-	std::cerr << "time: " << time << std::endl;
+	//std::cerr << "time: " << time << std::endl;
 	return time;
 }
 
