@@ -3,12 +3,9 @@
 
 source ./environment.sh
 
-$TERMINAL PeriodicTimer.frequency 100
+$TERMINAL CmdUpdateFrequency.frequency 100
 
 $TERMINAL Dev.posGain 0.00002262443
-
-#Note SPI.Height2 seems to be broken.
-$TERMINAL Dev.h2Ang_gain 0.0
 
 $TERMINAL Dev.angleGain 0.0003870809
 $TERMINAL Dev.angleOffset -0.4
@@ -19,7 +16,7 @@ $TERMINAL Dev.gyroGain -0.012
 $TERMINAL Dev.gyroOffset -7.98
 
 $TERMINAL Dev.accGain 0.0033674684
-$TERMINAL Dev.accOffset -122.1
+$TERMINAL Dev.accOffset -122.8
 
 
 $TERMINAL Motor.ki 0.033

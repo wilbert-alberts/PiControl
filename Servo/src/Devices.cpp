@@ -16,6 +16,7 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
+#include <cassert>
 
 Devices::Devices(ServoModule* other)
 : ServoModule("Dev", other)
