@@ -23,18 +23,18 @@
 SPI::SPI(ServoModule* wrapped)
 : ServoModule("SPI", wrapped)
 {
-	createRegister16(SPI::HEIGHT1, "height1", &buffer.height1);
-	createRegister16(SPI::HEIGHT2, "height2", &buffer.height2);
-	createRegister16(SPI::UBAT, "ubat", &buffer.ubat);
-	createRegister16(SPI::GYRO, "gyro", &buffer.gyro);
-	createRegister16(SPI::ENCPOS, "encpos", &buffer.encpos);
-	createRegister16(SPI::PWM, "pwm", &buffer.pwm);
+	createRegister16(SPI::HEIGHT1, "height1", (uint16_t*)&buffer.height1);
+	createRegister16(SPI::HEIGHT2, "height2", (uint16_t*)&buffer.height2);
+	createRegister16(SPI::UBAT, "ubat", (uint16_t*)&buffer.ubat);
+	createRegister16(SPI::GYRO, "gyro", (uint16_t*)&buffer.gyro);
+	createRegister16(SPI::ENCPOS, "encpos", (uint16_t*)&buffer.encpos);
+	createRegister16(SPI::PWM, "pwm", (uint16_t*)&buffer.pwm);
 
 	createRegister8(SPI::MOTORDIR, "motordir", &buffer.motordir);
 	createRegister8(SPI::OVERSAMPLING, "oversampling", &buffer.oversampling);
 	createRegister8(SPI::SAMPLESTAKEN, "samplestaken", &buffer.samplestaken);
 
-	createRegister16(SPI::ACC, "acc", &buffer.acc);
+	createRegister16(SPI::ACC, "acc", (uint16_t*)&buffer.acc);
 
 	par_enabled = createParameter("enabled");
 

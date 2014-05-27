@@ -46,16 +46,16 @@ private:
 	class SPIRegisters
 	{
 	public:
-		uint16_t height1;
-		uint16_t height2;
-		uint16_t ubat;
-		uint16_t gyro;
-		uint16_t encpos;
-		uint16_t pwm;
-		uint8_t  motordir;
-		uint8_t  oversampling;
-		uint8_t  samplestaken;
-		uint16_t acc;
+		uint8_t height1[2];
+		uint8_t height2[2];
+		uint8_t ubat[2];
+		uint8_t gyro[2];
+		uint8_t encpos[2];
+		uint8_t pwm[2];
+		uint8_t motordir;
+		uint8_t oversampling;
+		uint8_t samplestaken;
+		uint8_t acc[2];
 	};
 
 	SPIRegisters buffer;

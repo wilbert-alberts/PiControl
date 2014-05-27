@@ -190,6 +190,7 @@ void WiringPiHAL::captureBuffer(unsigned char* myBuffer, unsigned char* dest, in
 
 void WiringPiHAL::dumpBuffer(const char* msg, unsigned char* myBuffer, int len)
 {
+	printf("len: %d\n", len);
 	printf("%s: ", msg);
 	for (int i=0; i<len+8; i++) {
 		printf(" %02X", myBuffer[i]);
