@@ -28,6 +28,7 @@ Devices::Devices(ServoModule* other)
 	devices[H2] = new GODevice(new SPIDevice("Dev.h2", SPI::HEIGHT2));
 	devices[HEIGHT] = new LPFDevice(new D2Ang(devices[H1], devices[H2]));
 	devices[GYRO] = new LPFDevice(new GODevice(new SPIDevice("Dev.gyro", SPI::GYRO)));
+	devices[ACC] = new GODevice(new SPIDevice("Dev.acc", SPI::ACC));
 	devices[UBAT] = new SPIDevice("Dev.ubat", SPI::UBAT);
 	devices[DC] = new DutyCycle(SPI::PWM, SPI::MOTORDIR);
 
@@ -150,6 +151,25 @@ void LPFDevice::readDevice(int f)
 	rawDevice->readDevice(f);
 	*value = filter->calculate(*rawDevice);
 }
+
+HPFDevice::HPFDevice(Device* raw)
+: Device(raw->getID() + ".lpf")
+, rawDevice(raw)
+, filter(new Filter(getID() + ".filter" ,3))
+{
+};
+
+void HPFDevice::setSPI(SPI* spi)
+{
+	rawDevice->setSPI(spi);
+}
+
+void HPFDevice::readDevice(int f)
+{
+	rawDevice->readDevice(f);
+	*value = filter->calculate(*rawDevice);
+}
+
 
 Encoder::Encoder(SPI::RegisterID _spiReg)
 : Device("Dev.Encoder")

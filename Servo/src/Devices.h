@@ -76,6 +76,18 @@ private:
 	Filter* filter;
 };
 
+
+class HPFDevice : public Device {
+public:
+	HPFDevice(Device* raw);
+	virtual ~HPFDevice() {};
+	virtual void setSPI(SPI* spi);
+
+	virtual void readDevice(int f);
+private:
+	Device* rawDevice;
+	Filter* filter;
+};
 class Encoder : public Device
 {
 public:
@@ -173,6 +185,7 @@ public:
 		H2,
 		HEIGHT,
 		GYRO,
+		ACC,
 		NRINCREMENTS,
 		UBAT,
 		DC,
