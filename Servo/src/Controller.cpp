@@ -49,6 +49,7 @@ Controller::Controller(ServoModule* pre)
 	co_poski = createParameter("co_poski", 0);
 	co_angkp = createParameter("co_angkp", 0);
 	co_angkd = createParameter("co_angkd", 0);
+	co_angki = createParameter("co_angki", 0);
 
 	vang_flt = createParameter("angV_flt", 0);
 	ang_flt  = createParameter("ang_flt", 0);
@@ -138,7 +139,7 @@ void Controller::calculateModel()
 	// Get position from device.
 	pos = devs->getDeviceValue(Devices::pos);
 	*pos_raw = pos;
-	pos = filterDevice(flt_pos, pos);
+	//pos = filterDevice(flt_pos, pos);
 	*pos_flt = pos;
 
 	if (updateActualPosition) {
@@ -210,6 +211,8 @@ void Controller::calculateModel()
 
 	*co_angkp = *ang_kp * (*ang_mix);
 	*co_angkd = *ang_kd * angV3;
+	*co_angki = ang_ki->get() * am_i;
+
 
 	// Calculate final torque
 	tq = (pos_kp->get() * posError +
@@ -219,10 +222,10 @@ void Controller::calculateModel()
 		  ang_kd->get() * angV3 +
 		  ang_ki->get() * am_i);
 
-	if ((tq<0) && (tq>-45))
-		tq = -45;
-	if ((tq>0) && (tq<40))
-		tq = 40;
+	if ((tq<0) && (tq>-40))
+		tq = -40;
+	if ((tq>0) && (tq<35))
+		tq = 35;
 
 	// Inject noise
 	//tq = doInject(tq);

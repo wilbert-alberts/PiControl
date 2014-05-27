@@ -64,6 +64,7 @@ private:
 	Parameter* co_poski;
 	Parameter* co_angkp;
 	Parameter* co_angkd;
+	Parameter* co_angki;
 
 	Parameter* pos_raw;
 	Parameter* pos_flt;
