@@ -93,7 +93,7 @@ void SPI::calculateAfter() {
 	// 2) Wait until Mbed2Pi is zero
 	// 3) Transmit over spi
 
-	std::clog << "SPI::writeBus"<< std::endl;
+	//std::clog << "SPI::writeBus"<< std::endl;
 	copyFromParameters();
 
 	try {
