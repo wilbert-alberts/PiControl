@@ -1,7 +1,7 @@
 /*
- * Devices.cpp
+ * NewDevice.cpp
  *
- *  Created on: Jul 10, 2013
+ *  Created on: Mar 31, 2014
  *      Author: wilbert
  */
 
@@ -9,215 +9,299 @@
 
 #include "SPI.h"
 #include "Parameter.h"
-#include "PeriodicTimer.h"
+#include "Filter.h"
 
-#include <stdexcept>
-#include <iostream>
+#include <map>
 #include <cmath>
+#include <iostream>
+#include <algorithm>
+#include <functional>
 #include <cassert>
 
-Devices::Devices(ServoModule* wrapped) :
-ServoModule("Devices", wrapped),
-		spi(0),
+Devices::Devices(ServoModule* other)
+: ServoModule("Dev", other)
+, ctr(0)
+{
+	devices[ENCPOS] = new GODevice(new Encoder(SPI::ENCPOS));
+	devices[ENCPOS_D] = new DDevice(devices[ENCPOS]);
+	devices[H1] = new GODevice(new SPIDevice("Dev.h1", SPI::HEIGHT1));
+	devices[H2] = new GODevice(new SPIDevice("Dev.h2", SPI::HEIGHT2));
+	devices[HEIGHT] = new LPFDevice(new D2Ang(devices[H1], devices[H2]));
+	devices[GYRO] = new LPFDevice(new GODevice(new SPIDevice("Dev.gyro", SPI::GYRO)));
+	devices[UBAT] = new SPIDevice("Dev.ubat", SPI::UBAT);
+	devices[DC] = new DutyCycle(SPI::PWM, SPI::MOTORDIR);
 
-		par_h1Ang(createParameter("h1Ang",0.0, h1Ang)),
-		par_h2Ang(createParameter("h2Ang",0.0, h2Ang)),
+	devices[TEST] = new DDevice((new Counter()));
+}
 
-
-		par_h1AngGain( createParameter("h1Ang_gain",1.0, h1Ang_gain)),
-		par_h2AngGain( createParameter("h2Ang_gain",1.0, h2Ang_gain)),
-
-		par_h1AngOffset( createParameter("h1Ang_offset",0.0, h1Ang_offset)),
-		par_h2AngOffset( createParameter("h2Ang_offset",0.0, h1Ang_offset)),
-
-		par_rawAngle(createParameter("rawAngle",0.0, rawAngle)),
-		par_angle(createParameter("angle",0.0, angle)),
-		par_angleV(createParameter("angleV",0.0, angleV)),
-		par_angleA(createParameter("angleA",0.0, angleA)),
-		par_angleGain(createParameter("angleGain",1.0, angleGain)),
-		par_angleOffset(createParameter("angleOffset",0.0, angleOffset)),
-
-		prevRawPos(0), encPos(0),
-
-		par_rawPos(createParameter("rawPos",0.0, rawPos)),
-		par_pos(createParameter("pos",0.0, pos)),
-		par_posV(createParameter("posV",0.0, posV)),
-		par_posA(createParameter("posA",0.0, posA)),
-		par_posGain(createParameter("posGain",1.0, posGain)),
-		par_posOffset(createParameter("posOffset",0.0, posOffset)),
-
-		par_rawGyro(createParameter("rawGyro",0.0, rawGyro)),
-		par_gyro(createParameter("gyro",0.0, gyro)),
-		par_gyroGain(createParameter("gyroGain",0.0, gyroGain)),
-		par_gyroOffset(createParameter("gyroOffset",0.0, gyroOffset)),
-
-		par_rawAcc(createParameter("rawAcc",0.0, rawAcc)),
-		par_acc(createParameter("acc",0.0, acc)),
-		par_accGain(createParameter("accGain",0.0, accGain)),
-		par_accOffset(createParameter("accOffset",0.0, accOffset)),
-
-		par_nrIncrements(createParameter("nrIncrements",4096.0, nrIncrements)),
-
-		par_voltage(createParameter("voltage",0.0, voltage)),
-		par_voltageGain(createParameter("voltageGain",1.0, voltageGain)),
-		par_voltageOffset(createParameter("voltageOffset",0.0, voltageOffset)),
-
-		par_dutycycle(createParameter("dutycycle",0.0, dutycycle)),
-		par_motordir(createParameter("motordir",1.0, motordir)),
-		par_oversampling(createParameter("oversampling",25.0, oversampling))
-
+Devices::~Devices()
 {
 }
 
-Devices::~Devices() {
-	// TODO Auto-generated destructor stub
-}
-
-Parameter* Devices::createParameter(const std::string& name, double v, Devices::DeviceID id)
+void Devices::setSPI(SPI* spi)
 {
-	Parameter* result = new Parameter(std::string("Dev.")+name, v);
-
-	devices[id]=result;
-	return result;
+	for (auto iter = devices.begin(); iter!=devices.end(); iter++)
+	{
+		Device* d = iter->second;
+		d->setSPI(spi);
+	}
 }
 
-double Devices::getDeviceValue(DeviceID id) {
-	if (devices.find(id) == devices.end())
-		throw std::invalid_argument("Devices::getDevice: illegal value for deviceID: " + id);
-
-	Parameter* p = devices[id];
-
-	return *p;
-}
-
-void Devices::setDevice(DeviceID id, double v) {
-	if (devices.find(id) == devices.end())
-		throw std::invalid_argument("Devices::getDevice: illegal value for deviceID: " + id);
-
-	Parameter* p = devices[id];
-	*p = v;
-}
-
-void Devices::sampleAngle(double frequency) {
-	// Start with shifting previous values
-	angle_[2] = angle_[1];
-	angle_[1] = angle_[0];
-	angle_v[1] = angle_v[0];
-	// determine raw angle
-	double h1 = spi->getRegister(SPI::HEIGHT1);
-	*par_h1Ang = h1;
-	double h2 = spi->getRegister(SPI::HEIGHT2);
-	*par_h2Ang = h2;
-	double raw_angle = (*par_h1AngGain*h1 + *par_h1AngOffset) -
-			           (*par_h2AngGain*h2 + *par_h2AngOffset);
-	*par_rawAngle = raw_angle;
-	// calculate new angle with gain and offset
-	angle_[0] = raw_angle * *par_angleGain + *par_angleOffset;
-	angle_v[0] = (angle_[0] - angle_[1]) * frequency;
-	angle_v[1] = (angle_[1] - angle_[2]) * frequency;
-	angle_a[0] = (angle_v[0] - angle_v[1]) * frequency;
-	// store calculated values into parameters
-	*par_angle = angle_[0];
-	*par_angleA = angle_a[0];
-}
-
-void Devices::calculateBefore() {
-	assert(spi!=0);
-	double frequency = getPeriodicTimer()->getFrequency();
-
-	sampleAngle(frequency);
-	sampleGyro(frequency);
-	sampleAcc(frequency);
-	samplePosition(frequency);
-	sampleBattery();
-}
-
-void Devices::sampleGyro(double /*frequency*/)
+void Devices::calculateBefore()
 {
-	double rawGyro = spi->getRegister(SPI::GYRO);
-	if (rawGyro > 32767)
-		rawGyro -= 65536;
-	double gyro = rawGyro * *par_gyroGain + *par_gyroOffset;
-	*par_rawGyro = rawGyro;
-	*par_gyro = gyro;
+	for(auto iter = devices.begin(); iter!=devices.end(); iter ++)
+	{
+		iter->second->readDevice(ctr);
+	}
+	ctr++;
 }
 
-void Devices::sampleAcc(double /*frequency*/)
+void Devices::calculateAfter()
 {
-	double rawAcc = spi->getRegister(SPI::ACC);
-	double acc = rawAcc* par_accGain->get() + par_accOffset->get();
-	par_rawAcc->set(rawAcc);
-	par_acc->set(acc);
+	for(auto iter = devices.begin(); iter!=devices.end(); iter ++)
+	{
+		iter->second->writeDevice(ctr);
+	}
+	ctr++;
 }
 
-void Devices::samplePosition(double frequency) {
-	// Start with shifting previous values
-	pos_[2] = pos_[1];
-	pos_[1] = pos_[0];
-	pos_v[1] = pos_v[0];
+Device* Devices::getDevice(DeviceID did)
+{
+	if (devices.find(did) != devices.end())
+		return devices[did];
+	return 0;
+}
 
-	unsigned int rawpos = static_cast<unsigned int>(spi->getRegister(
-			SPI::ENCPOS));
+Device::Device(const std::string& _id)
+: id(_id)
+, value(createParameter("value"))
+{
+}
+
+Parameter* Device::createParameter(const std::string pid)
+{
+	return new Parameter(id + "." + pid);
+}
+
+Parameter* Device::createParameter(const std::string pid, double v)
+{
+	return new Parameter(id + "." + pid, v);
+}
+
+Device::operator double()
+{
+	return *value;
+};
+
+Device& Device::operator=(const double other)
+{
+	*value = other;
+	return *this;
+};
+
+void Device::read(int f)
+{
+	if (f!= fresh)
+		readDevice(f);
+	fresh = f;
+}
+
+void Device::write(int f)
+{
+	if (f!= fresh)
+		readDevice(f);
+	fresh = f;
+}
+GODevice::GODevice(Device* raw)
+: Device(raw->getID() + std::string(".go"))
+, rawDevice(raw)
+, gain(createParameter("gain",1.0))
+, offset(createParameter("offset",0.0))
+{
+}
+
+void GODevice::setSPI(SPI* spi)
+{
+	rawDevice->setSPI(spi);
+}
+
+void GODevice::readDevice(int f)
+{
+	rawDevice->read(f);
+	*value = *rawDevice* (*gain) + (*offset);
+}
+
+
+
+LPFDevice::LPFDevice(Device* raw)
+: Device(raw->getID() + ".lpf")
+, rawDevice(raw)
+, filter(new Filter(getID() + ".filter" ,3))
+{
+};
+
+void LPFDevice::setSPI(SPI* spi)
+{
+	rawDevice->setSPI(spi);
+}
+
+void LPFDevice::readDevice(int f)
+{
+	rawDevice->readDevice(f);
+	*value = filter->calculate(*rawDevice);
+}
+
+Encoder::Encoder(SPI::RegisterID _spiReg)
+: Device("Dev.Encoder")
+, spiReg(_spiReg)
+, spiPos(0)
+, prevSpiPos(createParameter("prevRawPos"))
+, nrIncrements(createParameter("nrIncrements", 4000))
+{
+};
+
+void Encoder::setSPI(SPI* spi)
+{
+	spiPos = spi->getRegister(spiReg);
+}
+
+void Encoder::readDevice(int /*f*/) {
+	unsigned int rawpos = static_cast<unsigned int>(*spiPos);
+
 	// Mask relevant bits
 	rawpos = rawpos & 0x0fff; // 12 bits
 	// determine delta w.r.t. previous sample;
-	*par_rawPos = rawpos;
-
-	int delta = rawpos - prevRawPos;
+	int delta = rawpos - *prevSpiPos;
 	// store new value for prevRawPos
-	prevRawPos = rawpos;
-	int nrIncs = *par_nrIncrements;
-
-	// Correct for over/underruns
-	if (delta > nrIncs / 2) {
-		delta -= nrIncs;
+	*prevSpiPos = rawpos;
+		// Correct for over/underruns
+	if (delta > *nrIncrements/ 2) {
+		delta -= *nrIncrements;
 	} else {
-		if (delta < -nrIncs / 2) {
-			delta += nrIncs;
+		if (delta < -*nrIncrements / 2) {
+			delta += *nrIncrements;
 		}
 	}
-
 	// Update encoder position
-	encPos += delta;
-
-	// Transform into real position
-	pos_[0] = encPos * *par_posGain + *par_posOffset;
-
-	// Calculate velocity and acceleration
-	pos_v[0] = (pos_[0] - pos_[1]) * frequency;
-	pos_v[1] = (pos_[1] - pos_[2]) * frequency;
-	pos_a[0] = (pos_v[0] - pos_v[1]) * frequency;
-
-	// store calculated values into parameters
-	*par_pos = pos_[0];
-	*par_posV = pos_v[0];
-	*par_posA = pos_a[0];
+	*value = *value + (double)delta;
 }
 
-void Devices::sampleBattery()
+SPIDevice::SPIDevice(const std::string& id, SPI::RegisterID  spiRegister)
+: Device(id)
+, spiReg(spiRegister)
+, spiH(0)
 {
-	*par_voltage = spi->getRegister(SPI::UBAT) * *par_voltageGain+ *par_voltageOffset;
+
+}
+
+void SPIDevice::setSPI(SPI* spi)
+{
+	spiH = spi->getRegister(spiReg);
+}
+
+void SPIDevice::readDevice(int /*f*/)
+{
+	*value = *spiH;
+}
+
+D2Ang::D2Ang(Device* d1, Device* d2)
+: Device("Dev.heightAngle")
+, devH1(d1)
+, devH2(d2)
+{
+}
+
+void D2Ang::setSPI(SPI* spi)
+{
+	devH1->setSPI(spi);
+	devH2->setSPI(spi);
+}
+
+void D2Ang::readDevice(int f)
+{
+	devH1->read(f);
+	devH2->read(f);
+
+	*value = *devH1 - *devH1;
+}
+
+DDevice::DDevice(Device* _d)
+: Device(_d->getID()+std::string(".D"))
+, d(_d)
+, prev(0.0)
+{
+}
+
+void DDevice::setSPI(SPI* spi)
+{
+	d->setSPI(spi);
+}
+
+void DDevice::readDevice(int f)
+{
+	double n;
+
+	d->readDevice(f);
+
+	n = *d;
+	*value = n - prev;
+	prev = n;
+}
+
+IDevice::IDevice(Device* _d)
+: Device(_d->getID()+std::string(".I"))
+, d(_d)
+, i(0.0)
+{
+}
+
+void IDevice::setSPI(SPI* spi)
+{
+	d->setSPI(spi);
+}
+
+void IDevice::readDevice(int f)
+{
+	d->readDevice(f);
+	i+= *d;
+	*value = i;
+}
+
+DutyCycle::DutyCycle(SPI::RegisterID _spiPw, SPI::RegisterID _spiDir)
+: Device("Dev.DutyCycle")
+, spiPw(_spiPw)
+, spiDir(_spiDir)
+, pw(0)
+, dir(0)
+{
+}
+
+void DutyCycle::setSPI(SPI* spi)
+{
+	pw = spi->getRegister(spiPw);
+	dir = spi->getRegister(spiDir);
+}
+
+void DutyCycle::writeDevice(int /*f*/)
+{
+	double dc;
+	double val(*value);
+	dc = (val) > 1.0 ?  1.0 : val;
+	dc = (val) <-1.0 ? -1.0 : val;
+
+	*pw = fabs(dc)*65535.0;
+	*dir = (*value) <0 ? 1 : 0;
 }
 
 
-
-void Devices::calculateAfter() {
-	//std::clog << "Devices::calculateAfter()" << std::endl;
-	updateDC();
-	spi->setRegister(SPI::OVERSAMPLING, *par_oversampling);
+Counter::Counter()
+: Device("Dev.Counter")
+, ctr(0.0)
+{
 }
 
-void Devices::updateDC() {
-	double dc = *par_dutycycle*(*par_motordir < 0? -1: 1);
-	// Limit dc to -1.0 -  1.0
-	dc = dc> 1.0?  1.0 : dc;
-	dc = dc<-1.0? -1.0 : dc;
-
-	// Determine value for direction register
-	int dir = dc<0.0 ? 1 : 0;
-	int rawDC = (int)(65535.0*fabs(dc));
-
-	//std::clog << "Devices::updateDC: " << rawDC << std::endl;
-	spi->setRegister(SPI::PWM, static_cast<double>(rawDC));
-	spi->setRegister(SPI::MOTORDIR, static_cast<double>(dir));
+void Counter::readDevice(int /*f*/)
+{
+	ctr+= 1.0;
+	*value = ctr;
 }

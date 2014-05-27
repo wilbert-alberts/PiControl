@@ -20,6 +20,7 @@ Motor::Motor(ServoModule* sm)
 , devs(0)
 {
 	enabled = createParameter("enabled",0);
+	nrIncrements = createParameter("nrIncrements",4000);
 
 	t = createParameter("torque",0.0);
 	ki = createParameter("ki",0.0);
@@ -44,12 +45,11 @@ void Motor::calculateAfter() {
 	assert(devs!=0);
 
 	// Calculate rotational velocity
-	double rvel = devs->getDeviceValue(Devices::posV);
-	double nrIncs = devs->getDeviceValue(Devices::nrIncrements);
+	double rvel = *devs->getDevice(Devices::ENCPOS_D);
 
-	*batVoltage= devs->getDeviceValue(Devices::voltage);
+	*batVoltage= *devs->getDevice(Devices::UBAT);
 
-	rvel = 2*M_PI*rvel/nrIncs; // Note rotations per second!
+	rvel = 2*M_PI*rvel/ (*nrIncrements); // Note rotations per second!
 	*rotVelo = rvel;
 
 	double im =  *t / *ki;             // Motor current.
@@ -63,7 +63,7 @@ void Motor::calculateAfter() {
 
 	dutycycle->set(dc);
 	if (*enabled != 0.0) {
-		devs->setDevice(Devices::dutycycle, dc);
+		*devs->getDevice(Devices::DC) = dc;
 	}
 	else {
 		//devs->setDevice(Devices::dutycycle, 0.0);

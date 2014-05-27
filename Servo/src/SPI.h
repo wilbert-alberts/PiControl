@@ -15,7 +15,6 @@
 
 
 
-class BitBus;
 class DigitalOut;
 class DigitalIn;
 class Parameter;
@@ -28,40 +27,56 @@ public:
 	void calculateBefore();
 	void calculateAfter();
 
+	typedef enum {
+		HEIGHT1,
+		HEIGHT2,
+		UBAT,
+		GYRO,
+		ENCPOS,
+		PWM,
+		MOTORDIR,
+		OVERSAMPLING,
+		SAMPLESTAKEN,
+		ACC
+	} RegisterID;
 
-	double getRegister(int reg);
-	void   setRegister(int reg, double value);
-
-	static constexpr int HEIGHT1 = 1;
-	static constexpr int HEIGHT2 = 2;
-	static constexpr int GYRO = 3;
-	static constexpr int UBAT = 4;
-	static constexpr int ENCPOS = 5;
-	static constexpr int ACC = 6;
-	static constexpr int SAMPLESTAKEN = 7;
-
-	static constexpr int PWM = 11;
-	static constexpr int MOTORDIR = 12;
-	static constexpr int OVERSAMPLING = 13;
-
+	Parameter* getRegister(RegisterID  id);
 
 private:
+	class SPIRegisters
+	{
+	public:
+		uint16_t height1;
+		uint16_t height2;
+		uint16_t ubat;
+		uint16_t gyro;
+		uint16_t encpos;
+		uint16_t pwm;
+		uint8_t  motordir;
+		uint8_t  oversampling;
+		uint8_t  samplestaken;
+		uint16_t acc;
+	};
+
+	SPIRegisters buffer;
+
+	std::map<Parameter*, uint16_t*>  reg16bit;
+	std::map<Parameter*, uint8_t*>   reg8bit;
+	std::map<RegisterID, Parameter*> id2par;
+
+	DigitalOut* Pi2Mbed;
+	DigitalIn*  Mbed2Pi;
+	Parameter* par_enabled;
+	bool enabled;
+
+	void createRegister16(RegisterID rid, const std::string& id, uint16_t* p);
+	void createRegister8(RegisterID rid, const std::string& id, uint8_t* p);
+
 	void waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs);
-	void createRegister(int id, const std::string& n, int start, int length);
 	void copyFromParameters();
 	void copyToParameters();
 	bool isEnabled();
-
-	bool            bEnabled;
-	Parameter*      enabled;
-	int             nrBytes;
-	unsigned char*  byteArray;
-	BitBus*     bb;
-	DigitalOut* Pi2Mbed;
-	DigitalIn*  Mbed2Pi;
-
-	std::map<int, Parameter*> registers;
-
 };
+
 
 #endif /* SPI_H_ */

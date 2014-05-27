@@ -103,7 +103,7 @@ bool Controller::mmdcSafe()
 		return true;
 
 	//double ang = devs->getDeviceValue(Devices::angle);
-	double ang = ang_mix->get();
+	double ang = *ang_mix;
 
 	return ((ang >= *mmdcMinAng) &&
 	        (ang <= *mmdcMaxAng));
@@ -137,7 +137,7 @@ void Controller::calculateModel()
 
 
 	// Get position from device.
-	pos = devs->getDeviceValue(Devices::pos);
+	pos = *devs->getDevice(Devices::ENCPOS);
 	*pos_raw = pos;
 	//pos = filterDevice(flt_pos, pos);
 	*pos_flt = pos;
@@ -170,7 +170,7 @@ void Controller::calculateModel()
 //	ang_flt->set(ang);
 
 	// Get angle from Device
-	ang = devs->getDeviceValue(Devices::acc);
+	ang = *devs->getDevice(Devices::HEIGHT);
 	*ang_raw = ang;
 	//ang = filterDevice(flt_ang, ang);
 	*ang_flt = ang;
@@ -180,7 +180,7 @@ void Controller::calculateModel()
 	angVError = (angError - prevAngError);
 
 	// Get angular velocity from gyro Device
-	angV1 = devs->getDeviceValue(Devices::gyro);
+	angV1 = *devs->getDevice(Devices::GYRO);
 	*vang_raw = angV1;
 	angV2 = filterDevice(flt_vang_hpf, angV1);
 	angV3 = filterDevice(flt_vang, angV2);
@@ -192,9 +192,9 @@ void Controller::calculateModel()
 	am = 0.98*(am + angV2 / 100.0) + 0.02*am_d2;
 	am_i = am_i + am/100.0;
 
-	ang_mix_d1->set(am_d1);
-	ang_mix_d2->set(am_d2);
-	ang_mix->set(am);
+	*ang_mix_d1 = am_d1 ;
+	*ang_mix_d2 = am_d2 ;
+	*ang_mix    = am ;
 
 
 	// Determine integrated position error

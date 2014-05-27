@@ -6,7 +6,6 @@
  */
 
 #include "SPI.h"
-#include "BitBus.h"
 #include "DigitalOut.h"
 #include "DigitalIn.h"
 #include "Parameter.h"
@@ -17,74 +16,42 @@
 #include <sys/time.h>
 #include <algorithm>
 
+#include <cstdint>
+
+
+
 SPI::SPI(ServoModule* wrapped)
 : ServoModule("SPI", wrapped)
 {
-	enabled = createParameter("enabled");
-	bb = new BitBus();
+	createRegister16(SPI::HEIGHT1, "height1", &buffer.height1);
+	createRegister16(SPI::HEIGHT2, "height2", &buffer.height2);
+	createRegister16(SPI::UBAT, "ubat", &buffer.ubat);
+	createRegister16(SPI::GYRO, "gyro", &buffer.gyro);
+	createRegister16(SPI::ENCPOS, "encpos", &buffer.encpos);
+	createRegister16(SPI::PWM, "pwm", &buffer.pwm);
 
-	createRegister(HEIGHT1, std::string("Height1"),    0, 16);
-	createRegister(HEIGHT2, std::string("Height2"),   16, 16);
+	createRegister8(SPI::MOTORDIR, "motordir", &buffer.motordir);
+	createRegister8(SPI::OVERSAMPLING, "oversampling", &buffer.oversampling);
+	createRegister8(SPI::SAMPLESTAKEN, "samplestaken", &buffer.samplestaken);
 
-	createRegister(UBAT, std::string("UBat"),   32, 16);
+	createRegister16(SPI::ACC, "acc", &buffer.acc);
 
-	createRegister(GYRO, std::string("Gyro"),      48, 16);
-	createRegister(ENCPOS, std::string("EncPos"),    64, 16);
-
-	createRegister(PWM, std::string("PWM"),      80, 16);
-	createRegister(MOTORDIR, std::string("MotorDir"), 96,  8);
-
-	createRegister(OVERSAMPLING, std::string("oversampling"), 104,  8);
-
-	createRegister(SAMPLESTAKEN, std::string("samplesTaken"), 112,  8);
-
-	createRegister(ACC, std::string("SPI.Acc"), 120,  16);
+	par_enabled = createParameter("enabled");
 
 	Pi2Mbed = createDigitalOut("pi2mbed", 4, 1);
 	Mbed2Pi = createDigitalIn("mbed2pi", 5);
 }
 
-SPI::~SPI() {
-	delete[] byteArray;
+SPI::~SPI()
+{
+
 }
 
-
-void SPI::createRegister(int id, const std::string& n, int start, int length)
+void SPI::createRegister16(RegisterID rid, const std::string& id, uint16_t* p)
 {
-	bb->createRegister(id, n, start, length);
-	registers[id]=createParameter(n,0.0);
-
-	int nb = (start+length)/8 + ((start+length)%8==0 ? 0 : 1);
-	if (nb > nrBytes) {
-		unsigned char* newBytes = new unsigned char[nb];
-		std::copy(byteArray, byteArray+nrBytes, newBytes);
-		delete[] byteArray;
-		byteArray = newBytes;
-		nrBytes = nb;
-	}
-	std::clog << "Adding " << n << " nrBytes: " << nrBytes << std::endl;
-}
-
-bool SPI::isEnabled()
-{
-	if (bEnabled && *enabled==0.0) {
-		// SPI got disabled
-		Mbed2Pi->setEnabled(false);
-		Pi2Mbed->setEnabled(false);
-		bEnabled = false;
-		return bEnabled;
-	}
-
-	if (!bEnabled && *enabled != 0.0) {
-		// SPI got enabled
-		Mbed2Pi->setEnabled(true);
-		Pi2Mbed->setEnabled(true);
-		bEnabled = true;
-		return bEnabled;
-	}
-
-	// In case of no change
-	return bEnabled;
+	Parameter* par = createParameter(id);
+	reg16bit[par] = p;
+	id2par[rid]= par;
 }
 
 void SPI::calculateAfter() {
@@ -108,39 +75,30 @@ void SPI::calculateAfter() {
 
 		//std::clog << "Initiating spi transfer" << std::endl;
 		if (isEnabled())
-			HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
+			HAL::getInstance()->wiringPiSPIDataRW(0, (unsigned char*) &buffer, sizeof(buffer));
 	} catch (int to) {
 		std::cerr << "Timeout on SPI bus during write, reset" << std::endl;
 		Pi2Mbed->set(1.0);
 	}
 }
 
-void SPI::copyFromParameters()
+void SPI::createRegister8(RegisterID rid, const std::string& id, uint8_t* p)
 {
-	for (auto iter = registers.begin(); iter!= registers.end(); iter++) {
-		Parameter* p = iter->second;
-		int id = iter->first;
-
-		//std::clog <<"setting register " << p->getName() << " to value: " << *p << std::endl;
-		bb->setRegister(byteArray, id, *p);
-	}
+	Parameter* par = createParameter(id);
+	reg8bit[par] = p;
+	id2par[rid]= par;
 }
 
-void SPI::copyToParameters()
+Parameter* SPI::getRegister(RegisterID rid)
 {
-//	for (int i=0; i<nrBytes; i++) {
-//		printf ("0x%02x ", byteArray[i]);
-//	}
-//	printf("\n");
-	for (auto iter = registers.begin(); iter!= registers.end(); iter++) {
-		Parameter* p = iter->second;
-		int id = iter->first;
-
-		*p = bb->getRegister(byteArray, id);
-	}
-
+	if (id2par.find(rid) != id2par.end())
+		return id2par[rid];
+	std::clog << "Warning: unable to find SPI register: " << rid << std::endl;
+	return 0;
 }
-void SPI::calculateBefore() {
+
+void SPI::calculateBefore()
+{
 	// Protocol to read from the bus consists of:
 	// 1) Pulling Pi2Mbed to zero
 	// 2) Wait until Mbed2Pi is zero
@@ -159,7 +117,7 @@ void SPI::calculateBefore() {
 
 		//std::clog << "Initiating spi transfer" << std::endl;
 		if (isEnabled())
-			HAL::getInstance()->wiringPiSPIDataRW(0, byteArray, nrBytes);
+			HAL::getInstance()->wiringPiSPIDataRW(0, (unsigned char*)&buffer, sizeof(buffer));
 
 		//std::clog << "Copying bytes to parameters" << std::endl;
 		//for (int i=0; i<nrBytes; i++) byteArray[i] = 0;
@@ -173,6 +131,64 @@ void SPI::calculateBefore() {
 		std::cerr << "Timeout on SPI bus read, reset" << std::endl;
 		Pi2Mbed->set(1.0);
 	}
+}
+
+void SPI::copyToParameters()
+{
+	for (auto iter = reg16bit.begin(); iter!= reg16bit.end(); iter++) {
+		Parameter* p = iter->first;
+		uint16_t* dest = iter->second;
+		*p = (double)*dest;
+	}
+
+	for (auto iter = reg8bit.begin(); iter!= reg8bit.end(); iter++) {
+		Parameter* p = iter->first;
+		uint8_t* dest = iter->second;
+		*p = (double)*dest;
+	}
+}
+
+void SPI::copyFromParameters()
+{
+//	for (int i=0; i<nrBytes; i++) {
+//		printf ("0x%02x ", byteArray[i]);
+//	}
+//	printf("\n");
+	for (auto iter = reg16bit.begin(); iter!= reg16bit.end(); iter++) {
+		Parameter* p = iter->first;
+		uint16_t* dest = iter->second;
+		*dest = (uint16_t) *p;
+	}
+
+	for (auto iter = reg8bit.begin(); iter!= reg8bit.end(); iter++) {
+		Parameter* p = iter->first;
+		uint8_t* dest = iter->second;
+		*dest = (uint8_t) *p;
+	}
+
+}
+
+
+bool SPI::isEnabled()
+{
+	if (enabled && *par_enabled==0.0) {
+		// SPI got disabled
+		Mbed2Pi->setEnabled(false);
+		Pi2Mbed->setEnabled(false);
+		enabled = false;
+		return enabled;
+	}
+
+	if (!enabled && *par_enabled != 0.0) {
+		// SPI got enabled
+		Mbed2Pi->setEnabled(true);
+		Pi2Mbed->setEnabled(true);
+		enabled = true;
+		return enabled;
+	}
+
+	// In case of no change
+	return enabled;
 }
 
 void SPI::waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs) {
@@ -192,19 +208,3 @@ void SPI::waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs) {
 	throw(1);
 }
 
-
-double SPI::getRegister(int reg)
-{
-	//TODO: check whether 'get' functionality should be based
-	//      on registers or parameters
-	return bb->getRegister(byteArray, reg);
-}
-
-void SPI::setRegister(int reg, double value)
-{
-	bb->setRegister(byteArray, reg, value);
-
-	Parameter* p = registers[reg];
-	*p = value;
-
-}

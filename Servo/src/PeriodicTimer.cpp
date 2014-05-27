@@ -39,11 +39,6 @@ void PeriodicTimer::addCallback(PeriodicTimerCB* cb) {
 }
 
 void PeriodicTimer::setupTimer(double f) {
-	int ret;
-	double period = 1.0/f;
-	struct timespec timespec;
-	struct itimerspec timerspec;
-
 	frequency = f;
 
 	/* Reset timer statistics */
@@ -65,15 +60,12 @@ double PeriodicTimer::getTime() const {
 	double period(1.0/frequency);
 	double time(0.0);
 
-	//std::cerr << "period: " << period << std::endl;
-
 	ret = timerfd_gettime(timer_fd, &timerspec);
 	if (ret == -1) {
 		perror("getTime");
 		return -1.0;
 	}
 	time = period - timespecToSeconds(&timerspec.it_value);
-	//std::cerr << "time: " << time << std::endl;
 	return time;
 }
 

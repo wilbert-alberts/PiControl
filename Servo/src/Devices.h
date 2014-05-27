@@ -1,138 +1,201 @@
 /*
- * Devices.h
+ * NewDevice.h
  *
- *  Created on: Jul 10, 2013
+ *  Created on: Mar 31, 2014
  *      Author: wilbert
  */
 
-#ifndef DEVICES_H_
-#define DEVICES_H_
-
-#include <map>
-#include <string>
+#ifndef DEVICES_H
+#define DEVICES_H
 
 #include "ServoModule.h"
+#include "SPI.h"
+
+#include <map>
+#include <set>
+#include <string>
 
 class Parameter;
-class SPI;
-class PeriodicTimer;
+class Filter;
 
-/*
-enum DeviceID {
-	h1Ang, h2Ang, rawAngle, angle, angleV, angleA, angleGain, angleOffset,
-
-	rawPos, pos, posV, posA, posGain, posOffset,
-
-	nrIncrements,
-
-	voltage, voltageGain, voltageOffset,
-
-	dutyCycle, motordir, oversampling
-} ;
-*/
-
-class Devices: public ServoModule {
+class Device {
 public:
-	Devices(ServoModule* wrapped);
+	Device(const std::string& _id);
+	virtual ~Device() {};
+	virtual void setSPI(SPI*) {};
 
-	virtual ~Devices();
+	Parameter* createParameter(const std::string pid);
+	Parameter* createParameter(const std::string pid, double v);
 
-	void calculateBefore();
-	void calculateAfter();
+	const std::string& getID() {return id; };
 
-	void setSPI(SPI* s) { spi = s; }
+	virtual operator double();
+	virtual Device& operator=(const double other);
 
-	enum DeviceID {
-		h1Ang, h2Ang, h1Ang_gain, h2Ang_gain, h1Ang_offset, h2Ang_offset,
+	virtual void readDevice(int) {};
+	virtual void writeDevice(int) {};
 
-		rawAngle, angle, angleV, angleA, angleGain, angleOffset,
-
-		rawPos, pos, posV, posA, posGain, posOffset,
-
-		rawGyro, gyro, gyroGain, gyroOffset,
-
-		rawAcc, acc, accGain, accOffset,
-
-		nrIncrements,
-
-		voltage, voltageGain, voltageOffset,
-
-		dutycycle, motordir, oversampling
-	} ;
-
-
-	double getDeviceValue(DeviceID id);
-	void setDevice(DeviceID id, double val);
+	void read(int f);
+	void write(int f);
 
 
 private:
-	Parameter* createParameter(const std::string& n, double v, DeviceID id);
-	void sampleAngle(double frequency);
-	void samplePosition(double frequency);
-	void sampleGyro(double frequency);
-	void sampleAcc(double frequency);
-	void sampleBattery();
+	const std::string id;
 
-	void updateDC();
+	int fresh;
 
-	static Devices* instance;
+protected:
+	Parameter* value;
 
-	SPI* spi;
-	std::map<DeviceID, Parameter*> devices;
-
-	double angle_[3];
-	double angle_v[2];
-	double angle_a[1];
-
-	Parameter* par_h1Ang;
-	Parameter* par_h2Ang;
-
-	Parameter* par_h1AngGain;
-	Parameter* par_h2AngGain;
-
-	Parameter* par_h1AngOffset;
-	Parameter* par_h2AngOffset;
-
-	Parameter* par_rawAngle;
-	Parameter* par_angle;
-	Parameter* par_angleV;
-	Parameter* par_angleA;
-	Parameter* par_angleGain;
-	Parameter* par_angleOffset;
-
-	double pos_[3];
-	double pos_v[2];
-	double pos_a[1];
-
-	unsigned int prevRawPos;
-	int encPos;
-
-	Parameter* par_rawPos;
-	Parameter* par_pos;
-	Parameter* par_posV;
-	Parameter* par_posA;
-	Parameter* par_posGain;
-	Parameter* par_posOffset;
-
-	Parameter* par_rawGyro;
-	Parameter* par_gyro;
-	Parameter* par_gyroGain;
-	Parameter* par_gyroOffset;
-
-	Parameter* par_rawAcc;
-	Parameter* par_acc;
-	Parameter* par_accGain;
-	Parameter* par_accOffset;
-
-	Parameter* par_nrIncrements;
-
-	Parameter* par_voltage;
-	Parameter* par_voltageGain;
-	Parameter* par_voltageOffset;
-
-	Parameter* par_dutycycle;
-	Parameter* par_motordir;
-	Parameter* par_oversampling;
 };
 
-#endif /* DEVICES_H_ */
+class GODevice : public  Device {
+public:
+	GODevice(Device* raw);
+	virtual ~GODevice() {};
+	virtual void setSPI(SPI* spi);
+
+	virtual void readDevice(int);
+	virtual void writeDevice(int) {};
+
+private:
+	Device*   rawDevice;
+	Parameter* gain;
+	Parameter* offset;
+};
+
+class LPFDevice : public Device {
+public:
+	LPFDevice(Device* raw);
+	virtual ~LPFDevice() {};
+	virtual void setSPI(SPI* spi);
+
+	virtual void readDevice(int f);
+private:
+	Device* rawDevice;
+	Filter* filter;
+};
+
+class Encoder : public Device
+{
+public:
+	Encoder(SPI::RegisterID spiReg);
+	void readDevice(int f);
+	void setSPI(SPI* spi);
+
+private:
+	SPI::RegisterID spiReg;
+	Parameter* spiPos;
+	Parameter* prevSpiPos;
+	Parameter* nrIncrements;
+};
+
+class SPIDevice: public Device
+{
+public:
+	SPIDevice(const std::string& id, SPI::RegisterID spiReg);
+	void readDevice(int f);
+	void setSPI(SPI* spi);
+
+private:
+	SPI::RegisterID spiReg;
+	Parameter* spiH;
+};
+
+class DutyCycle: public Device
+{
+public:
+	DutyCycle(SPI::RegisterID spiPw, SPI::RegisterID spiDir);
+	void setSPI(SPI* spi);
+	void writeDevice(int f);
+
+private:
+	SPI::RegisterID spiPw;
+	SPI::RegisterID spiDir;
+	Parameter* pw;
+	Parameter* dir;
+};
+
+
+
+class D2Ang: public Device
+{
+public:
+	D2Ang(Device* d1, Device* d2);
+	virtual void readDevice(int f);
+	virtual void setSPI(SPI* spi);
+
+private:
+	Device* devH1;
+	Device* devH2;
+};
+
+class DDevice : public Device
+{
+public:
+	DDevice(Device* d);
+	virtual void readDevice(int f);
+	virtual void setSPI(SPI* spi);
+
+private:
+	Device* d;
+	double  prev;
+};
+
+class Counter: public Device
+{
+public:
+	Counter();
+	virtual void readDevice(int f);
+private:
+	double ctr;
+};
+
+class IDevice: public Device
+{
+public:
+	IDevice(Device* d);
+	virtual void readDevice(int f);
+	virtual void setSPI(SPI* spi);
+
+private:
+	Device* d;
+	double  i;
+};
+
+class Devices: public ServoModule {
+public:
+	typedef enum
+	{
+		ENCPOS,
+		ENCPOS_D,
+		H1,
+		H2,
+		HEIGHT,
+		GYRO,
+		NRINCREMENTS,
+		UBAT,
+		DC,
+		TEST
+	} DeviceID;
+
+	Devices(ServoModule* other);
+	virtual ~Devices();
+
+	void setSPI(SPI* spi);
+
+	void calculateBefore();
+	void calculateAfter();
+	Device* getDevice(DeviceID did);
+
+private:
+	std::map<DeviceID, Device*> devices;
+	std::set<Device*>  readDevices;
+	std::set<Device*>  writeDevices;
+
+	int ctr;
+};
+
+#endif /* NEWDEVICE_H_ */
+
+

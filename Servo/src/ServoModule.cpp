@@ -44,19 +44,18 @@ void ServoModule::sample(PeriodicTimer* pt) {
 		*tsEnd2 = pt->getTime();
 }
 
-void ServoModule::calculateBefore()
-{
+void ServoModule::calculateBefore() {
 }
 
-void ServoModule::calculateAfter()
-{
+void ServoModule::calculateAfter() {
 }
-
 
 Parameter* ServoModule::createParameter(const std::string& id) {
 	return createParameter(id, 0.0);
 }
-	Parameter* ServoModule::createParameter(const std::string& id, const double value) {
+
+Parameter* ServoModule::createParameter(const std::string& id,
+		const double value) {
 	return new Parameter(getId() + "." + id, value);
 }
 
@@ -64,6 +63,7 @@ DigitalIn* ServoModule::createDigitalIn(const std::string& id, int pin) {
 	return DigitalIn::create(getId() + "." + id, pin);
 }
 
-DigitalOut* ServoModule::createDigitalOut(const std::string& id, int pin, int value) {
+DigitalOut* ServoModule::createDigitalOut(const std::string& id, int pin,
+		int value) {
 	return DigitalOut::create(getId() + "." + id, pin, value);
 }

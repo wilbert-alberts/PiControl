@@ -12,7 +12,6 @@
 #include "DigitalOut.h"
 #include "DigitalIn.h"
 #include "SPI.h"
-#include "BitBus.h"
 #include "Controller.h"
 #include "Motor.h"
 #include "HAL.h"
@@ -25,7 +24,7 @@
 #include "DBLocker.h"
 
 constexpr int MEMORYSIZE=64*1024;  // 16 Kilobytes.
-constexpr int SERVOFREQUENCY=1;  
+constexpr int SERVOFREQUENCY=1;
 
 int main(int /*argc*/, char** /*argv[]*/) {
 
@@ -57,8 +56,8 @@ int main(int /*argc*/, char** /*argv[]*/) {
 		motor->setDevices(devices);
 		controller->setDevices(devices);
 		controller->setMotor(motor);
-		devices->setSPI(spi);
 		cmdUpdateFreq->setPeriodicTimer(pt);
+		devices->setSPI(spi);
 
 		pt->addCallback(dblocker);
 
