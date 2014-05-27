@@ -23,18 +23,19 @@
 SPI::SPI(ServoModule* wrapped)
 : ServoModule("SPI", wrapped)
 {
-	createRegister16(SPI::HEIGHT1, "height1", (uint16_t*)&buffer.height1);
-	createRegister16(SPI::HEIGHT2, "height2", (uint16_t*)&buffer.height2);
-	createRegister16(SPI::UBAT, "ubat", (uint16_t*)&buffer.ubat);
-	createRegister16(SPI::GYRO, "gyro", (uint16_t*)&buffer.gyro);
-	createRegister16(SPI::ENCPOS, "encpos", (uint16_t*)&buffer.encpos);
-	createRegister16(SPI::PWM, "pwm", (uint16_t*)&buffer.pwm);
+	createRegister16(SPI::HEIGHT1, "height1", &buffer.height1);
+	createRegister16(SPI::HEIGHT2, "height2", &buffer.height2);
+	createRegister16(SPI::UBAT, "ubat", &buffer.ubat);
+	createRegister16(SPI::GYRO, "gyro", &buffer.gyro);
+	createRegister16(SPI::GYROREF, "gyroref", &buffer.gyroref);
+	createRegister16(SPI::ENCPOS, "encpos", &buffer.encpos);
+	createRegister16(SPI::PWM, "pwm", &buffer.pwm);
 
-	createRegister8(SPI::MOTORDIR, "motordir", &buffer.motordir);
-	createRegister8(SPI::OVERSAMPLING, "oversampling", &buffer.oversampling);
-	createRegister8(SPI::SAMPLESTAKEN, "samplestaken", &buffer.samplestaken);
+	createRegister16(SPI::MOTORDIR, "motordir", &buffer.motordir);
+	createRegister16(SPI::OVERSAMPLING, "oversampling", &buffer.oversampling);
+	createRegister16(SPI::SAMPLESTAKEN, "samplestaken", &buffer.samplestaken);
 
-	createRegister16(SPI::ACC, "acc", (uint16_t*)&buffer.acc);
+	createRegister16(SPI::ACC, "acc", &buffer.acc);
 
 	par_enabled = createParameter("enabled");
 
@@ -80,13 +81,6 @@ void SPI::calculateAfter() {
 		std::cerr << "Timeout on SPI bus during write, reset" << std::endl;
 		Pi2Mbed->set(1.0);
 	}
-}
-
-void SPI::createRegister8(RegisterID rid, const std::string& id, uint8_t* p)
-{
-	Parameter* par = createParameter(id);
-	reg8bit[par] = p;
-	id2par[rid]= par;
 }
 
 Parameter* SPI::getRegister(RegisterID rid)
@@ -140,12 +134,6 @@ void SPI::copyToParameters()
 		uint16_t* dest = iter->second;
 		*p = (double)*dest;
 	}
-
-	for (auto iter = reg8bit.begin(); iter!= reg8bit.end(); iter++) {
-		Parameter* p = iter->first;
-		uint8_t* dest = iter->second;
-		*p = (double)*dest;
-	}
 }
 
 void SPI::copyFromParameters()
@@ -159,13 +147,6 @@ void SPI::copyFromParameters()
 		uint16_t* dest = iter->second;
 		*dest = (uint16_t) *p;
 	}
-
-	for (auto iter = reg8bit.begin(); iter!= reg8bit.end(); iter++) {
-		Parameter* p = iter->first;
-		uint8_t* dest = iter->second;
-		*dest = (uint8_t) *p;
-	}
-
 }
 
 

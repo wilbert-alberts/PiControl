@@ -32,6 +32,7 @@ public:
 		HEIGHT2,
 		UBAT,
 		GYRO,
+		GYROREF,
 		ENCPOS,
 		PWM,
 		MOTORDIR,
@@ -46,22 +47,22 @@ private:
 	class SPIRegisters
 	{
 	public:
-		uint8_t height1[2];
-		uint8_t height2[2];
-		uint8_t ubat[2];
-		uint8_t gyro[2];
-		uint8_t encpos[2];
-		uint8_t pwm[2];
-		uint8_t motordir;
-		uint8_t oversampling;
-		uint8_t samplestaken;
-		uint8_t acc[2];
+		uint16_t height1;
+		uint16_t height2;
+		uint16_t ubat;
+		uint16_t gyro;
+		uint16_t gyroref;
+		uint16_t encpos;
+		uint16_t pwm;
+		uint16_t motordir;
+		uint16_t oversampling;
+		uint16_t samplestaken;
+		uint16_t acc;
 	};
 
 	SPIRegisters buffer;
 
 	std::map<Parameter*, uint16_t*>  reg16bit;
-	std::map<Parameter*, uint8_t*>   reg8bit;
 	std::map<RegisterID, Parameter*> id2par;
 
 	DigitalOut* Pi2Mbed;
@@ -70,7 +71,6 @@ private:
 	bool enabled;
 
 	void createRegister16(RegisterID rid, const std::string& id, uint16_t* p);
-	void createRegister8(RegisterID rid, const std::string& id, uint8_t* p);
 
 	void waitOnSignal(DigitalIn* in, double value, unsigned int timeoutInUs);
 	void copyFromParameters();

@@ -17,6 +17,7 @@
 
 class Parameter;
 class Filter;
+class HPFilter;
 
 class Device {
 public:
@@ -86,7 +87,7 @@ public:
 	virtual void readDevice(int f);
 private:
 	Device* rawDevice;
-	Filter* filter;
+	HPFilter* filter;
 };
 class Encoder : public Device
 {
@@ -129,19 +130,6 @@ private:
 };
 
 
-
-class D2Ang: public Device
-{
-public:
-	D2Ang(Device* d1, Device* d2);
-	virtual void readDevice(int f);
-	virtual void setSPI(SPI* spi);
-
-private:
-	Device* devH1;
-	Device* devH2;
-};
-
 class DDevice : public Device
 {
 public:
@@ -173,6 +161,18 @@ public:
 private:
 	Device* d;
 	double  i;
+};
+
+class DiffDevice: public Device
+{
+public:
+	DiffDevice(Device* d1, Device* d2);
+	virtual void readDevice(int f);
+	virtual void setSPI(SPI* spi);
+
+private:
+	Device* devD1;
+	Device* devD2;
 };
 
 class Devices: public ServoModule {

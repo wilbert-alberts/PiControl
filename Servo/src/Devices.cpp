@@ -26,8 +26,12 @@ Devices::Devices(ServoModule* other)
 	devices[ENCPOS_D] = new DDevice(devices[ENCPOS]);
 	devices[H1] = new GODevice(new SPIDevice("Dev.h1", SPI::HEIGHT1));
 	devices[H2] = new GODevice(new SPIDevice("Dev.h2", SPI::HEIGHT2));
-	devices[HEIGHT] = new LPFDevice(new D2Ang(devices[H1], devices[H2]));
-	devices[GYRO] = new LPFDevice(new GODevice(new SPIDevice("Dev.gyro", SPI::GYRO)));
+	devices[HEIGHT] = new LPFDevice(new DiffDevice(devices[H1], devices[H2]));
+	devices[GYRO] = new HPFDevice(
+						new GODevice(
+							new DiffDevice(
+								new SPIDevice("Dev.gyro", SPI::GYRO),
+								new SPIDevice("Dev.gyroref", SPI::GYROREF))));
 	devices[ACC] = new GODevice(new SPIDevice("Dev.acc", SPI::ACC));
 	devices[UBAT] = new SPIDevice("Dev.ubat", SPI::UBAT);
 	devices[DC] = new DutyCycle(SPI::PWM, SPI::MOTORDIR);
@@ -153,9 +157,9 @@ void LPFDevice::readDevice(int f)
 }
 
 HPFDevice::HPFDevice(Device* raw)
-: Device(raw->getID() + ".lpf")
+: Device(raw->getID() + ".hpf")
 , rawDevice(raw)
-, filter(new Filter(getID() + ".filter" ,3))
+, filter(new HPFilter(getID() + ".filter" ,3))
 {
 };
 
@@ -224,26 +228,28 @@ void SPIDevice::readDevice(int /*f*/)
 	*value = *spiH;
 }
 
-D2Ang::D2Ang(Device* d1, Device* d2)
-: Device("Dev.heightAngle")
-, devH1(d1)
-, devH2(d2)
+DiffDevice::DiffDevice(Device* d1, Device* d2)
+: Device(d1->getID() + std::string("_") + d2->getID()+ std::string(".diff"))
+, devD1(d1)
+, devD2(d2)
 {
 }
 
-void D2Ang::setSPI(SPI* spi)
+void DiffDevice::setSPI(SPI* spi)
 {
-	devH1->setSPI(spi);
-	devH2->setSPI(spi);
+	devD1->setSPI(spi);
+	devD2->setSPI(spi);
 }
 
-void D2Ang::readDevice(int f)
+void DiffDevice::readDevice(int f)
 {
-	devH1->read(f);
-	devH2->read(f);
+	devD1->read(f);
+	devD2->read(f);
 
-	*value = *devH1 - *devH1;
+	*value = *devD1 - *devD2;
 }
+
+
 
 DDevice::DDevice(Device* _d)
 : Device(_d->getID()+std::string(".D"))
