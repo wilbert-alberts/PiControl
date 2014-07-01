@@ -19,6 +19,9 @@ class HPFilter;
 
 #include "ServoModule.h"
 
+class Parameter;
+class Device;
+
 class Controller : public ServoModule{
 public:
 	Controller(ServoModule* pre);
@@ -26,83 +29,49 @@ public:
 
 	void calculateAfter();
 
-	void setDevices(Devices* devs) {
-		this->devs = devs;
-	}
+	void setDevices(Devices* devs);
 
 	void setMotor(Motor* motor) {
 		this->motor = motor;
 	}
 
 private:
-	void calculateModel();
-	bool mmdcSafe();
-	void disableController();
-	double filterDevice(Filter* f, double i);
-	double filterDevice(HPFilter* f, double i);
-	double doInject(double t);
+	void   calculateModel();
+	bool   mmdcSafe();
+	void   disableController();
+	double getFrequency();
 
 	static Controller* instance;
 
-	Parameter* enabled;
-	Parameter* pos_sp;
-	Parameter* pos_kp;
-	Parameter* pos_kd;
-	Parameter* pos_ki;
-	Parameter* ang_sp_kp;
-	Parameter* ang_sp;
-	Parameter* ang_kp;
-	Parameter* ang_kd;
-	Parameter* ang_ki;
-	Parameter* posErrorParam;
-	Parameter* angErrorParam;
-	Parameter* mmdcMinAng;
-	Parameter* mmdcMaxAng;
+	Parameter* par_enabled;
+	Devices*   devs;
+	Motor*     motor;
+	bool       updateActualPosition;
 
-	Parameter* co_poskp;
-	Parameter* co_poskd;
-	Parameter* co_poski;
-	Parameter* co_angkp;
-	Parameter* co_angkd;
-	Parameter* co_angki;
+	Parameter* par_alfa;
+	Parameter* par_alfa_dot;
 
-	Parameter* pos_raw;
-	Parameter* pos_flt;
+	Parameter* par_beta;
 
-	Parameter* ang_flt;
-	Parameter* ang_raw;
-	Parameter* vang_flt;
-	Parameter* vang_raw;
+	Parameter* par_x;
+	Parameter* par_x_dot;
 
-	Parameter* accAng_raw;
-	Parameter* accAng_flt;
+	Device*    dev_enc;
+	Device*    dev_enc_d;
 
-	Parameter* ang_mix;
-	Parameter* ang_mix_d1;
-	Parameter* ang_mix_d2;
+	Device*    dev_acc;
+	Device*    dev_gyro;
 
-	Filter* flt_acc;
-	Filter* flt_pos;
-	Filter* flt_ang;
-	Filter* flt_vang;
-	HPFilter* flt_vang_hpf;
+	Parameter* par_x_kp;
+	Parameter* par_x_kd;
+	Parameter* par_alfa_kp;
+	Parameter* par_alfa_kd;
 
-	std::default_random_engine generator;
-	std::normal_distribution<double> ndis;
-
-	Parameter* injAmpl;
-	Parameter* injFreq;
-	Parameter* noiseSample;
-
-	Motor* motor;
-	Devices* devs;
-
-	bool updateActualPosition;
-
-	double prevPosError;
-	double prevAngError;
-	double relPosOffset;
-	double sumError;
+	Parameter* par_out;
+	Parameter* par_out_x_kp;
+	Parameter* par_out_x_kd;
+	Parameter* par_out_alfa_kp;
+	Parameter* par_out_alfa_kd;
 
 };
 

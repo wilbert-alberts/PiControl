@@ -38,12 +38,16 @@ Motor::~Motor() {
 
 void Motor::setTorque(double tq) {
 	*t = tq;
-	//t->set(tq);
+}
+
+void Motor::setDC(double dc) {
+	*dutycycle = dc;
 }
 
 void Motor::calculateAfter() {
 	assert(devs!=0);
 
+#ifdef MOTORMODEL_NEEDED
 	// Calculate rotational velocity
 	double rvel = *devs->getDevice(Devices::ENCPOS_D);
 
@@ -68,4 +72,33 @@ void Motor::calculateAfter() {
 	else {
 		//devs->setDevice(Devices::dutycycle, 0.0);
 	}
+#endif
+
+#ifdef ALTERNATING_PULSE_TO_DETECT_DIRECTION_DEPENDENT_EFFECT
+	static int counter(0);
+	static int inc(1);
+	static int upper(1);
+	static int nrperiods(0);
+
+	if (counter >=upper) {
+		inc = -1;
+	}
+	if (counter < 0) {
+		inc = 1;
+		nrperiods++;
+		if (nrperiods==10) {
+			upper++;
+			nrperiods=0;
+		}
+	}
+	counter += inc;
+
+	*devs->getDevice(Devices::DC) = ((double)inc)/7.5;
+#endif
+
+	// Normalize dutycycle
+	if (*dutycycle > 1)  *dutycycle = 1.0;
+	if (*dutycycle < -1) *dutycycle = -1.0;
+
+	*devs->getDevice(Devices::DC) = *dutycycle;
 }

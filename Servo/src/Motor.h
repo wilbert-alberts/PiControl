@@ -23,6 +23,7 @@ public:
 	virtual ~Motor();
 
 	void setTorque(double torque);
+	void setDC(double dc);
 	void calculateAfter();
 
 	void setDevices(Devices* devs) {
@@ -37,12 +38,12 @@ private:
 	Parameter* nrIncrements;
 
 	Parameter* t;
+	Parameter* dutycycle;
 	Parameter* ki;
 	Parameter* kv;
 	Parameter* rm;
 
 	Parameter*  rotVelo;
-	Parameter*  dutycycle;
 
 	Parameter*  batVoltage;
 	Parameter*  motorCurrent;

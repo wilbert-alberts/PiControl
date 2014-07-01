@@ -17,70 +17,47 @@
 
 Controller::Controller(ServoModule* pre)
 : ServoModule("Controller", pre)
-, motor(0)
 , devs(0)
-, prevPosError(0.0)
-, prevAngError(0.0)
-, relPosOffset(0.0)
-, sumError(0.0)
+, motor(0)
+
+, par_alfa(createParameter("alfa"))
+, par_alfa_dot(createParameter("alfa_dot"))
+, par_beta(createParameter("beta"))
+, par_x(createParameter("x"))
+, par_x_dot(createParameter("x_dot"))
+
+, par_x_kp(createParameter("x_kp"))
+, par_x_kd(createParameter("x_kd"))
+, par_alfa_kp(createParameter("alfa_kp"))
+, par_alfa_kd(createParameter("alfa_kd"))
+
+, par_out(createParameter("out"))
+, par_out_x_kp(createParameter("out_x_kp"))
+, par_out_x_kd(createParameter("out_x_kd"))
+, par_out_alfa_kp(createParameter("out_alfa_kp"))
+, par_out_alfa_kd(createParameter("out_alfa_kd"))
+
+, par_enabled(createParameter("enabled"))
+
+, dev_enc(0)
+, dev_enc_d(0)
+, dev_acc(0)
+, dev_gyro(0)
 {
-	enabled = createParameter("enabled", 0);
-	pos_sp = createParameter("pos_sp", 0);
-	pos_kp = createParameter("pos_kp", 0);
-	pos_kd = createParameter("pos_kd", 0);
-	pos_ki = createParameter("pos_ki", 0);
-
-	ang_sp_kp = createParameter("ang_sp_kp", 0);
-
-	ang_sp = createParameter("ang_sp", 0);
-	ang_kp = createParameter("ang_kp", 0);
-	ang_kd = createParameter("ang_kd", 0);
-	ang_ki = createParameter("ang_ki", 0);
-
-	ang_mix = new Parameter("Controller.ang_mix", 0);
-	ang_mix_d1 = new Parameter("Controller.ang_mix_d1", 0);
-	ang_mix_d2 = new Parameter("Controller.ang_mix_d2", 0);
-
-	angErrorParam = createParameter("angError", 0);
-	posErrorParam = createParameter("posError", 0);
-
-	co_poskp = createParameter("co_poskp", 0);
-	co_poskd = createParameter("co_poskd", 0);
-	co_poski = createParameter("co_poski", 0);
-	co_angkp = createParameter("co_angkp", 0);
-	co_angkd = createParameter("co_angkd", 0);
-	co_angki = createParameter("co_angki", 0);
-
-	vang_flt = createParameter("angV_flt", 0);
-	ang_flt  = createParameter("ang_flt", 0);
-
-	vang_raw = createParameter("angV_raw", 0);
-	ang_raw  = createParameter("ang_raw", 0);
-
-	accAng_raw = new Parameter("Controller.accAng_raw",0);
-	accAng_flt = new Parameter("Controller.accAng_flt",0);
-
-	pos_flt  = new Parameter("Controller.pos_flt", 0);
-	pos_raw  = new Parameter("Controller.pos_raw", 0);
-
-	mmdcMinAng = new Parameter("Controller.minAng", -100);
-	mmdcMaxAng = new Parameter("Controller.maxAng",  100);
-
-	injAmpl = createParameter("inj_ampl", 0.0);
-	injFreq = createParameter("inj_freq", 0.5);
-	noiseSample = createParameter("noise", 0.0);
-
-	flt_pos = new Filter("pos", 3);
-	flt_ang = new Filter("ang", 3);
-	flt_vang = new Filter("gyro", 3);
-	flt_vang_hpf = new HPFilter("gyro_hpf", 3);
-	flt_acc = new Filter("acc", 3);
-
 	updateActualPosition = true;
 }
 
 Controller::~Controller() {
 	// TODO Auto-generated destructor stub
+}
+
+void Controller::setDevices(Devices* devs) {
+	this->devs = devs;
+	dev_gyro = devs->getDevice(Devices::GYRO);
+	dev_acc = devs->getDevice(Devices::ACC);
+	dev_enc = devs->getDevice(Devices::ENCPOS);
+	dev_enc_d = devs->getDevice(Devices::ENCPOS_D);
+
 }
 
 void Controller::calculateAfter() {
@@ -99,180 +76,94 @@ void Controller::calculateAfter() {
 
 bool Controller::mmdcSafe()
 {
-	if (*enabled==0.0)
+	if (*par_enabled==0.0)
 		return true;
 
-	//double ang = devs->getDeviceValue(Devices::angle);
-	double ang = *ang_mix;
+#warning Implement MMDC safe
 
-	return ((ang >= *mmdcMinAng) &&
-	        (ang <= *mmdcMaxAng));
+	return true;
 }
 
 void Controller::disableController()
 {
 	motor->setTorque(0.0);
-	*enabled = 0.0;
+	*par_enabled = 0.0;
 	updateActualPosition = true;
+}
+
+double Controller::getFrequency()
+{
+	int par_idx = Parameter::findParameter("CmdUpdateFrequency.frequency");
+
+	return Parameter::getByIdx(par_idx);
 }
 
 void Controller::calculateModel()
 {
-	double tq(0.0);
-	double pos(0.0);
-	double posError(0.0);
-	double posVError(0.0);
-	double angError(0.0);
-	double angVError(0.0);
+	static double alfa(0.0);
+	static double t1(0.0);
+	static double t2(0.0);
+	static double freq(1.0);
+	static double c1(0.0);
+	static double c2(0.0);
+	static double x_offset;
+	static double x;
+	static double x_dot;
 
-	double ang(0.0);
-	double angV1(0.0);
-	double angV2(0.0);
-	double angV3(0.0);
-
-	static double am_d1(0.0);
-	static double am_d2(0.0);
-	static double am(0.0);
-	static double am_i(0.0);
-
-
-	// Get position from device.
-	pos = *devs->getDevice(Devices::ENCPOS);
-	*pos_raw = pos;
-	//pos = filterDevice(flt_pos, pos);
-	*pos_flt = pos;
+	double kpx(0.0);
+	double kdx(0.0);
+	double kpa(0.0);
+	double kda(0.0);
+	double out(0.0);
 
 	if (updateActualPosition) {
 		// Get actual position from Devices
-		sumError = 0;
-		prevPosError = 0;
-		prevAngError = 0;
-		relPosOffset = pos;
 		updateActualPosition = false;
-		am_i=0.0;
+		freq = getFrequency();
+		alfa = 0.0;
+		x_offset = *dev_enc;
 	}
 
-	// Determine position error
-	posError = *pos_sp - (pos - relPosOffset);
-	posVError = (posError - prevPosError);
+	// Todo: move this inside updateActualPosition
+	freq = getFrequency();
 
-	// Determine setpoint for angle.
-	*ang_sp = posError * *ang_sp_kp;
+	t1 = *dev_acc * (1.0 - *par_beta);
 
-	// Limit angle setpoint between -1 and 1 degree
-	if (*ang_sp <-1) *ang_sp = -1;
-	if (*ang_sp > 1) *ang_sp =  1;
+	c1 = *dev_gyro * 1.0/freq;
+	c2 = alfa + c1;
+	t2 = c2 * (*par_beta);
 
-	// Get angle from height sensor
-//	ang = devs->getDeviceValue(Devices::angle);
-//	ang_raw->set(ang);
-//	ang = filterDevice(flt_ang, ang);
-//	ang_flt->set(ang);
+	alfa = t1 + t2;
 
-	// Get angle from Device
-	ang = *devs->getDevice(Devices::HEIGHT);
-	*ang_raw = ang;
-	//ang = filterDevice(flt_ang, ang);
-	*ang_flt = ang;
+	*par_alfa = alfa;
+	*par_alfa_dot = *dev_gyro;
 
-	// Determine angle error
-	angError = *ang_sp - ang;
-	angVError = (angError - prevAngError);
+	x = *dev_enc - x_offset;
+	x_dot = *dev_enc_d;
 
-	// Get angular velocity from gyro Device
-	angV1 = *devs->getDevice(Devices::GYRO);
-	*vang_raw = angV1;
-	angV2 = filterDevice(flt_vang_hpf, angV1);
-	angV3 = filterDevice(flt_vang, angV2);
-	*vang_flt = angV3;
+	*par_x = x;
+	*par_x_dot = x_dot;
 
-	// Determine mixed angle
-	am_d1 = am_d1 + angV2 / 100.0;
-	am_d2 = ang;
-	am = 0.98*(am + angV2 / 100.0) + 0.02*am_d2;
-	am_i = am_i + am/100.0;
+	// Calculate PID for alfa and x
 
-	*ang_mix_d1 = am_d1 ;
-	*ang_mix_d2 = am_d2 ;
-	*ang_mix    = am ;
+	kpx = *par_x_kp * x;
+	kdx = *par_x_kd * x_dot;
+	kpa = *par_alfa_kp * alfa;
+	kda = *par_alfa_kd * (*dev_gyro);
 
+	out = kpx + kdx + kpa + kda;
 
-	// Determine integrated position error
-	sumError += posError;
-	if ((posError > 0 && prevPosError < 0)
-			|| (posError < 0 && prevPosError > 0))
-		sumError = 0;
+	*par_out = out;
+	*par_out_x_kp = kpx;
+	*par_out_x_kd = kdx;
+	*par_out_alfa_kp = kpa;
+	*par_out_alfa_kd = kda;
 
-
-	// Store individual controller contributions
-	*co_poskp = *pos_kp * posError;
-	*co_poskd = *pos_kd * posVError;
-	*co_poski = *pos_ki * sumError;
-
-	*co_angkp = *ang_kp * (*ang_mix);
-	*co_angkd = *ang_kd * angV3;
-	*co_angki = ang_ki->get() * am_i;
-
-
-	// Calculate final torque
-	tq = (pos_kp->get() * posError +
-          pos_kd->get() * posVError +
-		  pos_ki->get() * sumError +
-		  ang_kp->get() * am +
-		  ang_kd->get() * angV3 +
-		  ang_ki->get() * am_i);
-
-	if ((tq<0) && (tq>-40))
-		tq = -40;
-	if ((tq>0) && (tq<35))
-		tq = 35;
-
-	// Inject noise
-	//tq = doInject(tq);
-
-	// Perform safety check
-	if (!mmdcSafe())
-	{
-		disableController();
-		return;
+	if (*par_enabled!=0.0) {
+		motor->setDC(out);
 	}
-
-
-	// Set torque.
-	if (*enabled != 0.0) {
-		motor->setTorque(tq);
-
-		prevPosError = posError;
-		prevAngError = angError;
-
-	} else {
-		//motor->setTorque(0.0);
+	else {
 		updateActualPosition = true;
 	}
-
-	*posErrorParam = posError;
-	*angErrorParam = angError;
-
 }
 
-
-double Controller::doInject(double t) {
-	double sample = ndis(generator);
-
-	*noiseSample = sample;
-
-	if (sample < *injFreq) return t - *injAmpl;
-	if (sample > *injFreq) return t + *injAmpl;
-	return t;
-}
-
-
-double Controller::filterDevice(Filter* f, double i)
-{
-	return f->calculate(i);
-}
-
-double Controller::filterDevice(HPFilter* f, double i)
-{
-	return f->calculate(i);
-}
