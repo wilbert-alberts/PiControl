@@ -132,7 +132,7 @@ void GODevice::setSPI(SPI* spi)
 
 void GODevice::readDevice(int f)
 {
-	rawDevice->read(f);
+	rawDevice->readDevice(f);
 	*value = *rawDevice* (*gain) + (*offset);
 }
 
@@ -189,16 +189,24 @@ void Encoder::setSPI(SPI* spi)
 	spiPos = spi->getRegister(spiReg);
 }
 
-void Encoder::readDevice(int /*f*/) {
-	unsigned int rawpos = static_cast<unsigned int>(*spiPos);
+void Encoder::readDevice(int /*f*/)
+{
+	static double       v(0.0);
+	static unsigned int rawPos;
+	static unsigned int prevPos(0);
+
+	rawPos = static_cast<unsigned int>(*spiPos);
+
 
 	// Mask relevant bits
-	rawpos = rawpos & 0x0fff; // 12 bits
+	rawPos = rawPos & 0x0fff; // 12 bits
 	// determine delta w.r.t. previous sample;
-	int delta = rawpos - *prevSpiPos;
+	int delta = rawPos - prevPos;
+
 	// store new value for prevRawPos
-	*prevSpiPos = rawpos;
-		// Correct for over/underruns
+	prevPos = rawPos;
+
+	// Correct for over/underruns
 	if (delta > *nrIncrements/ 2) {
 		delta -= *nrIncrements;
 	} else {
@@ -206,8 +214,12 @@ void Encoder::readDevice(int /*f*/) {
 			delta += *nrIncrements;
 		}
 	}
+
 	// Update encoder position
-	*value = *value + (double)delta;
+	v = v + (double)delta;
+	*value = v;
+
+	*prevSpiPos = prevPos;
 }
 
 SPIDevice::SPIDevice(const std::string& id, SPI::RegisterID  spiRegister)
@@ -270,7 +282,7 @@ void DDevice::readDevice(int f)
 	d->readDevice(f);
 
 	n = *d;
-	*value = n - prev;
+	*value = (n - prev)*f;
 	prev = n;
 }
 

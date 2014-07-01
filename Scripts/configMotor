@@ -3,15 +3,25 @@
 
 source ./environment.sh
 
+# Note: offset is added after multiplication with gain
+#       Changing gain must be followed by changing offset.
+
+
 $TERMINAL CmdUpdateFrequency.frequency 100
 
+$TERMINAL Dev.Encoder.nrIncrements 4096
+
 $TERMINAL Dev.acc.go.gain    0.0033674684
-$TERMINAL Dev.acc.go.offset -122.8
+$TERMINAL Dev.acc.go.offset -123.4
 
 $TERMINAL Dev.gyro_Dev.gyroref.diff.go.gain   -0.012
-$TERMINAL Dev.gyro_Dev.gyroref.diff.go.offset -7.98
+$TERMINAL Dev.gyro_Dev.gyroref.diff.go.offset -7.0
+
+$TERMINAL Dev.Encoder.go.gain 0.00002262443
 
 $TERMINAL cfgFilter Dev.gyro_Dev.gyroref.diff.go.hpf.filter 0.1 0.7
+
+$TERMINAL Controller.beta 0.98
 
 
 $TERMINAL SPI.enabled 1
@@ -19,14 +29,6 @@ $TERMINAL SPI.enabled 1
 exit 0
 
 
-
-$TERMINAL Dev.posGain 0.00002262443
-
-$TERMINAL Dev.angleGain 0.0003870809
-$TERMINAL Dev.angleOffset -0.4
-
-# Note: offset is added after multiplication with gain
-#       Changing gain must be followed by changing offset.
 
 
 $TERMINAL Motor.ki 0.033
