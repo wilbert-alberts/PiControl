@@ -1,0 +1,14 @@
+
+#!/bin/bash
+
+source ./environment.sh
+
+$TERMINAL addTrace Controller.alfa
+$TERMINAL addTrace Controller.x
+
+$TERMINAL addTrace Controller.out_x_kp
+$TERMINAL addTrace Controller.out_x_kd
+$TERMINAL addTrace Controller.out_alfa_kp
+$TERMINAL addTrace Controller.out_alfa_kd
+
+

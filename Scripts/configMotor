@@ -23,8 +23,17 @@ $TERMINAL cfgFilter Dev.gyro_Dev.gyroref.diff.go.hpf.filter 0.1 0.7
 
 $TERMINAL Controller.beta 0.98
 
+$TERMINAL Controller.x_kp -2
+$TERMINAL Controller.x_kd 0
+$TERMINAL Controller.alfa_kp      -0.05
+$TERMINAL Controller.alfa_kd      -0.004
+
 
 $TERMINAL SPI.enabled 1
+
+$TERMINAL Controller.enabled 0
+sleep 0.5
+$TERMINAL Controller.enabled 1
 
 exit 0
 
