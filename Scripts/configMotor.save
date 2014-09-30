@@ -1,0 +1,44 @@
+
+#!/bin/bash
+
+source ./environment.sh
+
+$TERMINAL PeriodicTimer.frequency 100
+
+$TERMINAL Dev.posGain 0.00002262443
+
+#Note SPI.Height2 seems to be broken.
+$TERMINAL Dev.h2Ang_gain 0.0
+
+$TERMINAL Dev.angleGain 0.0003870809
+$TERMINAL Dev.angleOffset -0.4
+
+# Note: offset is added after multiplication with gain
+#       Changing gain must be followed by changing offset.
+$TERMINAL Dev.gyroGain -0.012
+$TERMINAL Dev.gyroOffset -7.98
+
+$TERMINAL Dev.accGain 0.0033674684
+$TERMINAL Dev.accOffset -122.535
+
+
+$TERMINAL Motor.ki 0.033
+$TERMINAL Motor.kv 0.033
+$TERMINAL Motor.rm 4.72
+
+$TERMINAL Dev.oversampling 11
+$TERMINAL SPI.oversampling 11
+
+$TERMINAL SPI.enabled 1
+
+$TERMINAL cfgFilter ang 60 0.7
+$TERMINAL cfgFilter acc 6 0.7
+$TERMINAL cfgFilter pos 60 0.7
+$TERMINAL cfgFilter gyro 60 0.7
+$TERMINAL cfgFilter gyro_hpf 0.1 0.7
+
+$TERMINAL Traces.streaming 1
+
+
+$TERMINAL dumpParameters
+

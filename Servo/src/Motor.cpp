@@ -5,6 +5,8 @@
  *      Author: wilbert
  */
 
+#define Dont_ALTERNATING_PULSE_TO_DETECT_DIRECTION_DEPENDENT_EFFECT
+
 #include "Motor.h"
 #include "Parameter.h"
 #include "SPI.h"
@@ -80,20 +82,33 @@ void Motor::calculateAfter() {
 	static int upper(1);
 	static int nrperiods(0);
 
+	// If end of positive period is reached, start negative period.
 	if (counter >=upper) {
 		inc = -1;
 	}
+	// If end of negative period is reached, start new positive period
 	if (counter < 0) {
 		inc = 1;
+		// Count the number of periods.
 		nrperiods++;
-		if (nrperiods==10) {
-			upper++;
+
+		// Check whether period length should be changed
+		if (nrperiods>25/upper) {
+			// Reset period counter
 			nrperiods=0;
+
+			// Increase period length
+			upper+=1;
+
+			// Check whether max period length has been achieved.
+			// If so, start with minimal period length.
+			if (upper == 30)
+				upper = 1;
 		}
 	}
 	counter += inc;
-
-	*devs->getDevice(Devices::DC) = ((double)inc)/7.5;
+	((double)inc)/7.5;
+	*dutycycle = ((double)inc)/7.5;
 #endif
 
 	// Normalize dutycycle

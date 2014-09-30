@@ -22,20 +22,26 @@ Controller::Controller(ServoModule* pre)
 
 , par_alfa(createParameter("alfa"))
 , par_alfa_dot(createParameter("alfa_dot"))
+, par_alfa_int(createParameter("alfa_int"))
 , par_beta(createParameter("beta"))
 , par_x(createParameter("x"))
 , par_x_dot(createParameter("x_dot"))
+, par_x_int(createParameter("x_int"))
 
 , par_x_kp(createParameter("x_kp"))
 , par_x_kd(createParameter("x_kd"))
+, par_x_ki(createParameter("x_ki"))
 , par_alfa_kp(createParameter("alfa_kp"))
 , par_alfa_kd(createParameter("alfa_kd"))
+, par_alfa_ki(createParameter("alfa_ki"))
 
 , par_out(createParameter("out"))
 , par_out_x_kp(createParameter("out_x_kp"))
 , par_out_x_kd(createParameter("out_x_kd"))
+, par_out_x_ki(createParameter("out_x_ki"))
 , par_out_alfa_kp(createParameter("out_alfa_kp"))
 , par_out_alfa_kd(createParameter("out_alfa_kd"))
+, par_out_alfa_ki(createParameter("out_alfa_ki"))
 
 , par_enabled(createParameter("enabled"))
 
@@ -107,13 +113,17 @@ void Controller::calculateModel()
 	static double c1(0.0);
 	static double c2(0.0);
 	static double x_offset;
-	static double x;
-	static double x_dot;
+	static double x(0.0);
+	static double x_dot(0.0);
+	static double x_int(0.0);
+	static double alfa_int(0.0);
 
 	double kpx(0.0);
 	double kdx(0.0);
+	double kix(0.0);
 	double kpa(0.0);
 	double kda(0.0);
+	double kia(0.0);
 	double out(0.0);
 
 	if (updateActualPosition) {
@@ -122,6 +132,8 @@ void Controller::calculateModel()
 		freq = getFrequency();
 		alfa = 0.0;
 		x_offset = *dev_enc;
+		alfa_int = 0.0;
+		x_int=0.0;
 	}
 
 	// Todo: move this inside updateActualPosition
@@ -144,20 +156,27 @@ void Controller::calculateModel()
 	*par_x = x;
 	*par_x_dot = x_dot;
 
-	// Calculate PID for alfa and x
+	alfa_int = 0.99999*alfa_int + alfa;
+	*par_alfa_int = alfa_int;
+	x_int = 0.99999*x_int + x;
+	*par_x_int = x_int;
 
+	// Calculate PID for alfa and x
 	kpx = *par_x_kp * x;
 	kdx = *par_x_kd * x_dot;
+	kix = *par_x_ki * x_int;
 	kpa = *par_alfa_kp * alfa;
-	kda = *par_alfa_kd * (*dev_gyro);
-
-	out = kpx + kdx + kpa + kda;
+	kda = *par_alfa_kd * (*par_alfa_dot);
+	kia = *par_alfa_ki * (*par_alfa_int);
+	out = -(kpx + kdx + kpa + kda + kia + kix);
 
 	*par_out = out;
 	*par_out_x_kp = kpx;
 	*par_out_x_kd = kdx;
+	*par_out_x_ki = kix;
 	*par_out_alfa_kp = kpa;
 	*par_out_alfa_kd = kda;
+	*par_out_alfa_ki = kia;
 
 	if (*par_enabled!=0.0) {
 		motor->setDC(out);

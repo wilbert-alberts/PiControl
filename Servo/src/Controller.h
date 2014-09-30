@@ -50,11 +50,13 @@ private:
 
 	Parameter* par_alfa;
 	Parameter* par_alfa_dot;
+	Parameter* par_alfa_int;
 
 	Parameter* par_beta;
 
 	Parameter* par_x;
 	Parameter* par_x_dot;
+	Parameter* par_x_int;
 
 	Device*    dev_enc;
 	Device*    dev_enc_d;
@@ -64,14 +66,18 @@ private:
 
 	Parameter* par_x_kp;
 	Parameter* par_x_kd;
+	Parameter* par_x_ki;
 	Parameter* par_alfa_kp;
 	Parameter* par_alfa_kd;
+	Parameter* par_alfa_ki;
 
 	Parameter* par_out;
 	Parameter* par_out_x_kp;
 	Parameter* par_out_x_kd;
+	Parameter* par_out_x_ki;
 	Parameter* par_out_alfa_kp;
 	Parameter* par_out_alfa_kd;
+	Parameter* par_out_alfa_ki;
 
 };
 

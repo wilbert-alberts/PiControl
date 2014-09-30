@@ -6,7 +6,6 @@ source ./environment.sh
 #       Changing gain must be followed by changing offset.
 
 
-# Do not change samplefrequency unless DDevice.readDevice has been fixed
 $TERMINAL CmdUpdateFrequency.frequency 100
 
 $TERMINAL Dev.Encoder.nrIncrements 4096
@@ -21,22 +20,15 @@ $TERMINAL Dev.Encoder.go.gain 0.00002262443
 
 $TERMINAL cfgFilter Dev.gyro_Dev.gyroref.diff.go.hpf.filter 0.1 0.7
 
-$TERMINAL Controller.beta 0.98
-
-$TERMINAL Controller.alfa_kp      0.3046
-$TERMINAL Controller.alfa_kd      0.0049
-$TERMINAL Controller.alfa_ki      0.7911
-
-$TERMINAL Controller.x_kp         0.0
-$TERMINAL Controller.x_kd 	      0.0
-$TERMINAL Controller.x_ki         0.0
+$TERMINAL addTrace Dev.DutyCycle.value
+$TERMINAL addTrace Controller.alfa
+$TERMINAL addTrace Controller.alfa_dot
+$TERMINAL addTrace Controller.x
+$TERMINAL addTrace Controller.x_dot
 
 
 $TERMINAL SPI.enabled 1
 
-$TERMINAL Controller.enabled 0
-sleep 0.5
-$TERMINAL Controller.enabled 1
 
 exit 0
 

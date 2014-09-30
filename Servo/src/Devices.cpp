@@ -282,7 +282,8 @@ void DDevice::readDevice(int f)
 	d->readDevice(f);
 
 	n = *d;
-	*value = (n - prev)*f;
+#warning replace 100 by real samplefrequency
+	*value = (n - prev)*100;
 	prev = n;
 }
 
