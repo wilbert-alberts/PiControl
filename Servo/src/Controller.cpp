@@ -156,9 +156,9 @@ void Controller::calculateModel()
 	*par_x = x;
 	*par_x_dot = x_dot;
 
-	alfa_int = 0.99999*alfa_int + alfa;
+	alfa_int = 0.99*alfa_int + alfa;
 	*par_alfa_int = alfa_int;
-	x_int = 0.99999*x_int + x;
+	x_int = 0.99*x_int + x;
 	*par_x_int = x_int;
 
 	// Calculate PID for alfa and x
@@ -182,6 +182,7 @@ void Controller::calculateModel()
 		motor->setDC(out);
 	}
 	else {
+		motor->setDC(0.0);
 		updateActualPosition = true;
 	}
 }

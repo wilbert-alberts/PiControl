@@ -2,6 +2,8 @@
 
 source ./environment.sh
 
+# THIS IS THE VERSIONS THAT REALLY BALANCED
+
 # Note: offset is added after multiplication with gain
 #       Changing gain must be followed by changing offset.
 
@@ -23,41 +25,17 @@ $TERMINAL cfgFilter Dev.gyro_Dev.gyroref.diff.go.hpf.filter 0.1 0.7
 
 $TERMINAL Controller.beta 0.98
 
-$TERMINAL Controller.alfa_kp      0.3046
-$TERMINAL Controller.alfa_kd      0.0049
-$TERMINAL Controller.alfa_ki      0.7911
+$TERMINAL Controller.alfa_kp      0.05
+$TERMINAL Controller.alfa_kd      0.003
+$TERMINAL Controller.alfa_ki      0.006
 
-$TERMINAL Controller.x_kp         0.0
-$TERMINAL Controller.x_kd 	      0.0
+$TERMINAL Controller.x_kp         -10
+$TERMINAL Controller.x_kd         -0.75
 $TERMINAL Controller.x_ki         0.0
-
 
 $TERMINAL SPI.enabled 1
 
 $TERMINAL Controller.enabled 0
 sleep 0.5
 $TERMINAL Controller.enabled 1
-
-exit 0
-
-
-
-
-$TERMINAL Motor.ki 0.033
-$TERMINAL Motor.kv 0.033
-$TERMINAL Motor.rm 4.72
-
-$TERMINAL Dev.oversampling 11
-$TERMINAL SPI.oversampling 11
-
-$TERMINAL cfgFilter ang 60 0.7
-$TERMINAL cfgFilter acc 6 0.7
-$TERMINAL cfgFilter pos 60 0.7
-$TERMINAL cfgFilter gyro 60 0.7
-$TERMINAL cfgFilter gyro_hpf 0.1 0.7
-
-$TERMINAL Traces.streaming 1
-
-
-$TERMINAL dumpParameters
 

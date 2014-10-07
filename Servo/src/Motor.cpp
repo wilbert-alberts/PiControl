@@ -107,8 +107,7 @@ void Motor::calculateAfter() {
 		}
 	}
 	counter += inc;
-	((double)inc)/7.5;
-	*dutycycle = ((double)inc)/7.5;
+	*dutycycle = *dutycycle  + ((double)inc)/15;
 #endif
 
 	// Normalize dutycycle
