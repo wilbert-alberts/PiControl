@@ -13,3 +13,5 @@ alias freq1="$TERMINAL PeriodicTimer.frequency 1"
 alias freq100="$TERMINAL PeriodicTimer.frequency 100"
 alias setPWM="$TERMINAL Dev.dutycycle"
 alias setTorque="$TERMINAL Motor.enabled 1 && $TERMINAL Motor.torque"
+alias qs="./qs"
+

@@ -17,6 +17,11 @@ class HPFilter;
 #include <list>
 #include <random>
 
+#include "ReflexxesAPI.h"
+#include <RMLPositionFlags.h>
+#include <RMLPositionInputParameters.h>
+#include <RMLPositionOutputParameters.h>
+
 #include "ServoModule.h"
 
 class Parameter;
@@ -37,11 +42,19 @@ public:
 
 private:
 	void   calculateModel();
+	void   calculateSetpoint();
+	void   resetSPG();
 	bool   mmdcSafe();
 	void   disableController();
 	double getFrequency();
 
 	static Controller* instance;
+
+	ReflexxesAPI* RML;
+    RMLPositionInputParameters  *IP;
+	RMLPositionOutputParameters *OP;
+
+
 
 	Parameter* par_enabled;
 	Devices*   devs;
@@ -78,6 +91,12 @@ private:
 	Parameter* par_out_alfa_kp;
 	Parameter* par_out_alfa_kd;
 	Parameter* par_out_alfa_ki;
+
+	Parameter* par_reference;
+	Parameter* par_target;
+
+	Parameter* par_maxV;
+	Parameter* par_maxA;
 
 };
 

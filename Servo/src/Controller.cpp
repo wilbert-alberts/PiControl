@@ -15,8 +15,19 @@
 #include "Filter.h"
 #include "PeriodicTimer.h"
 
+#include <ReflexxesAPI.h>
+#include <RMLPositionFlags.h>
+#include <RMLPositionInputParameters.h>
+#include <RMLPositionOutputParameters.h>
+
 Controller::Controller(ServoModule* pre)
 : ServoModule("Controller", pre)
+, RML(new ReflexxesAPI(1, 1.0/100))
+, IP(new  RMLPositionInputParameters(1))
+, OP(new RMLPositionOutputParameters(1))
+
+, par_enabled(createParameter("enabled"))
+
 , devs(0)
 , motor(0)
 
@@ -43,14 +54,19 @@ Controller::Controller(ServoModule* pre)
 , par_out_alfa_kd(createParameter("out_alfa_kd"))
 , par_out_alfa_ki(createParameter("out_alfa_ki"))
 
-, par_enabled(createParameter("enabled"))
-
 , dev_enc(0)
 , dev_enc_d(0)
 , dev_acc(0)
 , dev_gyro(0)
+
+, par_reference(createParameter("reference"))
+, par_target(createParameter("target"))
+
+, par_maxA(createParameter("maxA"))
+, par_maxV(createParameter("maxV"))
 {
 	updateActualPosition = true;
+	std::cerr << "Construction Controller" << std::endl;
 }
 
 Controller::~Controller() {
@@ -72,6 +88,7 @@ void Controller::calculateAfter() {
 
 	if (mmdcSafe())
 	{
+		calculateSetpoint();
 		calculateModel();
 	}
 	else
@@ -118,6 +135,8 @@ void Controller::calculateModel()
 	static double x_int(0.0);
 	static double alfa_int(0.0);
 
+	static double xMin1(0.0);
+
 	double kpx(0.0);
 	double kdx(0.0);
 	double kix(0.0);
@@ -134,6 +153,8 @@ void Controller::calculateModel()
 		x_offset = *dev_enc;
 		alfa_int = 0.0;
 		x_int=0.0;
+		xMin1 = 0.0;
+		resetSPG();
 	}
 
 	// Todo: move this inside updateActualPosition
@@ -150,8 +171,9 @@ void Controller::calculateModel()
 	*par_alfa = alfa;
 	*par_alfa_dot = *dev_gyro;
 
-	x = *dev_enc - x_offset;
-	x_dot = *dev_enc_d;
+	x = (*dev_enc - x_offset)-(*par_reference);
+	x_dot = (x - xMin1)*freq; //x_dot = *dev_enc_d;
+	xMin1 = x;
 
 	*par_x = x;
 	*par_x_dot = x_dot;
@@ -187,3 +209,37 @@ void Controller::calculateModel()
 	}
 }
 
+void Controller::calculateSetpoint()
+{
+	static double prevTarget(0.0);
+	static RMLPositionFlags flags;
+
+	if (prevTarget != *par_target) {
+		// Recalculate profile
+		IP->MaxVelocityVector->VecData[0] = *par_maxV;
+		IP->MaxAccelerationVector->VecData[0] = *par_maxA;
+		IP->TargetPositionVector->VecData[0] = *par_target;
+		prevTarget = *par_target;
+	}
+
+	RML->RMLPosition(*IP, OP, flags);
+    *IP->CurrentPositionVector      =   *OP->NewPositionVector      ;
+    *IP->CurrentVelocityVector      =   *OP->NewVelocityVector      ;
+    *IP->CurrentAccelerationVector  =   *OP->NewAccelerationVector  ;
+
+	*par_reference = OP->NewPositionVector->VecData[0];
+}
+
+void Controller::resetSPG()
+{
+	IP->CurrentPositionVector->VecData[0] = 0.0;
+	IP->CurrentVelocityVector->VecData[0] = 0.0;
+	IP->CurrentAccelerationVector->VecData[0] = 0.0;
+	IP->MaxVelocityVector->VecData[0] = *par_maxV;
+	IP->MaxAccelerationVector->VecData[0] = *par_maxA;
+	IP->MaxJerkVector->VecData[0] = 1;
+	IP->TargetPositionVector->VecData[0] = 0.0;
+	IP->TargetVelocityVector->VecData[0] = 0.0;
+	IP->SelectionVector->VecData[0] = true;
+
+}
